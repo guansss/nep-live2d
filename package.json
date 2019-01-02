@@ -1,0 +1,13 @@
+{
+  "name": "nep-live2d",
+  "version": "0.0.1",
+  "description": "Live2D wallpaper for Neptune",
+  "main": "index.js",
+  "repository": "https://github.com/guansss/nep-live2d.git",
+  "author": "guansss",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "pixi.js": "^4.8.4"
+  }
+}
