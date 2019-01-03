@@ -1,13 +1,36 @@
 {
   "name": "nep-live2d",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Live2D wallpaper for Neptune",
   "main": "index.js",
   "repository": "https://github.com/guansss/nep-live2d.git",
   "author": "guansss",
   "license": "MIT",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "test:unit": "vue-cli-service test:unit"
+  },
   "dependencies": {
     "lodash": "^4.17.11",
-    "pixi.js": "^4.8.4"
+    "pixi.js": "^4.8.4",
+    "vue": "^2.5.21"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.2.2",
+    "@vue/cli-plugin-eslint": "^3.2.2",
+    "@vue/cli-plugin-unit-jest": "^3.2.3",
+    "@vue/cli-service": "^3.2.3",
+    "@vue/eslint-config-prettier": "^4.0.1",
+    "@vue/test-utils": "^1.0.0-beta.28",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "^23.6.0",
+    "eslint": "^5.11.1",
+    "eslint-plugin-vue": "^5.1.0",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2",
+    "vue-template-compiler": "^2.5.21"
   }
 }
