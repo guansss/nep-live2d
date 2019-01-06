@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import Settings from './components/Settings';
+import Settings from './components/Settings/index';
 
 export default {
     name: 'app',
