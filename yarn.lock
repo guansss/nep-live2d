@@ -4865,6 +4865,10 @@ pixi-gl-core@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/pixi-gl-core/-/pixi-gl-core-1.1.4.tgz#8b4b5c433b31e419bc379dc565ce1b835a91b372"
 
+pixi-live2d@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/pixi-live2d/-/pixi-live2d-1.2.1.tgz#8fc554057e2e2786352a334fefad1eafe6f653b1"
+
 pixi.js@^4.8.4:
   version "4.8.4"
   resolved "https://registry.yarnpkg.com/pixi.js/-/pixi.js-4.8.4.tgz#364da0f814a7aea47b1f795a23b3d9ebddef3838"
@@ -5366,6 +5370,13 @@ raw-body@2.3.3:
     http-errors "1.6.3"
     iconv-lite "0.4.23"
     unpipe "1.0.0"
+
+raw-loader@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/raw-loader/-/raw-loader-1.0.0.tgz#3f9889e73dadbda9a424bce79809b4133ad46405"
+  dependencies:
+    loader-utils "^1.1.0"
+    schema-utils "^1.0.0"
 
 rc@^1.2.7:
   version "1.2.8"
