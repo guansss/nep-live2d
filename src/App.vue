@@ -7,17 +7,18 @@
 
 <script>
 import Settings from './components/Settings/index';
-import 'live2d.min.js';
 import * as PIXI from 'pixi.js';
 import 'pixi-live2d';
-import modelJson from 'raw-loader!live2d/neptune/normal.model.json';
+import {loadJSON} from '@/utils/net';
 
 export default {
     name: 'app',
     components: {
         Settings
     },
-    mounted() {
+    async mounted() {
+        const modelJson = await loadJSON('live2d/neptune/normal.model.json');
+
         const renderer = new PIXI.WebGLRenderer(800, 600);
         this.$refs.canvas.appendChild(renderer.view);
         const stage = new PIXI.Container();
