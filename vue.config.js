@@ -5,6 +5,7 @@ module.exports = {
     configureWebpack: {
         resolve: {
             alias: {
+                'pixi-live2d': path.resolve('pixi-live2d'),
                 PIXI: 'pixi.js'
             }
         }

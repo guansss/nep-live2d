@@ -8,7 +8,7 @@
 <script>
 import Settings from './components/Settings/index';
 import * as PIXI from 'pixi.js';
-import 'pixi-live2d';
+import 'pixi-live2d/src';
 import {loadJSON} from '@/utils/net';
 
 export default {
