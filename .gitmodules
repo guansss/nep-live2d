@@ -1,0 +1,3 @@
+[submodule "pixi-live2d"]
+	path = pixi-live2d
+	url = git@github.com:guansss/pixi-live2d.git
