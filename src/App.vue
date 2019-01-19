@@ -9,7 +9,6 @@
 import Settings from './components/Settings/index';
 import * as PIXI from 'pixi.js';
 import 'pixi-live2d/src';
-import {loadJSON} from '@/utils/net';
 
 export default {
     name: 'app',
@@ -17,7 +16,7 @@ export default {
         Settings
     },
     async mounted() {
-        const modelJson = await loadJSON('live2d/neptune/normal.model.json');
+        const modelJson = 'live2d/neptune/normal.model.json';
 
         const renderer = new PIXI.WebGLRenderer(800, 600);
         this.$refs.canvas.appendChild(renderer.view);
