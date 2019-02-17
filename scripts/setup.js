@@ -44,7 +44,9 @@ async function copyFiles(...filePairs) {
         console.log(chalk.green(to));
     }
 
-    await Promise.all(filePairs.map(([from, to]) => copyFile(from, to)));
+    for (const [from, to] of filePairs) {
+        await copyFile(from, to);
+    }
 }
 
 async function setupProjectJson() {
