@@ -3,9 +3,9 @@
  * @property {string} WALLPAPER_PATH - Path to the wallpaper directory
  */
 
-const chalk = require('chalk');
-const fs = require('fs');
-const vue$loadEnv = require('@vue/cli-service/lib/util/loadEnv');
+import chalk from 'chalk';
+import fs from 'fs';
+import vue$loadEnv from '@vue/cli-service/lib/util/loadEnv';
 
 const ENV_VARS = {
     WALLPAPER_PATH(v) {

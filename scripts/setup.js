@@ -1,8 +1,8 @@
-const path = require('path');
-const fs = require('fs');
-const readline = require('readline');
-const chalk = require('chalk');
-const loadEnv = require('./load-env');
+import path from 'path';
+import fs from 'fs';
+import readline from 'readline';
+import chalk from 'chalk';
+import loadEnv from './load-env';
 
 /** @type {ENV} */
 const env = loadEnv();
