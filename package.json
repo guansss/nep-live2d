@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.11",
-    "pixi.js": "^4.8.4",
+    "pixi.js": "^5.0.0-rc.2",
     "raw-loader": "^1.0.0",
     "vue": "^2.5.21"
   },
