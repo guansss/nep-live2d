@@ -1,4 +1,4 @@
-import {logger} from '@/utils/log';
+import { logger } from '@/utils/log';
 
 const log = logger('net');
 
@@ -21,6 +21,4 @@ async function loadJSON(url) {
     }
 }
 
-export {
-    loadJSON
-};
+export { loadJSON };

@@ -9,8 +9,7 @@ import generateProjectJson from './project-json-generator';
 /** @type {ENV} */
 const env = loadEnv();
 
-if (!env)
-    throw 'Missing environment variables';
+if (!env) throw 'Missing environment variables';
 
 const rl = readline.createInterface(process.stdin, process.stdout);
 
@@ -62,8 +61,9 @@ async function setupProjectJson() {
 }
 
 async function confirm(message) {
-    const result = await new Promise(resolve => rl.question(message + ' [y]/n: ', resolve));
+    const result = await new Promise(resolve =>
+        rl.question(message + ' [y]/n: ', resolve)
+    );
 
-    if (result !== 'y')
-        throw 'Action canceled';
+    if (result !== 'y') throw 'Action canceled';
 }

@@ -50,6 +50,11 @@
       "parser": "babel-eslint"
     }
   },
+  "prettier": {
+    "printWidth": 120,
+    "tabWidth": 4,
+    "singleQuote": true
+  },
   "postcss": {
     "plugins": {
       "autoprefixer": {}

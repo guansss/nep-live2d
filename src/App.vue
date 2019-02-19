@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <Settings/>
+        <Settings />
         <div ref="canvas"></div>
     </div>
 </template>
@@ -26,7 +26,7 @@ export default {
         stage.addChild(live2dSprite);
 
         live2dSprite.startRandomMotion('idle');
-        live2dSprite.on('mousemove', (evt) => {
+        live2dSprite.on('mousemove', evt => {
             const point = evt.data.global;
             live2dSprite.setViewPoint(point.x, point.y);
         });

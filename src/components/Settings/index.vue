@@ -1,7 +1,5 @@
 <template>
-    <div class="settings">
-        Settings
-    </div>
+    <div class="settings">Settings</div>
 </template>
 
 <script>
@@ -10,6 +8,4 @@ export default {
 };
 </script>
 
-<style scoped lang="stylus">
-
-</style>
+<style scoped lang="stylus"></style>

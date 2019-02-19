@@ -1,13 +1,13 @@
 const logs = [];
 
 function log(tag, ...messages) {
-    logs.push({tag, messages});
+    logs.push({ tag, messages });
 
     console.log(`[${tag}] `, ...messages);
 }
 
 function error(tag, ...messages) {
-    logs.push({tag, messages, error: true});
+    logs.push({ tag, messages, error: true });
 
     console.error(`[${tag}] `, ...messages);
 }
@@ -19,7 +19,4 @@ function logger(tag) {
     return _log;
 }
 
-export {
-    log,
-    logger
-};
+export { log, logger };

@@ -9,8 +9,7 @@ import vue$loadEnv from '@vue/cli-service/lib/util/loadEnv';
 
 const ENV_VARS = {
     WALLPAPER_PATH(v) {
-        if (!fs.lstatSync(v).isDirectory())
-            throw 'Path is not a directory';
+        if (!fs.lstatSync(v).isDirectory()) throw 'Path is not a directory';
     }
 };
 
@@ -39,7 +38,12 @@ function loadEnv() {
     });
 
     if (!checkPassed) {
-        console.log(chalk.bgRed.black(' CHECK ENV FAILED '), 'Pleas check your', chalk.bold('.env.local'), 'file');
+        console.log(
+            chalk.bgRed.black(' CHECK ENV FAILED '),
+            'Pleas check your',
+            chalk.bold('.env.local'),
+            'file'
+        );
     } else {
         console.log(chalk.bgGreen.black(' CHECK ENV PASSED '));
         return env;
