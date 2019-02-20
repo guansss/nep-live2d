@@ -13,7 +13,7 @@ import 'pixi-live2d/src';
 export default {
     name: 'app',
     components: {
-        Settings
+        Settings,
     },
     async mounted() {
         const modelJson = 'live2d/neptune/normal.model.json';
@@ -37,7 +37,7 @@ export default {
         }
 
         animate();
-    }
+    },
 };
 </script>
 <style lang="stylus">
