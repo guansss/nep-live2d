@@ -7,36 +7,18 @@
 
 <script>
 import Settings from './components/Settings/index';
-import * as PIXI from 'pixi.js';
-import 'pixi-live2d/src';
+import Mka from '@/core/mka';
+import * as players from '@/core/players';
 
 export default {
     name: 'app',
     components: {
         Settings,
     },
-    async mounted() {
-        const modelJson = 'live2d/neptune/normal.model.json';
+    created() {
+        const mka = new Mka(this.$refs.canvas);
 
-        const renderer = new PIXI.WebGLRenderer(800, 600);
-        this.$refs.canvas.appendChild(renderer.view);
-        const stage = new PIXI.Container();
-
-        const live2dSprite = new PIXI.Live2DSprite(modelJson);
-        stage.addChild(live2dSprite);
-
-        live2dSprite.startRandomMotion('idle');
-        live2dSprite.on('mousemove', evt => {
-            const point = evt.data.global;
-            live2dSprite.setViewPoint(point.x, point.y);
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            renderer.render(stage);
-        }
-
-        animate();
+        Object.entries(players).forEach(([name, player]) => mka.addPlayer(name, player));
     },
 };
 </script>
