@@ -20,9 +20,16 @@ export default {
         const mka = new Mka(this.$refs.canvas);
 
         Object.entries(players).forEach(([name, player]) => mka.addPlayer(name, player));
+
+        this.mka = mka;
     },
     mounted() {
         this.$refs.bg.src = '/image/bg_forest.jpg';
+    },
+    beforeDestroy() {
+        if (this.mka) {
+            this.mka.destroy();
+        }
     },
 };
 </script>

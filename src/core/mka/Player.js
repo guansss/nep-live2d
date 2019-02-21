@@ -1,32 +1,23 @@
 export default class Player {
+    enabled = true;
+    paused = false;
+
     /**
-     * @interface
      * @param {number} dt - Delta time
      */
     update(dt) {}
 
-    /**
-     * @interface
-     */
-    pause() {}
-
-    /**
-     * @interface
-     */
-    resume() {}
-
-    /**
-     * @interface
-     */
     attach() {}
 
-    /**
-     * @interface
-     */
+    enable() {}
+
+    resume() {}
+
+    pause() {}
+
+    disable() {}
+
     detach() {}
 
-    /**
-     * @interface
-     */
     destroy() {}
 }

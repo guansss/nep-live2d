@@ -1,5 +1,8 @@
 import Player from '@/core/mka/Player';
 import Live2DSprite from '@/core/pixi/Live2DSprite';
+import { logger } from '@/utils/log';
+
+const log = logger('Live2DPlayer');
 
 export default class Live2DPlayer extends Player {
     _sprites = [];
@@ -11,7 +14,9 @@ export default class Live2DPlayer extends Player {
     }
 
     /**
-     * @override
+     * @inheritDoc
      */
-    update(dt) {}
+    update(dt) {
+        log('Update ' + dt);
+    }
 }
