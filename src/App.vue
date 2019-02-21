@@ -1,7 +1,8 @@
 <template>
     <div id="app">
-        <Settings />
+        <Settings v-if="false" />
         <div ref="canvas"></div>
+        <img ref="bg" class="bg" src="" />
     </div>
 </template>
 
@@ -20,12 +21,26 @@ export default {
 
         Object.entries(players).forEach(([name, player]) => mka.addPlayer(name, player));
     },
+    mounted() {
+        this.$refs.bg.src = '/image/bg_forest.jpg';
+    },
 };
 </script>
 <style lang="stylus">
+*
+    box-sizing: border-box
+    margin: 0
+
 #app
-    font-family 'Avenir', Helvetica, Arial, sans-serif
-    -webkit-font-smoothing antialiased
-    -moz-osx-font-smoothing grayscale
-    color #333
+    height: 100vh
+    background-color: #333
+    color: #333
+    font-family: 'Avenir', Helvetica, Arial, sans-serif
+    -webkit-font-smoothing: antialiased
+    -moz-osx-font-smoothing: grayscale
+
+.bg
+    display: block
+    width: 100%
+    height: 100%
 </style>
