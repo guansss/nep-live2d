@@ -3,13 +3,13 @@ const logs = [];
 function log(tag, ...messages) {
     logs.push({ tag, messages });
 
-    console.log(`[${tag}] `, ...messages);
+    console.log(`[${tag}]`, ...messages);
 }
 
 function error(tag, ...messages) {
     logs.push({ tag, messages, error: true });
 
-    console.error(`[${tag}] `, ...messages);
+    console.error(`[${tag}]`, ...messages);
 }
 
 function logger(tag) {
