@@ -5,33 +5,29 @@ function LAppLive2DManager() {
     this.reloadFlg = false;
 
     Live2D.init();
-    Live2DFramework.setPlatformManager(new PlatformManager);
+    Live2DFramework.setPlatformManager(new PlatformManager());
 }
 
-LAppLive2DManager.prototype.createModel = function () {
-
+LAppLive2DManager.prototype.createModel = function() {
     var model = new LAppModel();
     this.models.push(model);
 
     return model;
 };
 
-
-LAppLive2DManager.prototype.loadModel = function (gl, path, callback) {
-//    l2dLog('load: ' + path);
+LAppLive2DManager.prototype.loadModel = function(gl, path, callback) {
+    //    l2dLog('load: ' + path);
     this.releaseModel(0, gl);
     this.createModel().load(gl, path, callback);
 };
 
-
-LAppLive2DManager.prototype.getModel = function (no) {
+LAppLive2DManager.prototype.getModel = function(no) {
     if (no >= this.models.length) return null;
 
     return this.models[no];
 };
 
-
-LAppLive2DManager.prototype.releaseModel = function (no, gl) {
+LAppLive2DManager.prototype.releaseModel = function(no, gl) {
     if (this.models.length <= no) return;
 
     this.models[no].release(gl);
@@ -40,60 +36,45 @@ LAppLive2DManager.prototype.releaseModel = function (no, gl) {
     this.models.splice(no, 1);
 };
 
-
-LAppLive2DManager.prototype.numModels = function () {
+LAppLive2DManager.prototype.numModels = function() {
     return this.models.length;
 };
 
-
-LAppLive2DManager.prototype.setDrag = function (x, y) {
+LAppLive2DManager.prototype.setDrag = function(x, y) {
     for (var i = 0; i < this.models.length; i++) {
         this.models[i].setDrag(x, y);
     }
 };
 
-
-LAppLive2DManager.prototype.maxScaleEvent = function () {
-    if (LAppDefine.DEBUG_LOG)
-        console.log('Max scale event.');
+LAppLive2DManager.prototype.maxScaleEvent = function() {
+    if (LAppDefine.DEBUG_LOG) console.log('Max scale event.');
     for (var i = 0; i < this.models.length; i++) {
-        this.models[i].startRandomMotion(LAppDefine.MOTION_GROUP_PINCH_IN,
-            LAppDefine.PRIORITY_NORMAL);
+        this.models[i].startRandomMotion(LAppDefine.MOTION_GROUP_PINCH_IN, LAppDefine.PRIORITY_NORMAL);
     }
 };
 
-
-LAppLive2DManager.prototype.minScaleEvent = function () {
-    if (LAppDefine.DEBUG_LOG)
-        console.log('Min scale event.');
+LAppLive2DManager.prototype.minScaleEvent = function() {
+    if (LAppDefine.DEBUG_LOG) console.log('Min scale event.');
     for (var i = 0; i < this.models.length; i++) {
-        this.models[i].startRandomMotion(LAppDefine.MOTION_GROUP_PINCH_OUT,
-            LAppDefine.PRIORITY_NORMAL);
+        this.models[i].startRandomMotion(LAppDefine.MOTION_GROUP_PINCH_OUT, LAppDefine.PRIORITY_NORMAL);
     }
 };
 
-
-LAppLive2DManager.prototype.tapEvent = function (x, y) {
-    if (LAppDefine.DEBUG_LOG)
-        console.log('tapEvent view x:' + x + ' y:' + y);
+LAppLive2DManager.prototype.tapEvent = function(x, y) {
+    if (LAppDefine.DEBUG_LOG) console.log('tapEvent view x:' + x + ' y:' + y);
 
     for (var i = 0; i < this.models.length; i++) {
-
         if (this.models[i].hitTest(LAppDefine.HIT_AREA_HEAD, x, y)) {
-
-            if (LAppDefine.DEBUG_LOG)
-                console.log('Tap face.');
+            if (LAppDefine.DEBUG_LOG) console.log('Tap face.');
 
             this.models[i].setRandomExpression();
-        }
-        else if (this.models[i].hitTest(LAppDefine.HIT_AREA_BODY, x, y) ||
-            this.models[i].hitTest(LAppDefine.HIT_AREA_BELLY, x, y)) {
+        } else if (
+            this.models[i].hitTest(LAppDefine.HIT_AREA_BODY, x, y) ||
+            this.models[i].hitTest(LAppDefine.HIT_AREA_BELLY, x, y)
+        ) {
+            if (LAppDefine.DEBUG_LOG) console.log('Tap body.' + ' models[' + i + ']');
 
-            if (LAppDefine.DEBUG_LOG)
-                console.log('Tap body.' + ' models[' + i + ']');
-
-            this.models[i].startRandomMotion(LAppDefine.MOTION_GROUP_TAP_BODY,
-                LAppDefine.PRIORITY_NORMAL);
+            this.models[i].startRandomMotion(LAppDefine.MOTION_GROUP_TAP_BODY, LAppDefine.PRIORITY_NORMAL);
         }
     }
 

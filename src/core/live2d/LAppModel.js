@@ -16,7 +16,7 @@ function LAppModel() {
 
 LAppModel.prototype = new L2DBaseModel();
 
-LAppModel.prototype.load = function (gl, modelSettingPath, callback) {
+LAppModel.prototype.load = function(gl, modelSettingPath, callback) {
     this.setUpdating(true);
     this.setInitialized(false);
 
@@ -26,31 +26,27 @@ LAppModel.prototype.load = function (gl, modelSettingPath, callback) {
 
     var thisRef = this;
 
-    this.modelSetting.loadModelSetting(modelSettingPath, function () {
-
+    this.modelSetting.loadModelSetting(modelSettingPath, function() {
         var path = parsePath(thisRef.modelHomeDir, thisRef.modelSetting.getModelFile());
-        thisRef.loadModelData(path, function (model) {
-
+        thisRef.loadModelData(path, function(model) {
             for (var i = 0; i < thisRef.modelSetting.getTextureNum(); i++) {
-
                 var texPaths = parsePath(thisRef.modelHomeDir, thisRef.modelSetting.getTextureFile(i));
 
-                thisRef.loadTexture(i, texPaths, function () {
-
+                thisRef.loadTexture(i, texPaths, function() {
                     if (thisRef.isTexLoaded) {
-
                         if (thisRef.modelSetting.getExpressionNum() > 0) {
-
                             thisRef.expressions = {};
 
                             for (var j = 0; j < thisRef.modelSetting.getExpressionNum(); j++) {
                                 var expName = thisRef.modelSetting.getExpressionName(j);
-                                var expFilePath = parsePath(thisRef.modelHomeDir, thisRef.modelSetting.getExpressionFile(j));
+                                var expFilePath = parsePath(
+                                    thisRef.modelHomeDir,
+                                    thisRef.modelSetting.getExpressionFile(j),
+                                );
 
                                 thisRef.loadExpression(expName, expFilePath);
                             }
-                        }
-                        else {
+                        } else {
                             thisRef.expressionManager = null;
                             thisRef.expressions = {};
                         }
@@ -66,10 +62,11 @@ LAppModel.prototype.load = function (gl, modelSettingPath, callback) {
                         }
 
                         if (thisRef.modelSetting.getPoseFile()) {
-                            thisRef.loadPose(parsePath(thisRef.modelHomeDir, thisRef.modelSetting.getPoseFile()),
-                                function () {
+                            thisRef.loadPose(
+                                parsePath(thisRef.modelHomeDir, thisRef.modelSetting.getPoseFile()),
+                                function() {
                                     thisRef.pose.updateParam(thisRef.live2DModel);
-                                }
+                                },
                             );
                         } else {
                             thisRef.pose = null;
@@ -77,46 +74,36 @@ LAppModel.prototype.load = function (gl, modelSettingPath, callback) {
 
                         thisRef.subtitles = [];
                         if (thisRef.modelSetting.getSubtitleFile())
-                            thisRef.loadSubtitles(parsePath(thisRef.modelHomeDir, thisRef.modelSetting.getSubtitleFile()));
+                            thisRef.loadSubtitles(
+                                parsePath(thisRef.modelHomeDir, thisRef.modelSetting.getSubtitleFile()),
+                            );
 
                         if (thisRef.modelSetting.getLayout()) {
                             var layout = thisRef.modelSetting.getLayout();
-                            if (layout['width'])
-                                thisRef.modelMatrix.setWidth(layout['width']);
-                            if (layout['height'])
-                                thisRef.modelMatrix.setHeight(layout['height']);
+                            if (layout['width']) thisRef.modelMatrix.setWidth(layout['width']);
+                            if (layout['height']) thisRef.modelMatrix.setHeight(layout['height']);
 
-                            if (layout['x'])
-                                thisRef.modelMatrix.setX(layout['x']);
-                            if (layout['y'])
-                                thisRef.modelMatrix.setY(layout['y']);
-                            if (layout['center_x'])
-                                thisRef.modelMatrix.centerX(layout['center_x']);
-                            if (layout['center_y'])
-                                thisRef.modelMatrix.centerY(layout['center_y']);
-                            if (layout['top'])
-                                thisRef.modelMatrix.top(layout['top']);
-                            if (layout['bottom'])
-                                thisRef.modelMatrix.bottom(layout['bottom']);
-                            if (layout['left'])
-                                thisRef.modelMatrix.left(layout['left']);
-                            if (layout['right'])
-                                thisRef.modelMatrix.right(layout['right']);
+                            if (layout['x']) thisRef.modelMatrix.setX(layout['x']);
+                            if (layout['y']) thisRef.modelMatrix.setY(layout['y']);
+                            if (layout['center_x']) thisRef.modelMatrix.centerX(layout['center_x']);
+                            if (layout['center_y']) thisRef.modelMatrix.centerY(layout['center_y']);
+                            if (layout['top']) thisRef.modelMatrix.top(layout['top']);
+                            if (layout['bottom']) thisRef.modelMatrix.bottom(layout['bottom']);
+                            if (layout['left']) thisRef.modelMatrix.left(layout['left']);
+                            if (layout['right']) thisRef.modelMatrix.right(layout['right']);
                         }
 
                         for (var j = 0; j < thisRef.modelSetting.getInitParamNum(); j++) {
-
                             thisRef.live2DModel.setParamFloat(
                                 thisRef.modelSetting.getInitParamID(j),
-                                thisRef.modelSetting.getInitParamValue(j)
+                                thisRef.modelSetting.getInitParamValue(j),
                             );
                         }
 
                         for (var j = 0; j < thisRef.modelSetting.getInitPartsVisibleNum(); j++) {
-
                             thisRef.live2DModel.setPartsOpacity(
                                 thisRef.modelSetting.getInitPartsVisibleID(j),
-                                thisRef.modelSetting.getInitPartsVisibleValue(j)
+                                thisRef.modelSetting.getInitPartsVisibleValue(j),
                             );
                         }
 
@@ -139,22 +126,22 @@ LAppModel.prototype.load = function (gl, modelSettingPath, callback) {
     });
 };
 
-LAppModel.prototype.release = function (gl) {
+LAppModel.prototype.release = function(gl) {
     // this.live2DModel.deleteTextures();
     var pm = Live2DFramework.getPlatformManager();
 
     gl.deleteTexture(pm.texture);
 };
 
-LAppModel.prototype.preloadMotionGroup = function (name) {
+LAppModel.prototype.preloadMotionGroup = function(name) {
     var thisRef = this;
 
     var motions = this.modelSetting.getMotions(name);
 
     for (var i = 0; i < motions.length; i++) {
         var file = this.modelSetting.getMotionFile(name, i);
-        (function (i) {
-            thisRef.loadMotion(file, parsePath(thisRef.modelHomeDir, file), function (motion) {
+        (function(i) {
+            thisRef.loadMotion(file, parsePath(thisRef.modelHomeDir, file), function(motion) {
                 motion.setFadeIn(thisRef.modelSetting.getMotionFadeIn(name, i));
                 motion.setFadeOut(thisRef.modelSetting.getMotionFadeOut(name, i));
             });
@@ -162,7 +149,7 @@ LAppModel.prototype.preloadMotionGroup = function (name) {
     }
 };
 
-LAppModel.prototype.update = function () {
+LAppModel.prototype.update = function() {
     // console.log("--> LAppModel.update()");
 
     if (this.live2DModel == null) {
@@ -181,9 +168,11 @@ LAppModel.prototype.update = function () {
             this.startMotion(m.name, m.no, LAppDefine.PRIORITY_NORMAL);
         } else {
             this.startRandomMotion(
-                MyTools.altIdleAvailable && MyTools.altIdleEnabled ?
-                    LAppDefine.MOTION_GROUP_ALT_IDLE : LAppDefine.MOTION_GROUP_IDLE,
-                LAppDefine.PRIORITY_IDLE);
+                MyTools.altIdleAvailable && MyTools.altIdleEnabled
+                    ? LAppDefine.MOTION_GROUP_ALT_IDLE
+                    : LAppDefine.MOTION_GROUP_IDLE,
+                LAppDefine.PRIORITY_IDLE,
+            );
         }
     }
 
@@ -193,7 +182,6 @@ LAppModel.prototype.update = function () {
 
     var update = this.mainMotionManager.updateParam(this.live2DModel);
     if (!update) {
-
         if (this.eyeBlink) {
             this.eyeBlink.updateParam(this.live2DModel);
         }
@@ -203,39 +191,31 @@ LAppModel.prototype.update = function () {
 
     //-----------------------------------------------------------------
 
-    if (this.expressionManager &&
-        this.expressions &&
-        !this.expressionManager.isFinished()) {
+    if (this.expressionManager && this.expressions && !this.expressionManager.isFinished()) {
         this.expressionManager.updateParam(this.live2DModel);
     }
 
     this.live2DModel.addToParamFloat('PARAM_ANGLE_X', this.dragX * 30, 1);
     this.live2DModel.addToParamFloat('PARAM_ANGLE_Y', this.dragY * 30, 1);
-    this.live2DModel.addToParamFloat('PARAM_ANGLE_Z', (this.dragX * this.dragY) * -30, 1);
+    this.live2DModel.addToParamFloat('PARAM_ANGLE_Z', this.dragX * this.dragY * -30, 1);
 
     this.live2DModel.addToParamFloat('PARAM_BODY_ANGLE_X', this.dragX * 10, 1);
 
     this.live2DModel.addToParamFloat('PARAM_EYE_BALL_X', this.dragX, 1);
     this.live2DModel.addToParamFloat('PARAM_EYE_BALL_Y', this.dragY, 1);
 
-    this.live2DModel.addToParamFloat('PARAM_ANGLE_X',
-        Number((15 * Math.sin(t / 6.5345))), 0.5);
-    this.live2DModel.addToParamFloat('PARAM_ANGLE_Y',
-        Number((8 * Math.sin(t / 3.5345))), 0.5);
-    this.live2DModel.addToParamFloat('PARAM_ANGLE_Z',
-        Number((10 * Math.sin(t / 5.5345))), 0.5);
-    this.live2DModel.addToParamFloat('PARAM_BODY_ANGLE_X',
-        Number((4 * Math.sin(t / 15.5345))), 0.5);
-    this.live2DModel.setParamFloat('PARAM_BREATH',
-        Number((0.5 + 0.5 * Math.sin(t / 3.2345))), 1);
+    this.live2DModel.addToParamFloat('PARAM_ANGLE_X', Number(15 * Math.sin(t / 6.5345)), 0.5);
+    this.live2DModel.addToParamFloat('PARAM_ANGLE_Y', Number(8 * Math.sin(t / 3.5345)), 0.5);
+    this.live2DModel.addToParamFloat('PARAM_ANGLE_Z', Number(10 * Math.sin(t / 5.5345)), 0.5);
+    this.live2DModel.addToParamFloat('PARAM_BODY_ANGLE_X', Number(4 * Math.sin(t / 15.5345)), 0.5);
+    this.live2DModel.setParamFloat('PARAM_BREATH', Number(0.5 + 0.5 * Math.sin(t / 3.2345)), 1);
 
     if (this.physics) {
         this.physics.updateParam(this.live2DModel);
     }
 
     if (this.lipSync == null) {
-        this.live2DModel.setParamFloat('PARAM_MOUTH_OPEN_Y',
-            this.lipSyncValue);
+        this.live2DModel.setParamFloat('PARAM_MOUTH_OPEN_Y', this.lipSyncValue);
     }
 
     if (this.pose) {
@@ -246,14 +226,13 @@ LAppModel.prototype.update = function () {
 };
 
 var lastExpNo;
-LAppModel.prototype.setRandomExpression = function () {
+LAppModel.prototype.setRandomExpression = function() {
     var tmp = [];
     for (var name in this.expressions) {
         tmp.push(name);
     }
 
-    if (tmp.length === 0)
-        return;
+    if (tmp.length === 0) return;
 
     var no = 0;
     if (tmp.length !== 1) {
@@ -266,26 +245,24 @@ LAppModel.prototype.setRandomExpression = function () {
     this.setExpression(tmp[no]);
 };
 
-LAppModel.prototype.startRandomMotion = function (name, priority) {
+LAppModel.prototype.startRandomMotion = function(name, priority) {
     var max = this.modelSetting.getMotions(name).length;
     var no = parseInt(Math.random() * max);
     this.startMotion(name, no, priority);
 };
 
-LAppModel.prototype.startMotion = function (name, no, priority) {
+LAppModel.prototype.startMotion = function(name, no, priority) {
     var motionName = this.modelSetting.getMotionFile(name, no);
 
     if (motionName == null || motionName === '') {
-        if (LAppDefine.DEBUG_LOG)
-            console.error('Failed to motion.');
+        if (LAppDefine.DEBUG_LOG) console.error('Failed to motion.');
         return;
     }
 
     if (priority === LAppDefine.PRIORITY_FORCE) {
         this.mainMotionManager.setReservePriority(priority);
     } else if (!this.mainMotionManager.reserveMotion(priority)) {
-        if (LAppDefine.DEBUG_LOG)
-            console.log('Motion is running.');
+        if (LAppDefine.DEBUG_LOG) console.log('Motion is running.');
         return;
     }
 
@@ -293,21 +270,19 @@ LAppModel.prototype.startMotion = function (name, no, priority) {
     var motion;
 
     if (this.motions[name] == null) {
-        this.loadMotion(null, parsePath(this.modelHomeDir, motionName), function (mtn) {
+        this.loadMotion(null, parsePath(this.modelHomeDir, motionName), function(mtn) {
             motion = mtn;
 
             thisRef.setFadeInFadeOut(name, no, priority, motion);
-
         });
-    }
-    else {
+    } else {
         motion = this.motions[name];
 
         thisRef.setFadeInFadeOut(name, no, priority, motion);
     }
 };
 
-LAppModel.prototype.setFadeInFadeOut = function (name, no, priority, motion) {
+LAppModel.prototype.setFadeInFadeOut = function(name, no, priority, motion) {
     if (priority !== LAppDefine.PRIORITY_IDLE) {
         if (this.curExpName && this.expressions['normal'])
             this.expressionManager.startMotion(this.expressions['normal'], false);
@@ -320,13 +295,11 @@ LAppModel.prototype.setFadeInFadeOut = function (name, no, priority, motion) {
     motion.setFadeIn(this.modelSetting.getMotionFadeIn(name, no));
     motion.setFadeOut(this.modelSetting.getMotionFadeOut(name, no));
 
-    if (LAppDefine.DEBUG_LOG)
-        console.log('Start motion : ' + motionName);
+    if (LAppDefine.DEBUG_LOG) console.log('Start motion : ' + motionName);
 
     if (this.modelSetting.getMotionSound(name, no) == null) {
         this.mainMotionManager.startMotionPrio(motion, priority);
-    }
-    else {
+    } else {
         var soundName = this.modelSetting.getMotionSound(name, no);
         // var player = new Sound(this.modelHomeDir + soundName);
 
@@ -339,25 +312,23 @@ LAppModel.prototype.setFadeInFadeOut = function (name, no, priority, motion) {
 
         MyTools.updateAudio(snd, subtitle, font);
 
-        if (LAppDefine.DEBUG_LOG)
-            console.log('Start sound : ' + soundName);
+        if (LAppDefine.DEBUG_LOG) console.log('Start sound : ' + soundName);
 
         snd.play();
         this.mainMotionManager.startMotionPrio(motion, priority);
     }
 };
 
-LAppModel.prototype.setExpression = function (name) {
+LAppModel.prototype.setExpression = function(name) {
     this.curExpName = name;
     var motion = this.expressions[name];
 
-    if (LAppDefine.DEBUG_LOG)
-        console.log('Expression : ' + name);
+    if (LAppDefine.DEBUG_LOG) console.log('Expression : ' + name);
 
     this.expressionManager.startMotion(motion, false);
 };
 
-LAppModel.prototype.draw = function (gl) {
+LAppModel.prototype.draw = function(gl) {
     //console.log("--> LAppModel.draw()");
 
     // if(this.live2DModel == null) return;
@@ -371,10 +342,9 @@ LAppModel.prototype.draw = function (gl) {
     this.live2DModel.draw();
 
     MatrixStack.pop();
-
 };
 
-LAppModel.prototype.hitTest = function (id, testX, testY) {
+LAppModel.prototype.hitTest = function(id, testX, testY) {
     var len = this.modelSetting.getHitAreaNum();
     for (var i = 0; i < len; i++) {
         if (id == this.modelSetting.getHitAreaName(i)) {

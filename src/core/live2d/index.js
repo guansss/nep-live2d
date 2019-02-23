@@ -23,11 +23,11 @@ function main() {
     initListener();
     init();
 
-    setTimeout(function () {
+    setTimeout(function() {
         // Just for viewing via browser (Chrome for best compatibility)
         if (!window.wallpaperPropertyListener.hasBeenCalled) {
             window.wallpaperPropertyListener.applyGeneralProperties({ language: navigator.language.toLowerCase() });
-            ajax('project.json', false, function (buf) {
+            ajax('project.json', false, function(buf) {
                 window.wallpaperPropertyListener.applyUserProperties(JSON.parse(buf).general.properties);
             });
         }
@@ -41,43 +41,43 @@ function initL2dCanvas(canvasId) {
 function initListener() {
     $(document).on('mousedown mouseup mouseout', mouseEvent);
 
-//    var no = 0, max = 88;
-//    $('#btnChangeBg').on('click', function () {
-//        if (--no >= 0)
-//            live2DMgr.models[0].startMotion('tap_body', no, 2);
-//        else
-//            no++;
-//        log(no);
-//    });
-//    $('#btn1').on('click', function () {
-//        live2DMgr.models[0].startMotion('tap_body', no, 2);
-//        log(no);
-//    });
-//    $('#btn2').on('click', function () {
-//        if (++no < max)
-//            live2DMgr.models[0].startMotion('tap_body', no, 2);
-//        else
-//            no--;
-//        log(no);
-//    });
+    //    var no = 0, max = 88;
+    //    $('#btnChangeBg').on('click', function () {
+    //        if (--no >= 0)
+    //            live2DMgr.models[0].startMotion('tap_body', no, 2);
+    //        else
+    //            no++;
+    //        log(no);
+    //    });
+    //    $('#btn1').on('click', function () {
+    //        live2DMgr.models[0].startMotion('tap_body', no, 2);
+    //        log(no);
+    //    });
+    //    $('#btn2').on('click', function () {
+    //        if (++no < max)
+    //            live2DMgr.models[0].startMotion('tap_body', no, 2);
+    //        else
+    //            no--;
+    //        log(no);
+    //    });
 
     // Click events can be caught in another way
-//    eventTarget.addEventListener("click", mouseEvent, false);
+    //    eventTarget.addEventListener("click", mouseEvent, false);
 
     // These events are useless, see comments in mouseEvent()
-//    eventTarget.addEventListener('mousewheel', mouseEvent, false);
-//    eventTarget.addEventListener('contextmenu', mouseEvent, false);
+    //    eventTarget.addEventListener('mousewheel', mouseEvent, false);
+    //    eventTarget.addEventListener('contextmenu', mouseEvent, false);
 
     // These are events in mobile browsers, also useless for WE
-//    eventTarget.addEventListener("touchstart", touchEvent, false);
-//    eventTarget.addEventListener("touchend", touchEvent, false);
-//    eventTarget.addEventListener("touchmove", touchEvent, false);
+    //    eventTarget.addEventListener("touchstart", touchEvent, false);
+    //    eventTarget.addEventListener("touchend", touchEvent, false);
+    //    eventTarget.addEventListener("touchmove", touchEvent, false);
 
     // Currently no model changing
-//    btnChangeModel = document.getElementById("btnChange");
-//    btnChangeModel.addEventListener("click", function (e) {
-//        changeModel();
-//    });
+    //    btnChangeModel = document.getElementById("btnChange");
+    //    btnChangeModel.addEventListener("click", function (e) {
+    //        changeModel();
+    //    });
 }
 
 function init() {
@@ -115,10 +115,11 @@ function init() {
         LAppDefine.VIEW_LOGICAL_MAX_LEFT,
         LAppDefine.VIEW_LOGICAL_MAX_RIGHT,
         LAppDefine.VIEW_LOGICAL_MAX_BOTTOM,
-        LAppDefine.VIEW_LOGICAL_MAX_TOP);
+        LAppDefine.VIEW_LOGICAL_MAX_TOP,
+    );
 
-    viewMatrix.setMaxScale(/*LAppDefine.VIEW_MAX_SCALE*/2);
-    viewMatrix.setMinScale(/*LAppDefine.VIEW_MIN_SCALE*/0.01);
+    viewMatrix.setMaxScale(/*LAppDefine.VIEW_MAX_SCALE*/ 2);
+    viewMatrix.setMinScale(/*LAppDefine.VIEW_MIN_SCALE*/ 0.01);
 
     projMatrix = new L2DMatrix44();
 
@@ -127,11 +128,14 @@ function init() {
     projMatrix.translate(-l2dViewToCanvasScale * l2dViewToCanvasScale, offsetY);
     projMatrix.scale(l2dViewToCanvasScale, l2dViewToCanvasScale * (canvas.width / canvas.height));
 
-    var horPixelsToLogical = right * 2 / (innerWidth - MyTools.canvasBaseWidth / 2);
-    var verPixelsToLogical = bottom * 2 / MyTools.canvasBaseHeight;
+    var horPixelsToLogical = (right * 2) / (innerWidth - MyTools.canvasBaseWidth / 2);
+    var verPixelsToLogical = (bottom * 2) / MyTools.canvasBaseHeight;
 
     deviceToScreen = new L2DMatrix44();
-    deviceToScreen.translate(-(innerWidth - MyTools.canvasBaseWidth / 2), -(innerHeight - MyTools.canvasBaseHeight / 2));
+    deviceToScreen.translate(
+        -(innerWidth - MyTools.canvasBaseWidth / 2),
+        -(innerHeight - MyTools.canvasBaseHeight / 2),
+    );
     deviceToScreen.multScale(horPixelsToLogical, verPixelsToLogical);
 
     gl = getWebGLContext();
@@ -161,11 +165,9 @@ function tick() {
     if (MyTools.frameAvailable()) {
         draw();
 
-        if (MyTools.snowUpdater !== null)
-            MyTools.snowUpdater();
+        if (MyTools.snowUpdater !== null) MyTools.snowUpdater();
 
-        if (MyTools.fpsEnabled)
-            MyTools.fps();
+        if (MyTools.fpsEnabled) MyTools.fps();
     }
 }
 
@@ -202,27 +204,25 @@ function draw() {
 
 // Old name: modelTurnHead(event) {
 function modelAction(event, tap) {
-//    var rect = event.target.getBoundingClientRect();
+    //    var rect = event.target.getBoundingClientRect();
 
-//    var sx = transformScreenX(event.clientX - rect.left);
-//    var sy = transformScreenY(event.clientY - rect.top);
+    //    var sx = transformScreenX(event.clientX - rect.left);
+    //    var sy = transformScreenY(event.clientY - rect.top);
     var vx = transformViewX(event.clientX /*- rect.left*/);
     var vy = transformViewY(event.clientY /*- rect.top*/);
 
     if (LAppDefine.DEBUG_MOUSE_LOG)
         log('action device( x:' + event.clientX + ' y:' + event.clientY + ' ) view( x:' + vx + ' y:' + vy + ')');
 
-    if (tap)
-        live2DMgr.tapEvent(vx, vy);
-    else
-        dragMgr.setPoint(vx, vy);
+    if (tap) live2DMgr.tapEvent(vx, vy);
+    else dragMgr.setPoint(vx, vy);
 }
 
 function followPointer(event) {
-//    var rect = event.target.getBoundingClientRect();
+    //    var rect = event.target.getBoundingClientRect();
 
-//    var sx = transformScreenX(event.clientX - rect.left);
-//    var sy = transformScreenY(event.clientY - rect.top);
+    //    var sx = transformScreenX(event.clientX - rect.left);
+    //    var sy = transformScreenY(event.clientY - rect.top);
     var vx = transformViewX(event.clientX /*- rect.left*/);
     var vy = transformViewY(event.clientY /*- rect.top*/);
 
@@ -251,28 +251,23 @@ function mouseEvent(e) {
             mouseDown = true;
             drag = false;
 
-            if (!MyTools.ffEnabled)
-                $('body').on('mousemove', mouseEvent);
+            if (!MyTools.ffEnabled) $('body').on('mousemove', mouseEvent);
 
-            if (MyTools.ffEnabled && MyTools.ffAutoReleaseTimeout > 0)
-                MyTools.clearAutoRelease();
+            if (MyTools.ffEnabled && MyTools.ffAutoReleaseTimeout > 0) MyTools.clearAutoRelease();
             break;
 
         case 'mousemove':
             drag = true;
             followPointer(e);
 
-            if (!mouseDown && MyTools.ffEnabled && MyTools.ffAutoReleaseTimeout > 0)
-                MyTools.updateAutoRelease();
+            if (!mouseDown && MyTools.ffEnabled && MyTools.ffAutoReleaseTimeout > 0) MyTools.updateAutoRelease();
             break;
 
         // Triggered when user's cursor moves to another visible element or leaves the current monitor
         case 'mouseout':
             // If caused by moving to another element, then ignore it.
-            if (e.clientX >= 0)
-                break;
-            else if (MyTools.ffEnabled)
-                lookFront();
+            if (e.clientX >= 0) break;
+            else if (MyTools.ffEnabled) lookFront();
 
         case 'mouseup':
             //if ("button" in e && e.button != 0) return;
@@ -291,8 +286,7 @@ function mouseEvent(e) {
                 if (!drag) {
                     modelAction(e, true);
 
-                    if (MyTools.ffEnabled && MyTools.ffClickToRelease)
-                        lookFront();
+                    if (MyTools.ffEnabled && MyTools.ffClickToRelease) lookFront();
                 }
             }
             break;
@@ -301,7 +295,7 @@ function mouseEvent(e) {
 
 function transformViewX(deviceX) {
     var screenX = deviceToScreen.transformX(deviceX);
-//    log(deviceX + ' -> ' + screenX + '+' + -viewMatrix.getArray()[12] + '*' + viewMatrix.getScaleX() + ' -> ' + viewMatrix.invertTransformX(screenX));
+    //    log(deviceX + ' -> ' + screenX + '+' + -viewMatrix.getArray()[12] + '*' + viewMatrix.getScaleX() + ' -> ' + viewMatrix.invertTransformX(screenX));
     return viewMatrix.invertTransformX(screenX);
 }
 
@@ -317,9 +311,7 @@ function getWebGLContext() {
         try {
             var ctx = canvas.getContext(NAMES[i], { premultipliedAlpha: true });
             if (ctx) return ctx;
-        }
-        catch (e) {
-        }
+        } catch (e) {}
     }
     return null;
 }
