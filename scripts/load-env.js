@@ -7,14 +7,21 @@ import chalk from 'chalk';
 import fs from 'fs';
 import vue$loadEnv from '@vue/cli-service/lib/util/loadEnv';
 
+const ENV_FILE = '.env.local';
+
 const ENV_VARS = {
     WALLPAPER_PATH(v) {
         if (!fs.lstatSync(v).isDirectory()) throw 'Path is not a directory';
-    }
+    },
 };
 
 function loadEnv() {
-    const env = vue$loadEnv('.env.local');
+    if (!fs.existsSync(ENV_FILE)) {
+        console.error(`Cannot find env file "${ENV_FILE}"`);
+        return;
+    }
+
+    const env = vue$loadEnv(ENV_FILE);
     let checkPassed = true;
 
     Object.entries(ENV_VARS).forEach(([key, validator]) => {
@@ -42,7 +49,7 @@ function loadEnv() {
             chalk.bgRed.black(' CHECK ENV FAILED '),
             'Pleas check your',
             chalk.bold('.env.local'),
-            'file'
+            'file',
         );
     } else {
         console.log(chalk.bgGreen.black(' CHECK ENV PASSED '));

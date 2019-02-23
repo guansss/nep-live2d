@@ -9,7 +9,10 @@ import generateProjectJson from './project-json-generator';
 /** @type {ENV} */
 const env = loadEnv();
 
-if (!env) throw 'Missing environment variables';
+if (!env) {
+    console.error('Missing environment variables');
+    process.exit(1);
+}
 
 const rl = readline.createInterface(process.stdin, process.stdout);
 
@@ -21,7 +24,7 @@ const rl = readline.createInterface(process.stdin, process.stdout);
 
         await copyFiles(
             ['./assets/stub.html', path.join(env.WALLPAPER_PATH, 'index.html')],
-            ['./assets/preview.jpg', path.join(env.WALLPAPER_PATH, 'preview.jpg')]
+            ['./assets/preview.jpg', path.join(env.WALLPAPER_PATH, 'preview.jpg')],
         );
 
         await setupProjectJson();
@@ -62,7 +65,7 @@ async function setupProjectJson() {
 
 async function confirm(message) {
     const result = await new Promise(resolve =>
-        rl.question(message + ' [y]/n: ', resolve)
+        rl.question(message + ' [y]/n: ', resolve),
     );
 
     if (result !== 'y') throw 'Action canceled';
