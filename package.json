@@ -7,6 +7,7 @@
   "author": "guansss",
   "license": "MIT",
   "scripts": {
+    "test": "jest",
     "setup": "babel-node --presets @babel/env scripts/setup.js",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -25,11 +26,11 @@
     "@vue/cli-plugin-eslint": "^3.2.2",
     "@vue/cli-service": "^3.2.3",
     "@vue/eslint-config-prettier": "^4.0.1",
-    "@vue/test-utils": "^1.0.0-beta.28",
     "babel-eslint": "^10.0.1",
     "chalk": "^2.4.2",
     "eslint": "^5.11.1",
     "eslint-plugin-vue": "^5.1.0",
+    "jest": "^24.1.0",
     "shelljs": "^0.8.3",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
@@ -64,5 +65,10 @@
   },
   "browserslist": [
     "Chrome >= 67"
-  ]
+  ],
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    }
+  }
 }
