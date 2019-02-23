@@ -2,7 +2,7 @@
     <div id="app">
         <Settings v-if="false" />
         <div ref="canvas"></div>
-        <img ref="bg" class="bg" src="" />
+        <img class="bg" :src="backgroundImage" />
     </div>
 </template>
 
@@ -16,6 +16,9 @@ export default {
     components: {
         Settings,
     },
+    data: () => ({
+        backgroundImage: '',
+    }),
     created() {
         const mka = new Mka(this.$refs.canvas);
 
@@ -24,7 +27,7 @@ export default {
         this.mka = mka;
     },
     mounted() {
-        this.$refs.bg.src = '/image/bg_forest.jpg';
+        this.backgroundImage = '/image/bg_forest.jpg';
     },
     beforeDestroy() {
         if (this.mka) {
