@@ -198,7 +198,7 @@ L2DBaseModel.prototype.loadExpression = function(name /*String*/, path /*String*
     var thisRef = this;
     pm.loadBytes(path, function(buf) {
         if (name != null) {
-            thisRef.expressions[name] = L2DExpressionMotion.loadJson(buf);
+            thisRef.expressions[name] = L2DExpressionMotion.loadJSON(buf);
         }
         if (typeof callback === 'function') callback();
     });
@@ -294,7 +294,7 @@ L2DExpressionMotion.TYPE_SET = 0;
 L2DExpressionMotion.TYPE_ADD = 1;
 L2DExpressionMotion.TYPE_MULT = 2;
 
-L2DExpressionMotion.loadJson = function(buf) {
+L2DExpressionMotion.loadJSON = function(buf) {
     var ret = new L2DExpressionMotion();
 
     var pm = Live2DFramework.getPlatformManager();

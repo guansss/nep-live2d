@@ -4,7 +4,7 @@ import readline from 'readline';
 import chalk from 'chalk';
 
 import loadEnv from './load-env';
-import generateProjectJson from './project-json-generator';
+import generateProjectJSON from './project-json-generator';
 
 /** @type {ENV} */
 const env = loadEnv();
@@ -27,7 +27,7 @@ const rl = readline.createInterface(process.stdin, process.stdout);
             ['./assets/preview.jpg', path.join(env.WALLPAPER_PATH, 'preview.jpg')],
         );
 
-        await setupProjectJson();
+        await setupProjectJSON();
     } catch (e) {
         console.warn(e);
     }
@@ -51,16 +51,16 @@ async function copyFiles(...filePairs) {
     }
 }
 
-async function setupProjectJson() {
-    const projectJsonPath = path.join(env.WALLPAPER_PATH, 'project.json');
+async function setupProjectJSON() {
+    const projectJSONPath = path.join(env.WALLPAPER_PATH, 'project.json');
 
-    if (fs.existsSync(projectJsonPath)) {
-        console.log(chalk.red(projectJsonPath));
+    if (fs.existsSync(projectJSONPath)) {
+        console.log(chalk.red(projectJSONPath));
         await confirm('File already exists, overwrite it?');
     }
 
-    generateProjectJson(projectJsonPath);
-    console.log(chalk.green(projectJsonPath));
+    generateProjectJSON(projectJSONPath);
+    console.log(chalk.green(projectJSONPath));
 }
 
 async function confirm(message) {
