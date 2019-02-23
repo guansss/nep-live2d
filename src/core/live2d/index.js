@@ -1,6 +1,5 @@
 import './LAppDefine';
 import './Live2DFramework';
-import './PlatformManager';
 import './LAppModel';
 import './LAppLive2DManager';
 

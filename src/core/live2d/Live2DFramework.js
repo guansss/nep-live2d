@@ -5,6 +5,12 @@
  *
  *  (c) Live2D Inc. All rights reserved.
  */
+
+import { getArrayBuffer } from '@/utils/net';
+import { logger } from '@/utils/log';
+
+const log = logger('Live2DModel');
+
 //============================================================
 //============================================================
 //  class L2DBaseModel
@@ -101,36 +107,20 @@ L2DBaseModel.prototype.getExpressionManager = function() {
     return this.expressionManager;
 };
 
-L2DBaseModel.prototype.loadModelData = function(path /*String*/, callback) {
-    /*
-     if( this.live2DModel != null ) {
-     this.live2DModel.deleteTextures();
-     }
-     */
-    var pm = Live2DFramework.getPlatformManager(); //IPlatformManager
-    if (this.debugMode) pm.log('Load model : ' + path);
+L2DBaseModel.prototype.loadModelData = async function(path) {
+    const arrayBuffer = await getArrayBuffer(path);
 
-    var thisRef = this;
-    pm.loadLive2DModel(path, function(l2dModel) {
-        thisRef.live2DModel = l2dModel;
-        thisRef.live2DModel.saveParam();
+    this.modelData = Live2DModelWebGL.loadModel(arrayBuffer);
+    this.modelData.saveParam();
 
-        var _err = Live2D.getError();
+    const error = Live2D.getError();
+    if (error) throw 'Failed to load model data' + error;
 
-        if (_err != 0) {
-            console.error('Error : Failed to loadModelData().');
-            return;
-        }
+    this.modelMatrix = new L2DModelMatrix(this.modelData.getCanvasWidth(), this.modelData.getCanvasHeight());
+    this.modelMatrix.setWidth(2);
+    this.modelMatrix.setCenterPosition(0, 0);
 
-        thisRef.modelMatrix = new L2DModelMatrix(
-            thisRef.live2DModel.getCanvasWidth(),
-            thisRef.live2DModel.getCanvasHeight(),
-        ); //L2DModelMatrix
-        thisRef.modelMatrix.setWidth(2);
-        thisRef.modelMatrix.setCenterPosition(0, 0);
-
-        callback(thisRef.live2DModel);
-    });
+    return this.modelData;
 };
 
 L2DBaseModel.prototype.loadTexture = function(no /*int*/, path /*String*/, callback) {
@@ -141,11 +131,46 @@ L2DBaseModel.prototype.loadTexture = function(no /*int*/, path /*String*/, callb
     if (this.debugMode) pm.log('Load Texture : ' + path);
 
     var thisRef = this;
-    pm.loadTexture(this.live2DModel, no, path, function() {
+
+    var loadedImage = new Image();
+    loadedImage.src = path;
+
+    var thisRef = this;
+    loadedImage.onload = function() {
+        // create texture
+        var canvas = document.getElementById('gl-canvas');
+        var gl = getWebGLContext(canvas, { premultipliedAlpha: true });
+        var texture = gl.createTexture();
+        if (!texture) {
+            console.error('Failed to generate gl texture name.');
+            return -1;
+        }
+
+        if (this.live2DModel.isPremultipliedAlpha() == false) {
+            // 乗算済アルファテクスチャ以外の場合
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+        }
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, loadedImage);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+        gl.generateMipmap(gl.TEXTURE_2D);
+
+        this.live2DModel.setTexture(no, texture);
+
+        // テクスチャオブジェクトを解放
+        texture = null;
+
         texCounter--;
         if (texCounter == 0) thisRef.isTexLoaded = true;
         if (typeof callback == 'function') callback();
-    });
+    };
+
+    loadedImage.onerror = function() {
+        console.error('Failed to load image : ' + path);
+    };
 };
 
 L2DBaseModel.prototype.loadMotion = function(name /*String*/, path /*String*/, callback) {
