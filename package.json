@@ -65,10 +65,5 @@
   },
   "browserslist": [
     "Chrome >= 67"
-  ],
-  "jest": {
-    "transform": {
-      "^.+\\.jsx?$": "babel-jest"
-    }
-  }
+  ]
 }
