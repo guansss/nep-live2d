@@ -6,10 +6,12 @@ export default class ModelSettings {
 
     name = '';
     model = '';
-    textures = [''];
     pose = '';
     physics = '';
     subtitle = '';
+
+    /** @type {string[]} */
+    textures = [];
 
     /** @type {Object<string, number>} */
     layout = {};
@@ -38,7 +40,7 @@ export default class ModelSettings {
     /**
      * @param {Object} json
      */
-    static fromJson(json) {
+    static fromJSON(json) {
         const instance = new this();
 
         const clone = cloneWithCamelCase(json);
@@ -61,8 +63,8 @@ function cloneWithCamelCase(value) {
     if (value && typeof value === 'object') {
         const clone = {};
 
-        for (const key in Object.keys(value)) {
-            clone[camelCase(key)] = value[key];
+        for (const key of Object.keys(value)) {
+            clone[camelCase(key)] = cloneWithCamelCase(value[key]);
         }
 
         return clone;
