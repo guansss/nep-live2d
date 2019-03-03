@@ -65,5 +65,10 @@
   },
   "browserslist": [
     "Chrome >= 67"
-  ]
+  ],
+  "jest": {
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    }
+  }
 }
