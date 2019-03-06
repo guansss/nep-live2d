@@ -24,7 +24,7 @@ export default class ModelSettings {
 
     /**
      * @typedef {Object} Motion
-     * @property {string} file - `.mtn` file
+     * @property {string} file - `*.mtn` file
      * @property {string} [sound] - sound file
      * @property {string} [subtitle] - subtitle's name
      * @property {number} [fadeIn] - motion fade in timeout
@@ -38,7 +38,7 @@ export default class ModelSettings {
     };
 
     /**
-     * @param {Object} json
+     * @param {Object} JSON
      */
     static fromJSON(json) {
         const instance = new this();
@@ -51,7 +51,7 @@ export default class ModelSettings {
 }
 
 /**
- * Clones an **JSON**, converting all the properties to camel case.
+ * Deep clones a JSON object, converting all the properties to camel case.
  * @param {Object} value
  * @return {Object}
  */
