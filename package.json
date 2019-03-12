@@ -24,8 +24,10 @@
     "@babel/node": "^7.2.2",
     "@vue/cli-plugin-babel": "^3.4.1",
     "@vue/cli-plugin-eslint": "^3.4.1",
+    "@vue/cli-plugin-typescript": "^3.5.0",
     "@vue/cli-service": "^3.4.1",
     "@vue/eslint-config-prettier": "^4.0.1",
+    "@vue/eslint-config-typescript": "^4.0.0",
     "babel-eslint": "^10.0.1",
     "chalk": "^2.4.2",
     "eslint": "^5.15.0",
@@ -34,6 +36,7 @@
     "shelljs": "^0.8.3",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
+    "typescript": "^3.2.1",
     "vue-template-compiler": "^2.6.8"
   },
   "eslintConfig": {
@@ -43,13 +46,14 @@
     },
     "extends": [
       "plugin:vue/essential",
-      "@vue/prettier"
+      "@vue/prettier",
+      "@vue/typescript"
     ],
     "rules": {
       "no-console": "off"
     },
     "parserOptions": {
-      "parser": "babel-eslint"
+      "parser": "@typescript-eslint/parser"
     }
   },
   "prettier": {
