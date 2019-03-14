@@ -8,17 +8,17 @@ export default abstract class Player {
      */
     abstract update(dt: number): boolean;
 
-    abstract attach(): void;
+    attach() {}
 
-    abstract detach(): void;
+    detach() {}
 
-    abstract enable(): void;
+    enable() {}
 
-    abstract disable(): void;
+    disable() {}
 
-    abstract resume(): void;
+    resume() {}
 
-    abstract pause(): void;
+    pause() {}
 
-    abstract destroy(): void;
+    destroy() {}
 }
