@@ -1,5 +1,6 @@
 import Player from '@/core/mka/Player';
 import { logger } from '@/core/utils/log';
+import autobind from 'autobind-decorator';
 
 const log = logger('Mka');
 
@@ -12,20 +13,15 @@ export default class Mka {
     private lastUpdated = performance.now();
 
     /**
-     * `tick()` bound with `this`, will be used during every tick, so cache it for efficiency
-     */
-    private readonly boundTick: FrameRequestCallback;
-
-    /**
      * ID returned by `requestAnimationFrame()`
      */
     private rafId = 0;
 
     constructor(element: HTMLElement) {
-        this.boundTick = this.tick.bind(this);
-        this.rafId = requestAnimationFrame(this.boundTick);
+        this.rafId = requestAnimationFrame(this.tick);
     }
 
+    @autobind
     private tick(now: number) {
         const delta = now - this.lastUpdated;
 
@@ -36,7 +32,7 @@ export default class Mka {
         }
 
         this.lastUpdated = performance.now();
-        this.rafId = requestAnimationFrame(this.boundTick);
+        this.rafId = requestAnimationFrame(this.tick);
     }
 
     addPlayer(name: string, player: Player) {
