@@ -1,5 +1,5 @@
 import Player from '@/core/mka/Player';
-import { logger } from '@/utils/log';
+import { logger } from '@/core/utils/log';
 
 const log = logger('Mka');
 

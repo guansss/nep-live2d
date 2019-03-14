@@ -1,4 +1,4 @@
-import { logger } from '@/utils/log';
+import { logger } from '../log';
 
 const TYPE_JSON = Symbol();
 const TYPE_ARRAY_BUFFER = Symbol();

@@ -1,6 +1,6 @@
 import Player from '@/core/mka/Player';
 import Live2DSprite from '@/core/pixi/Live2DSprite';
-import { logger } from '@/utils/log';
+import { logger } from '@/core/utils/log';
 
 const log = logger('Live2DPlayer');
 

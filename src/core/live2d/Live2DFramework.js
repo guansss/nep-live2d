@@ -6,8 +6,8 @@
  *  (c) Live2D Inc. All rights reserved.
  */
 
-import { getArrayBuffer } from '@/utils/net';
-import { logger } from '@/utils/log';
+import { getArrayBuffer } from '@/core/utils/net';
+import { logger } from '@/core/utils/log';
 
 const log = logger('Live2DModel');
 
