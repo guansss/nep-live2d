@@ -5,18 +5,16 @@ import { logger } from '@/core/utils/log';
 const log = logger('Live2DPlayer');
 
 export default class Live2DPlayer extends Player {
-    _sprites = [];
+    private readonly sprites: Live2DSprite[] = [];
 
     constructor() {
         super();
 
-        this._sprites.push(new Live2DSprite('live2d/neptune/normal.model.json'));
+        this.sprites.push(new Live2DSprite('live2d/neptune/normal.model.json'));
     }
 
-    /**
-     * @inheritDoc
-     */
-    update(dt) {
-        log('Update ' + dt);
+    update(dt: number) {
+        // log('Update ' + dt);
+        return true;
     }
 }
