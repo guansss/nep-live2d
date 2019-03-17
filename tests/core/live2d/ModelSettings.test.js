@@ -1,8 +1,12 @@
 import ModelSettings from '@/core/live2d/ModelSettings';
 
 const MODEL_SETTINGS_FILE = '../../../wallpaper/live2d/neptune/normal.model.json';
+const MODEL_BASE_PATH = 'http://localhost/model/';
 
-it('loads from JSON', () => {
+// prevent logging
+console.log = jest.fn();
+
+it('should load from JSON', () => {
     let modelSettingsJson;
 
     try {
@@ -12,9 +16,11 @@ it('loads from JSON', () => {
         return;
     }
 
-    const modelSettings = ModelSettings.fromJSON(modelSettingsJson);
+    const modelSettings = new ModelSettings(modelSettingsJson, MODEL_BASE_PATH);
 
     expect(modelSettings.hitAreas).toBeInstanceOf(Array);
     expect(modelSettings.hitAreas.length).toBeGreaterThan(0);
     expect(modelSettings.motions.idle[0].fadeIn).toBe(2000);
+
+    expect(modelSettings.model).toMatch(/** @type {RegExp} */ new RegExp(`^${MODEL_BASE_PATH}.+?\\.moc`));
 });
