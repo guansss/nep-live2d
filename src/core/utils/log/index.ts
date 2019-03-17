@@ -1,26 +1,36 @@
-const logs = [];
-
-function log(tag: string, ...messages: string[]) {
-    logs.push({ tag, messages });
-
-    console.log(`[${tag}]`, ...messages);
+interface LogRecord {
+    tag: string;
+    message: string;
+    error?: boolean;
 }
 
-function error(tag: string, ...messages: string[]) {
-    logs.push({ tag, messages, error: true });
+interface Logger {
+    (...messages: any[]): void;
 
-    console.error(`[${tag}]`, ...messages);
+    error(...messages: any[]): void;
 }
 
-/**
- * Creates a logger with specified tag.
- * @param tag
- */
-function logger(tag: string) {
-    const _log = (...message: string[]) => log(tag, ...message);
-    _log.error = (...message: string[]) => error(tag, ...message);
+export default function logger(tag: string): Logger {
+    const log = function(...messages: any[]) {
+        logger.logs.push({
+            tag: tag,
+            message: messages.map(m => m.toString()).join(' '),
+        });
 
-    return _log;
+        console.log(`[${tag}]`, ...messages);
+    } as Logger;
+
+    log.error = function(...messages: any[]) {
+        logger.logs.push({
+            tag: tag,
+            message: messages.map(m => m.toString()).join(' '),
+            error: true,
+        });
+
+        console.error(`[${tag}]`, ...messages);
+    };
+
+    return log;
 }
 
-export { log, logger };
+logger.logs = [] as LogRecord[];
