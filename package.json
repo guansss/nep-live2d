@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@pixi/display": "latest",
+    "autobind-decorator": "^2.4.0",
     "lodash": "^4.17.11",
     "pixi.js": "^5.0.0-rc.2",
     "raw-loader": "^1.0.0",
