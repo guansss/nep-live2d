@@ -8,48 +8,48 @@ const log = logger('ModelSettings');
 
 interface MotionDef {
     /** `*.mtn` file. */
-    file: string;
+    readonly file: string;
 
     /** Sound file. */
-    sound?: string;
+    readonly sound?: string;
 
     /** Subtitle name. */
-    subtitle?: string;
+    readonly subtitle?: string;
 
     /** Motion fade-in timeout. */
-    fadeIn?: number;
+    readonly fadeIn?: number;
 
     /** Motion fade-out timeout. */
-    fadeOut?: number;
+    readonly fadeOut?: number;
 
     /** Start time in hours (for start-up motions only). */
-    time?: number;
+    readonly time?: number;
 }
 
 interface ExpressionDef {
-    name: string;
+    readonly name: string;
 
     /** `*.json` file. */
-    file: string;
+    readonly file: string;
 }
 
 export default class ModelSettings {
-    name?: string;
+    readonly name?: string;
 
     // files
-    model: string = '';
-    pose?: string;
-    physics?: string;
-    subtitle?: string;
-    textures: string[] = [];
+    readonly model: string = '';
+    readonly pose?: string;
+    readonly physics?: string;
+    readonly subtitle?: string;
+    readonly textures: string[] = [];
 
     // metadata
-    layout: { [id: string]: number } = {};
-    hitAreas?: { name: string; id: string }[];
+    readonly layout?: { [id: string]: number };
+    readonly hitAreas?: { name: string; id: string }[];
 
     // motions
-    expressions?: ExpressionDef[];
-    motions: { [group: string]: MotionDef[] } = {};
+    readonly expressions?: ExpressionDef[];
+    readonly motions: { [group: string]: MotionDef[] } = {};
 
     /**
      * @param json - The model settings JSON
@@ -82,7 +82,7 @@ export default class ModelSettings {
         }
 
         if (json.textures) {
-            this.textures = json.textures.filter(file => typeof file === 'string');
+            this.textures.push(...json.textures.filter(file => typeof file === 'string'));
         }
 
         if (this.textures.length === 0) {
@@ -97,6 +97,9 @@ export default class ModelSettings {
         copyProperty(this, json, 'subtitle', 'string');
 
         if (json.layout && typeof json.layout === 'object') {
+            // @ts-ignore
+            this.layout = {};
+
             // copy only the number properties
             for (const [key, value] of Object.entries(json.layout)) {
                 if (!isNaN(value)) {
@@ -107,11 +110,13 @@ export default class ModelSettings {
 
         if (Array.isArray(json.hitAreas)) {
             const filter = (hitArea: any) => typeof hitArea.name === 'string' && typeof hitArea.id === 'string';
+            // @ts-ignore
             this.hitAreas = json.hitAreas.filter(filter);
         }
 
         if (Array.isArray(json.expressions)) {
             const filter = (exp: any) => typeof exp.name === 'string' && typeof exp.file === 'string';
+            // @ts-ignore
             this.expressions = json.expressions.filter(filter);
         }
 
