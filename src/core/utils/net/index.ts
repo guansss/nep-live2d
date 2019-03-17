@@ -1,4 +1,4 @@
-import { logger } from '../log';
+import logger from '../log';
 
 enum ResultType {
     JSON,

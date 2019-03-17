@@ -1,5 +1,5 @@
 import Player from '@/core/mka/Player';
-import { logger } from '@/core/utils/log';
+import logger from '@/core/utils/log';
 import autobind from 'autobind-decorator';
 
 const log = logger('Mka');
