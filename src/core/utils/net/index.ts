@@ -1,6 +1,6 @@
 import logger from '../log';
 
-enum ResultType {
+const enum ResultType {
     JSON,
     ArrayBuffer,
 }
