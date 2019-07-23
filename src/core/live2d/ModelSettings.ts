@@ -1,12 +1,14 @@
-// @ts-ignore
-import { resolve as urlResolve } from 'url';
-import { get, set } from 'lodash';
 import logger from '@/core/utils/log';
 import { cloneWithCamelCase } from '@/core/utils/misc';
+import { get, set } from 'lodash';
+// @ts-ignore
+import { resolve as urlResolve } from 'url';
 
 const log = logger('ModelSettings');
 
 interface MotionDef {
+    readonly name?: string
+
     /** `*.mtn` file. */
     readonly file: string;
 
@@ -46,6 +48,8 @@ export default class ModelSettings {
     // metadata
     readonly layout?: { [id: string]: number };
     readonly hitAreas?: { name: string; id: string }[];
+    readonly initParams?: [{ id: string; value: number }];
+    readonly initOpacities?: [{ id: string; value: number }];
 
     // motions
     readonly expressions?: ExpressionDef[];
@@ -72,7 +76,7 @@ export default class ModelSettings {
      * The `json` param borrows `ModelSettings` type to prevent the annoying type checking,
      * types will be manually checked.
      */
-    private copy(json: ModelSettings) {
+    private copy(json: any) {
         // begin essential properties
 
         copyProperty(this, json, 'model', 'string');
@@ -82,7 +86,7 @@ export default class ModelSettings {
         }
 
         if (json.textures) {
-            this.textures.push(...json.textures.filter(file => typeof file === 'string'));
+            this.textures.push(...json.textures.filter((file: any) => typeof file === 'string'));
         }
 
         if (this.textures.length === 0) {
@@ -102,8 +106,8 @@ export default class ModelSettings {
 
             // copy only the number properties
             for (const [key, value] of Object.entries(json.layout)) {
-                if (!isNaN(value)) {
-                    this.layout[key] = value;
+                if (!isNaN(value as number)) {
+                    this.layout[key] = value as number;
                 }
             }
         }
@@ -120,12 +124,24 @@ export default class ModelSettings {
             this.expressions = json.expressions.filter(filter);
         }
 
+        if (Array.isArray(json.initParam)) {
+            const filter = (param: any) => typeof param.id === 'string' && typeof param.value === 'string';
+            // @ts-ignore
+            this.initParams = json.initParam.filter(filter);
+        }
+
+        if (Array.isArray(json.initPartsVisible)) {
+            const filter = (param: any) => typeof param.id === 'string' && typeof param.value === 'string';
+            // @ts-ignore
+            this.initOpacities = json.initPartsVisible.filter(filter);
+        }
+
         if (json.motions && typeof json.motions === 'object') {
             for (const [group, motionGroup] of Object.entries(json.motions)) {
                 if (Array.isArray(motionGroup)) {
                     this.motions[group] = motionGroup
 
-                        // filter out the motions without `file` defined
+                    // filter out the motions without `file` defined
                         .filter(motion => motion && typeof motion.file === 'string')
 
                         // copy only the valid properties

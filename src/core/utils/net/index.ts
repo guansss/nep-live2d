@@ -16,9 +16,9 @@ async function getJSON(url: string) {
 }
 
 async function getArrayBuffer(url: string) {
-    const arrayBuffer = await ajax(url, { type: ResultType.ArrayBuffer });
+    const arrayBuffer: ArrayBuffer = await ajax(url, { type: ResultType.ArrayBuffer });
 
-    log(`Loaded ArrayBuffer(${arrayBuffer.length})`, url);
+    log(`Loaded ArrayBuffer(${arrayBuffer.byteLength})`, url);
 
     return arrayBuffer;
 }
