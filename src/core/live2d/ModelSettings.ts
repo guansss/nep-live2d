@@ -6,7 +6,7 @@ import { resolve as urlResolve } from 'url';
 
 const log = logger('ModelSettings');
 
-interface MotionDef {
+export interface MotionDefinition {
     readonly name?: string
 
     /** `*.mtn` file. */
@@ -28,7 +28,7 @@ interface MotionDef {
     readonly time?: number;
 }
 
-interface ExpressionDef {
+export interface ExpressionDefinition {
     readonly name: string;
 
     /** `*.json` file. */
@@ -52,8 +52,8 @@ export default class ModelSettings {
     readonly initOpacities?: [{ id: string; value: number }];
 
     // motions
-    readonly expressions?: ExpressionDef[];
-    readonly motions: { [group: string]: MotionDef[] } = {};
+    readonly expressions?: ExpressionDefinition[];
+    readonly motions: { [group: string]: MotionDefinition[] } = {};
 
     /**
      * @param json - The model settings JSON
@@ -146,7 +146,7 @@ export default class ModelSettings {
 
                         // copy only the valid properties
                         .map((motion: any) => {
-                            const copy: MotionDef = {
+                            const copy: MotionDefinition = {
                                 file: motion.file,
                             };
 

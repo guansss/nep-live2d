@@ -1,108 +1,124 @@
-import Live2DExpression from '@/core/live2d/Live2DExpression';
-import ModelSettings from '@/core/live2d/ModelSettings';
+import ExpressionManager from '@/core/live2d/ExpressionManager';
+import { ExpressionDefinition, MotionDefinition } from '@/core/live2d/ModelSettings';
 import logger, { Logger } from '@/core/utils/log';
-import { getArrayBuffer, getJSON } from '@/core/utils/net';
-import { randomID } from '@/core/utils/string';
+import { getArrayBuffer } from '@/core/utils/net';
 
 enum Priority {
-    None,
-    Idle,
-    Normal,
-    Force,
+    None = 0,
+    Idle = 1,
+    Normal = 2,
+    Force = 3,
+}
+
+enum Group {
+    Idle = 'idle',
 }
 
 export default class MotionManager extends MotionQueueManager {
     static readonly Priority = Priority;
 
-    private readonly model: Live2DModelWebGL;
+    readonly expressionManager: ExpressionManager;
 
-    private readonly motions: { [group: string]: Live2DMotion[] } = {};
+    readonly model: Live2DModelWebGL;
 
-    private readonly expressions: { name: string; expression: Live2DExpression }[] = [];
+    readonly definitions: { [group: string]: MotionDefinition[] };
 
-    private currentPriority = Priority.None;
-    private reservePriority = Priority.None;
+    readonly motions: { [group: string]: Live2DMotion[] } = {};
 
-    private readonly log: Logger;
+    currentPriority = Priority.None;
 
-    constructor(model: Live2DModelWebGL, modelSettings: ModelSettings) {
+    readonly log: Logger;
+
+    constructor(
+        name: string,
+        model: Live2DModelWebGL,
+        motionDefinitions: { [group: string]: MotionDefinition[] },
+        expressionDefinitions: ExpressionDefinition[],
+    ) {
         super();
 
         this.model = model;
-        this.log = logger(MotionManager.name + (modelSettings.name || randomID()));
+        this.definitions = motionDefinitions;
 
-        this.loadMotions(modelSettings).then();
-        this.loadExpressions(modelSettings).then();
+        this.expressionManager = new ExpressionManager(name, model!, expressionDefinitions);
+        this.log = logger(`${MotionManager.name}(${name})`);
+
+        this.loadMotions().then();
 
         this.stopAllMotions();
     }
 
-    private async loadMotions(modelSettings: ModelSettings) {
-        if (!modelSettings.motions) {
-            return;
-        }
+    private async loadMotions() {
+        // initialize all motion groups with empty arrays
+        Object.keys(this.definitions).forEach(group => (this.motions[group] = []));
 
-        Object.entries(modelSettings.motions).forEach(([group, motionDefs]) => {
-            this.motions[group] = [];
-
-            motionDefs.forEach(async ({ name, file }) => {
-                try {
-                    const buffer = await getArrayBuffer(file);
-
-                    this.motions[group].push(Live2DMotion.loadMotion(buffer));
-                } catch (e) {
-                    this.log.error(`Failed to load motion [${name}]: ${file}`, e);
-                }
-            });
-        });
-    }
-
-    private async loadExpressions(modelSettings: ModelSettings) {
-        if (!modelSettings.expressions) {
-            return;
-        }
-
-        modelSettings.expressions.forEach(async ({ name, file }) => {
-            try {
-                const json = await getJSON(file);
-
-                this.expressions.push({
-                    name,
-                    expression: new Live2DExpression(json),
-                });
-            } catch (e) {
-                this.log.error(`Failed to load expression [${name}]: ${file}`, e);
+        // preload idle motions
+        if (this.definitions[Group.Idle]) {
+            for (let i = this.definitions[Group.Idle].length - 1; i >= 0; i--) {
+                this.loadMotion(Group.Idle, i).then();
             }
-        });
+        }
     }
 
-    /**
-     * @returns True if succeeded
-     */
-    reserveMotion(priority: Priority) {
-        if (priority <= this.currentPriority || priority <= this.reservePriority) {
-            return false;
+    private async loadMotion(group: string, index: number) {
+        this.log(`Loading motion at ${index} in group "${group}"`);
+
+        const definition = this.definitions[group] && this.definitions[group][index];
+
+        if (!definition) {
+            this.log.error('Motion not found');
+            return;
         }
 
-        this.reservePriority = priority;
-        return true;
+        this.log(`Loading motion [${definition.name}]`);
+
+        try {
+            const buffer = await getArrayBuffer(definition.file);
+            const motion = Live2DMotion.loadMotion(buffer);
+
+            this.motions[group][index] = motion;
+            return motion;
+        } catch (e) {
+            this.log.error(`Failed to load motion [${definition.name}]: ${definition.file}`, e);
+        }
     }
 
-    startMotion(motion: Live2DMotion, priority: Priority) {
-        if (priority === this.reservePriority) {
-            this.reservePriority = 0;
+    async startMotionByPriority(group: string, index: number, priority: Priority = Priority.Normal) {
+        if (priority <= this.currentPriority) {
+            this.log('Cannot start motion because another motion of higher priority is running');
+            return;
         }
         this.currentPriority = priority;
-        return MotionQueueManager.prototype.startMotion.call(this, motion, false);
+
+        if (priority > Priority.Idle) {
+            this.expressionManager.resetExpression();
+        }
+
+        let motion = this.motions[group] && (this.motions[group][index] || (await this.loadMotion(group, index)));
+        if (!motion) return;
+
+        const definition = this.definitions[group][index];
+        this.log('Starting motion:', definition);
+
+        this.startMotion(motion);
+    }
+
+    startRandomMotion(group: Group, priority: Priority = Priority.Normal) {
+        const groupDefinitions = this.definitions[group];
+
+        if (groupDefinitions && groupDefinitions.length > 0) {
+            const index = Math.floor(Math.random() * groupDefinitions.length);
+            this.startMotionByPriority(group, index, priority).then();
+        }
     }
 
     update() {
-        const updated = this.updateParam(this.model);
-
         if (this.isFinished()) {
-            this.currentPriority = 0;
+            this.currentPriority = Priority.None;
+            this.expressionManager.restoreExpression();
+            this.startRandomMotion(Group.Idle, Priority.Idle);
         }
 
-        return updated;
+        return this.updateParam(this.model);
     }
 }

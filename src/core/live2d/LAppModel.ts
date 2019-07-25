@@ -10,6 +10,8 @@ const log = logger('Live2DModel');
 export default class Live2DModel {
     private coreModel?: Live2DModelWebGL;
 
+    name?: string;
+
     baseDir = '';
 
     modelSettings?: ModelSettings;
@@ -42,8 +44,10 @@ export default class Live2DModel {
         const url = urlParse(file);
         this.baseDir = dirname(url.pathname);
 
+        let modelSettingsJSON;
+
         try {
-            const modelSettingsJSON = await getJSON(file);
+            modelSettingsJSON = await getJSON(file);
         } catch (e) {
             log.error('Failed to load model settings file', e);
             return;
@@ -51,6 +55,8 @@ export default class Live2DModel {
 
         try {
             const modelSettings = new ModelSettings(modelSettingsJSON, this.baseDir);
+            this.modelSettings = modelSettings;
+            this.name = modelSettings.name || randomID();
 
             await this.loadModelData(modelSettings);
             await this.loadTextures(modelSettings);
@@ -59,8 +65,7 @@ export default class Live2DModel {
             await this.loadPhysics(modelSettings);
             await this.loadSubtitles(modelSettings);
 
-            this.modelSettings = modelSettings;
-            this.motionManager = new MotionManager(this.coreModel!, this.modelSettings!);
+            this.motionManager = new MotionManager(this.name, this.coreModel!, this.modelSettings!);
             this.initialized = true;
         } catch (e) {
             log.error('Failed to initialize model', e);
@@ -192,6 +197,65 @@ export default class Live2DModel {
         this.coreModel!.saveParam();
     }
 
+    update(dt: number, now: DOMHighResTimeStamp) {
+        if (!this.coreModel) return;
+
+        var timeSec = timeMSec / 1000.0;
+        var t = timeSec * 2 * Math.PI;
+
+        if (this.motionManager) {
+
+        }
+
+        //-----------------------------------------------------------------
+
+        this.live2DModel.loadParam();
+
+        var update = this.motionManager.updateParam(this.live2DModel);
+        if (!update) {
+            if (this.eyeBlink) {
+                this.eyeBlink.updateParam(this.live2DModel);
+            }
+        }
+
+        this.live2DModel.saveParam();
+
+        //-----------------------------------------------------------------
+
+        if (this.expressionManager && this.expressions && !this.expressionManager.isFinished()) {
+            this.expressionManager.updateParam(this.live2DModel);
+        }
+
+        this.live2DModel.addToParamFloat('PARAM_ANGLE_X', this.dragX * 30, 1);
+        this.live2DModel.addToParamFloat('PARAM_ANGLE_Y', this.dragY * 30, 1);
+        this.live2DModel.addToParamFloat('PARAM_ANGLE_Z', this.dragX * this.dragY * -30, 1);
+
+        this.live2DModel.addToParamFloat('PARAM_BODY_ANGLE_X', this.dragX * 10, 1);
+
+        this.live2DModel.addToParamFloat('PARAM_EYE_BALL_X', this.dragX, 1);
+        this.live2DModel.addToParamFloat('PARAM_EYE_BALL_Y', this.dragY, 1);
+
+        this.live2DModel.addToParamFloat('PARAM_ANGLE_X', Number(15 * Math.sin(t / 6.5345)), 0.5);
+        this.live2DModel.addToParamFloat('PARAM_ANGLE_Y', Number(8 * Math.sin(t / 3.5345)), 0.5);
+        this.live2DModel.addToParamFloat('PARAM_ANGLE_Z', Number(10 * Math.sin(t / 5.5345)), 0.5);
+        this.live2DModel.addToParamFloat('PARAM_BODY_ANGLE_X', Number(4 * Math.sin(t / 15.5345)), 0.5);
+        this.live2DModel.setParamFloat('PARAM_BREATH', Number(0.5 + 0.5 * Math.sin(t / 3.2345)), 1);
+
+        if (this.physics) {
+            this.physics.updateParam(this.live2DModel);
+        }
+
+        if (this.lipSync == null) {
+            this.live2DModel.setParamFloat('PARAM_MOUTH_OPEN_Y', this.lipSyncValue);
+        }
+
+        if (this.pose) {
+            this.pose.updateParam(this.live2DModel);
+        }
+
+        this.live2DModel.update();
+    }
+
     hitTest(drawID: string, testX: number, testY: number) {
         let drawIndex = this.coreModel!.getDrawDataIndex(drawID);
 
@@ -242,185 +306,6 @@ export default class Live2DModel {
         }
     }
 }
-
-LAppModel.prototype.update = function() {
-    // console.log("--> LAppModel.update()");
-
-    if (this.live2DModel == null) {
-        if (LAppDefine.DEBUG_LOG) console.error('Failed to update.');
-
-        return;
-    }
-
-    var timeMSec = UtSystem.getUserTimeMSec() - this.startTimeMSec;
-    var timeSec = timeMSec / 1000.0;
-    var t = timeSec * 2 * Math.PI;
-
-    if (this.motionManager.isFinished()) {
-        if (this.motionQueue.length > 0) {
-            var m = this.motionQueue.shift();
-            this.startMotion(m.name, m.no, LAppDefine.PRIORITY_NORMAL);
-        } else {
-            this.startRandomMotion(
-                MyTools.altIdleAvailable && MyTools.altIdleEnabled
-                    ? LAppDefine.MOTION_GROUP_ALT_IDLE
-                    : LAppDefine.MOTION_GROUP_IDLE,
-                LAppDefine.PRIORITY_IDLE,
-            );
-        }
-    }
-
-    //-----------------------------------------------------------------
-
-    this.live2DModel.loadParam();
-
-    var update = this.motionManager.updateParam(this.live2DModel);
-    if (!update) {
-        if (this.eyeBlink) {
-            this.eyeBlink.updateParam(this.live2DModel);
-        }
-    }
-
-    this.live2DModel.saveParam();
-
-    //-----------------------------------------------------------------
-
-    if (this.expressionManager && this.expressions && !this.expressionManager.isFinished()) {
-        this.expressionManager.updateParam(this.live2DModel);
-    }
-
-    this.live2DModel.addToParamFloat('PARAM_ANGLE_X', this.dragX * 30, 1);
-    this.live2DModel.addToParamFloat('PARAM_ANGLE_Y', this.dragY * 30, 1);
-    this.live2DModel.addToParamFloat('PARAM_ANGLE_Z', this.dragX * this.dragY * -30, 1);
-
-    this.live2DModel.addToParamFloat('PARAM_BODY_ANGLE_X', this.dragX * 10, 1);
-
-    this.live2DModel.addToParamFloat('PARAM_EYE_BALL_X', this.dragX, 1);
-    this.live2DModel.addToParamFloat('PARAM_EYE_BALL_Y', this.dragY, 1);
-
-    this.live2DModel.addToParamFloat('PARAM_ANGLE_X', Number(15 * Math.sin(t / 6.5345)), 0.5);
-    this.live2DModel.addToParamFloat('PARAM_ANGLE_Y', Number(8 * Math.sin(t / 3.5345)), 0.5);
-    this.live2DModel.addToParamFloat('PARAM_ANGLE_Z', Number(10 * Math.sin(t / 5.5345)), 0.5);
-    this.live2DModel.addToParamFloat('PARAM_BODY_ANGLE_X', Number(4 * Math.sin(t / 15.5345)), 0.5);
-    this.live2DModel.setParamFloat('PARAM_BREATH', Number(0.5 + 0.5 * Math.sin(t / 3.2345)), 1);
-
-    if (this.physics) {
-        this.physics.updateParam(this.live2DModel);
-    }
-
-    if (this.lipSync == null) {
-        this.live2DModel.setParamFloat('PARAM_MOUTH_OPEN_Y', this.lipSyncValue);
-    }
-
-    if (this.pose) {
-        this.pose.updateParam(this.live2DModel);
-    }
-
-    this.live2DModel.update();
-};
-
-var lastExpNo;
-LAppModel.prototype.setRandomExpression = function() {
-    var tmp = [];
-    for (var name in this.expressions) {
-        tmp.push(name);
-    }
-
-    if (tmp.length === 0) return;
-
-    var no = 0;
-    if (tmp.length !== 1) {
-        do {
-            no = parseInt(Math.random() * tmp.length);
-        } while (no === lastExpNo);
-        lastExpNo = no;
-    }
-
-    this.setExpression(tmp[no]);
-};
-
-LAppModel.prototype.startRandomMotion = function(name, priority) {
-    var max = this.modelSetting.getMotions(name).length;
-    var no = parseInt(Math.random() * max);
-    this.startMotion(name, no, priority);
-};
-
-LAppModel.prototype.startMotion = function(name, no, priority) {
-    var motionName = this.modelSetting.getMotionFile(name, no);
-
-    if (motionName == null || motionName === '') {
-        if (LAppDefine.DEBUG_LOG) console.error('Failed to motion.');
-        return;
-    }
-
-    if (priority === LAppDefine.PRIORITY_FORCE) {
-        this.motionManager.setReservePriority(priority);
-    } else if (!this.motionManager.reserveMotion(priority)) {
-        if (LAppDefine.DEBUG_LOG) console.log('Motion is running.');
-        return;
-    }
-
-    var thisRef = this;
-    var motion;
-
-    if (this.motions[name] == null) {
-        this.loadMotion(null, parsePath(this.baseDir, motionName), function(mtn) {
-            motion = mtn;
-
-            thisRef.setFadeInFadeOut(name, no, priority, motion);
-        });
-    } else {
-        motion = this.motions[name];
-
-        thisRef.setFadeInFadeOut(name, no, priority, motion);
-    }
-};
-
-LAppModel.prototype.setFadeInFadeOut = function(name, no, priority, motion) {
-    if (priority !== LAppDefine.PRIORITY_IDLE) {
-        if (this.curExpName && this.expressions['normal'])
-            this.expressionManager.startMotion(this.expressions['normal'], false);
-    } else if (this.curExpName) {
-        this.expressionManager.startMotion(this.expressions[this.curExpName], false);
-    }
-
-    var motionName = this.modelSetting.getMotionFile(name, no);
-
-    motion.setFadeIn(this.modelSetting.getMotionFadeIn(name, no));
-    motion.setFadeOut(this.modelSetting.getMotionFadeOut(name, no));
-
-    if (LAppDefine.DEBUG_LOG) console.log('Start motion : ' + motionName);
-
-    if (this.modelSetting.getMotionSound(name, no) == null) {
-        this.motionManager.startMotionPrio(motion, priority);
-    } else {
-        var soundName = this.modelSetting.getMotionSound(name, no);
-        // var player = new Sound(this.baseDir + soundName);
-
-        var snd = document.createElement('audio');
-        snd.src = parsePath(this.baseDir, soundName);
-
-        var subtitle, font;
-        if (MyTools.subtitleEnabled)
-            [subtitle, font] = MyTools.getSubtitle(this.subtitles, this.modelSetting.getMotionSubtitle(name, no));
-
-        MyTools.updateAudio(snd, subtitle, font);
-
-        if (LAppDefine.DEBUG_LOG) console.log('Start sound : ' + soundName);
-
-        snd.play();
-        this.motionManager.startMotionPrio(motion, priority);
-    }
-};
-
-LAppModel.prototype.setExpression = function(name) {
-    this.curExpName = name;
-    var motion = this.expressions[name];
-
-    if (LAppDefine.DEBUG_LOG) console.log('Expression : ' + name);
-
-    this.expressionManager.startMotion(motion, false);
-};
 
 LAppModel.prototype.draw = function(gl) {
     //console.log("--> LAppModel.draw()");

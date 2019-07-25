@@ -15,11 +15,14 @@ interface Param {
 const DEFAULT_FADE_TIMEOUT = 500;
 
 export default class Live2DExpression extends AMotion {
+    name?: string;
+
     readonly params: Param[] = [];
 
-    constructor(json: object) {
+    constructor(json: object, name?: string) {
         super();
 
+        this.name = name;
         this.load(cloneWithCamelCase(json));
     }
 
@@ -47,17 +50,13 @@ export default class Live2DExpression extends AMotion {
                     value /= defaultValue;
                 }
 
-                this.params.push({
-                    id,
-                    value,
-                    type,
-                });
+                this.params.push({ id, value, type });
             });
         }
     }
 
     /** @override */
-    updateParamExe(model: Live2DModelJS, time: DOMTimeStamp, weight: number, MotionQueueEnt: unknown) {
+    updateParamExe(model: Live2DModelWebGL, time: DOMTimeStamp, weight: number, motionQueueEnt: unknown) {
         this.params.forEach(param => {
             switch (param.type) {
                 case ParamCalcType.Set:
