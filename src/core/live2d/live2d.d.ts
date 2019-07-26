@@ -28,7 +28,15 @@ declare class Live2DModelWebGL {
 
     multParamFloat(id: string | number, value: number, weight?: number): unknown;
 
-    setPartsOpacity(id: string, value: number): unknown;
+    setPartsOpacity(id: string | number, value: number): unknown;
+
+    getPartsOpacity(id: string | number): number;
+
+    getParamFloat(id: string | number): number;
+
+    getParamIndex(id: string): number;
+
+    getPartsDataIndex(id: string): number;
 
     getDrawDataIndex(id: string): number;
 
@@ -90,4 +98,8 @@ declare class PhysicsHair {
     addTargetParam(type: string, id: string, scale: number, weight: number): unknown;
 
     update(model: Live2DModelWebGL, time: DOMTimeStamp): unknown;
+}
+
+declare class PartsDataID {
+    static getID(id: string): string;
 }

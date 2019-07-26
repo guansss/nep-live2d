@@ -1,4 +1,5 @@
 import Live2DPhysics from '@/core/live2d/Live2DPhysics';
+import Live2DPose from '@/core/live2d/Live2DPose';
 import ModelSettings from '@/core/live2d/ModelSettings';
 import { log, Tagged } from '@/core/utils/log';
 import { getArrayBuffer, getJSON } from '@/core/utils/net';
@@ -66,13 +67,11 @@ export async function loadTexture(file?: string, gl: WebGLRenderingContext) {
     return texture;
 }
 
-export async function loadPose(file?: string) {
-    if (!file) throw 'Missing pose file';
-
+export async function loadPose(file: string, internalModel: Live2DModelWebGL) {
     log(logSender, 'Loading pose:', file);
 
-    const buffer = await getArrayBuffer(file);
-    return L2DPose.load(buffer);
+    const json = await getJSON(file);
+    return new Live2DPose(internalModel, json);
 }
 
 export async function loadPhysics(file: string, internalModel: Live2DModelWebGL) {

@@ -1,6 +1,7 @@
 import Live2DEyeBlink from '@/core/live2d/Live2DEyeBlink';
 import { loadModel, loadModelSettings, loadPhysics, loadPose, loadTexture } from '@/core/live2d/Live2DLoader';
 import Live2DPhysics from '@/core/live2d/Live2DPhysics';
+import Live2DPose from '@/core/live2d/Live2DPose';
 import ModelSettings from '@/core/live2d/ModelSettings';
 import MotionManager from '@/core/live2d/MotionManager';
 import { log, Tagged } from '@/core/utils/log';
@@ -20,7 +21,7 @@ export default class Live2DModel implements Tagged {
     modelMatrix = null; // L2DModelMatrix
     eyeBlink: Live2DEyeBlink;
     physics?: Live2DPhysics;
-    pose = null; // L2DPose
+    pose?: Live2DPose;
 
     static async create(file: string, webGLContext: WebGLRenderingContext) {
         const modelSettings = await loadModelSettings(file);
@@ -69,9 +70,11 @@ export default class Live2DModel implements Tagged {
         );
         this.eyeBlink = new Live2DEyeBlink(internalModel);
 
-        loadPose(this.modelSettings.pose)
-            .then(pose => (this.pose = pose))
-            .catch(e => log(this, e));
+        if (this.modelSettings.pose) {
+            loadPose(this.modelSettings.pose, internalModel)
+                .then(pose => (this.pose = pose))
+                .catch(e => log(this, e));
+        }
 
         if (this.modelSettings.physics) {
             loadPhysics(this.modelSettings.physics, internalModel)
@@ -163,8 +166,8 @@ export default class Live2DModel implements Tagged {
 
         this.internalModel.saveParam();
 
-        this.physics && this.physics.update();
-        this.pose && this.pose.update();
+        this.physics && this.physics.update(dt);
+        this.pose && this.pose.update(dt);
 
         this.internalModel.update();
 
