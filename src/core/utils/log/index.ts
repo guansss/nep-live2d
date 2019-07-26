@@ -1,36 +1,31 @@
 interface LogRecord {
-    tag: string;
+    tag?: string;
     message: string;
-    error?: boolean;
+    error: boolean;
 }
 
-interface Logger {
-    (...messages: any[]): void;
-
-    error(...messages: any[]): void;
+export interface Tagged {
+    tag: string;
 }
 
-export default function logger(tag: string): Logger {
-    const log = function(...messages: any[]) {
-        logger.logs.push({
-            tag: tag,
-            message: messages.map(m => m.toString()).join(' '),
-        });
+const logs: LogRecord[] = [];
 
-        console.log(`[${tag}]`, ...messages);
-    } as Logger;
+export function log(sender?: Tagged, ...messages: any[]) {
+    logs.push({
+        tag: sender && sender.tag,
+        message: messages.map(m => m.toString()).join(' '),
+        error: false,
+    });
 
-    log.error = function(...messages: any[]) {
-        logger.logs.push({
-            tag: tag,
-            message: messages.map(m => m.toString()).join(' '),
-            error: true,
-        });
-
-        console.error(`[${tag}]`, ...messages);
-    };
-
-    return log;
+    console.log(`[${sender ? sender.tag : ''}]`, ...messages);
 }
 
-logger.logs = [] as LogRecord[];
+export function error(sender?: Tagged, ...messages: any[]) {
+    logs.push({
+        tag: sender && sender.tag,
+        message: messages.map(m => m.toString()).join(' '),
+        error: true,
+    });
+
+    console.error(`[${sender ? sender.tag : ''}]`, ...messages);
+}
