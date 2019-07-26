@@ -1,11 +1,13 @@
 import Live2DExpression from '@/core/live2d/Live2DExpression';
 import { ExpressionDefinition } from '@/core/live2d/ModelSettings';
-import logger, { Logger } from '@/core/utils/log';
+import { error, log, Tagged } from '@/core/utils/log';
 import { getJSON } from '@/core/utils/net';
 import { sample } from 'lodash';
 
-export default class ExpressionManager extends MotionQueueManager {
-    private readonly model: Live2DModelWebGL;
+export default class ExpressionManager extends MotionQueueManager implements Tagged {
+    tag: string;
+
+    private readonly internalModel: Live2DModelWebGL;
 
     private readonly definitions: ExpressionDefinition[];
     private readonly expressions: Live2DExpression[] = [];
@@ -13,14 +15,12 @@ export default class ExpressionManager extends MotionQueueManager {
     private defaultExpression = new Live2DExpression({});
     private currentExpression = this.defaultExpression;
 
-    private readonly log: Logger;
-
     constructor(name: string, model: Live2DModelWebGL, definitions: ExpressionDefinition[]) {
         super();
 
-        this.model = model;
+        this.tag = `${ExpressionManager.name}(${name})`;
+        this.internalModel = model;
         this.definitions = definitions;
-        this.log = logger(`${ExpressionManager.name}(${name})`);
 
         this.loadExpressions().then();
         this.stopAllMotions();
@@ -29,11 +29,11 @@ export default class ExpressionManager extends MotionQueueManager {
     private async loadExpressions() {
         this.definitions.forEach(async ({ name, file }) => {
             try {
-                this.log(`Loading expression [${name}]`);
+                log(this, `Loading expression [${name}]`);
                 const json = await getJSON(file);
                 this.expressions.push(new Live2DExpression(json, name));
             } catch (e) {
-                this.log.error(`Failed to load expression [${name}]: ${file}`, e);
+                error(this, `Failed to load expression [${name}]: ${file}`, e);
             }
         });
     }
@@ -64,7 +64,14 @@ export default class ExpressionManager extends MotionQueueManager {
     }
 
     setExpression(expression: Live2DExpression) {
+        log(this, 'Setting expression:', expression.name);
         this.currentExpression = expression;
         this.startMotion(expression);
+    }
+
+    update() {
+        if (!this.isFinished()) {
+            return this.updateParam(this.internalModel);
+        }
     }
 }

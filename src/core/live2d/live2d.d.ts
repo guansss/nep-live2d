@@ -6,17 +6,21 @@
  */
 
 declare class Live2D {
-    static getError(): unknown | undefined
+    static getError(): unknown | undefined;
 }
 
 declare class Live2DModelWebGL {
+    private constructor();
+
     static loadModel(buffer: ArrayBuffer): Live2DModelWebGL;
 
-    getCanvasWidth(): number
+    getCanvasWidth(): number;
 
-    getCanvasHeight(): number
+    getCanvasHeight(): number;
 
-    setTexture(index: number, texture: WebGLTexture): void
+    setTexture(index: number, texture: WebGLTexture): void;
+
+    setMatrix(matrix: any): void;
 
     setParamFloat(id: string | number, value: number, weight?: number): unknown;
 
@@ -24,13 +28,19 @@ declare class Live2DModelWebGL {
 
     multParamFloat(id: string | number, value: number, weight?: number): unknown;
 
-    setPartsOpacity(id: string, value: number): unknown
+    setPartsOpacity(id: string, value: number): unknown;
 
-    getDrawDataIndex(id: string): number
+    getDrawDataIndex(id: string): number;
 
-    getTransformedPoints(index: number): number[]
+    getTransformedPoints(index: number): number[];
 
-    saveParam(): void
+    loadParam(): void;
+
+    saveParam(): void;
+
+    update(): void;
+
+    draw(): void
 }
 
 declare class AMotion {
@@ -41,16 +51,19 @@ declare class AMotion {
     updateParamExe(model: Live2DModelWebGL, time: DOMTimeStamp, weight: number, MotionQueueEnt: unknown): unknown;
 }
 
-declare class Live2DMotion {
+declare class Live2DMotion extends AMotion {
     private constructor();
 
     static loadMotion(buffer: ArrayBuffer): Live2DMotion;
 }
 
 declare class MotionQueueManager {
-    startMotion(motion: AMotion, unknownArg: boolean): unknown;
+    /** @returns size of internal motion arrays */
+    startMotion(motion: AMotion, neverUsedArg?: boolean): number;
 
     stopAllMotions(): void;
+
+    isFinished(): boolean;
 
     updateParam(model: Live2DModelWebGL): any;
 }
