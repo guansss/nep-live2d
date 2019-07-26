@@ -1,3 +1,4 @@
+import Live2DEyeBlink from '@/core/live2d/Live2DEyeBlink';
 import { loadModel, loadModelSettings, loadPhysics, loadPose, loadTexture } from '@/core/live2d/Live2DLoader';
 import ModelSettings from '@/core/live2d/ModelSettings';
 import MotionManager from '@/core/live2d/MotionManager';
@@ -16,7 +17,7 @@ export default class Live2DModel implements Tagged {
     motionManager: MotionManager;
 
     modelMatrix = null; // L2DModelMatrix
-    eyeBlink = null; // L2DEyeBlink
+    eyeBlink: Live2DEyeBlink;
     physics = null; // L2DPhysics
     pose = null; // L2DPose
 
@@ -65,6 +66,7 @@ export default class Live2DModel implements Tagged {
             modelSettings.motions,
             modelSettings.expressions,
         );
+        this.eyeBlink = new Live2DEyeBlink(internalModel);
 
         loadPose(this.modelSettings.pose)
             .then(pose => (this.pose = pose))
@@ -153,7 +155,7 @@ export default class Live2DModel implements Tagged {
 
         const updated = this.motionManager.update();
         if (!updated && this.eyeBlink) {
-            this.eyeBlink.update();
+            this.eyeBlink.update(dt);
         }
 
         this.internalModel.saveParam();
