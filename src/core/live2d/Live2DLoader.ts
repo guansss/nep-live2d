@@ -1,3 +1,4 @@
+import Live2DPhysics from '@/core/live2d/Live2DPhysics';
 import ModelSettings from '@/core/live2d/ModelSettings';
 import { log, Tagged } from '@/core/utils/log';
 import { getArrayBuffer, getJSON } from '@/core/utils/net';
@@ -74,13 +75,11 @@ export async function loadPose(file?: string) {
     return L2DPose.load(buffer);
 }
 
-export async function loadPhysics(file?: string) {
-    if (!file) throw 'Missing physics file';
-
+export async function loadPhysics(file: string, internalModel: Live2DModelWebGL) {
     log(logSender, 'Loading physics:', file);
 
-    const buffer = await getArrayBuffer(file);
-    return L2DPhysics.load(buffer);
+    const json = await getJSON(file);
+    return new Live2DPhysics(internalModel!, json);
 }
 
 export async function loadSubtitle(file?: string) {

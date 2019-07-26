@@ -40,7 +40,7 @@ declare class Live2DModelWebGL {
 
     update(): void;
 
-    draw(): void
+    draw(): void;
 }
 
 declare class AMotion {
@@ -66,4 +66,28 @@ declare class MotionQueueManager {
     isFinished(): boolean;
 
     updateParam(model: Live2DModelWebGL): any;
+}
+
+declare interface PhysicsHairSrc {
+    SRC_TO_X: string;
+    SRC_TO_Y: string;
+    SRC_TO_G_ANGLE: string;
+}
+
+declare interface PhysicsHairTarget {
+    TARGET_FROM_ANGLE: string;
+    TARGET_FROM_ANGLE_V: string;
+}
+
+declare class PhysicsHair {
+    static Src: PhysicsHairSrc;
+    static Target: PhysicsHairTarget;
+
+    setup(length: number, regist: number, mass: number): unknown;
+
+    addSrcParam(type: string, id: string, scale: number, weight: number): unknown;
+
+    addTargetParam(type: string, id: string, scale: number, weight: number): unknown;
+
+    update(model: Live2DModelWebGL, time: DOMTimeStamp): unknown;
 }
