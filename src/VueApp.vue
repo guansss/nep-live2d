@@ -1,40 +1,40 @@
 <template>
     <div id="app">
-        <Settings v-if="false" />
-        <div ref="canvas"></div>
         <img class="bg" :src="backgroundImage" />
+        <component :is="child" :key="child.name"></component>
     </div>
 </template>
 
-<script>
-import Settings from './components/Settings/index';
+<script lang="ts">
 import Mka from '@/core/mka';
-import * as players from '@/core/players';
+import Vue, { VueConstructor } from 'vue';
 
-export default {
+export default Vue.extend({
     name: 'app',
-    components: {
-        Settings,
-    },
+    components: {},
     data: () => ({
         backgroundImage: '',
+        children: [],
     }),
     created() {
-        const mka = new Mka(this.$refs.canvas);
-
-        Object.entries(players).forEach(([name, player]) => mka.addPlayer(name, player));
+        const mka = new Mka(this.$refs.canvas as HTMLCanvasElement);
 
         this.mka = mka;
     },
     mounted() {
         this.backgroundImage = '/image/bg_forest.jpg';
     },
+    methods: {
+        addChild(componentClass: VueConstructor) {
+            (this.children as VueConstructor[]).push(componentClass);
+        },
+    },
     beforeDestroy() {
         if (this.mka) {
             this.mka.destroy();
         }
     },
-};
+});
 </script>
 <style lang="stylus">
 *

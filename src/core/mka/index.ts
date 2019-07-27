@@ -1,14 +1,17 @@
 import Player from '@/core/mka/Player';
-import logger from '@/core/utils/log';
+import { error, log, Tagged } from '@/core/utils/log';
+import { Application as PIXIApplication } from '@pixi/app';
 import autobind from 'autobind-decorator';
 
-const log = logger('Mka');
+export default class Mka implements Tagged {
+    tag = Mka.name;
 
-export default class Mka {
+    readonly pixiApp: PIXIApplication;
+
     /**
      * Stores all players by names.
      */
-    private players: { [name: string]: Player } = {};
+    private readonly players: { [name: string]: Player } = {};
 
     private lastUpdated = performance.now();
 
@@ -17,7 +20,9 @@ export default class Mka {
      */
     private rafId = 0;
 
-    constructor(element: HTMLElement) {
+    constructor(canvas: HTMLCanvasElement) {
+        this.pixiApp = new PIXIApplication();
+
         this.rafId = requestAnimationFrame(this.tick);
     }
 
@@ -37,11 +42,11 @@ export default class Mka {
 
     addPlayer(name: string, player: Player) {
         if (this.players[name]) {
-            log(`Player "${name}" already exists, ignored.`);
+            log(this, `Player "${name}" already exists, ignored.`);
             return;
         }
 
-        log(`Add player "${name}"`);
+        log(this, `Add player "${name}"`);
         this.players[name] = player;
     }
 
@@ -55,13 +60,13 @@ export default class Mka {
         }
 
         Object.entries(this.players).forEach(([name, player]) => {
-            log(`Destroying player "${name}"...`);
+            log(this, `Destroying player "${name}"...`);
 
             // don't break the loop when error occurs
             try {
                 player.destroy();
             } catch (e) {
-                log.error(e.message, e.stack);
+                error(this, e.message, e.stack);
             }
         });
     }

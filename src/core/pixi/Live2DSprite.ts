@@ -1,6 +1,6 @@
-import { Container } from '@pixi/display';
+import { DisplayObject } from '@pixi/display';
 
-export default class Live2DSprite extends Container {
+export default class Live2DSprite extends DisplayObject {
     constructor(model: string) {
         super();
 

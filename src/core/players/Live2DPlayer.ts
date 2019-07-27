@@ -13,6 +13,7 @@ export default class Live2DPlayer extends Player {
         this.sprites.push(new Live2DSprite('live2d/neptune/normal.model.json'));
     }
 
+    /** @override */
     update(dt: number) {
         // log('Update ' + dt);
         return true;
