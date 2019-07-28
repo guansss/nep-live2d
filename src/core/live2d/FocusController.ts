@@ -1,6 +1,6 @@
 import { clamp } from 'lodash';
 
-export default class FollowingController {
+export default class FocusController {
     /** Minimum distance to respond */
     static EPSILON = 0.01;
 
@@ -15,7 +15,7 @@ export default class FollowingController {
 
     constructor() {}
 
-    follow(x: number, y: number) {
+    focus(x: number, y: number) {
         this.x = x;
         this.y = y;
     }
@@ -24,7 +24,7 @@ export default class FollowingController {
         const dx = this.targetX - this.x;
         const dy = this.targetY - this.y;
 
-        if (Math.abs(dx) < FollowingController.EPSILON && Math.abs(dy) < FollowingController.EPSILON) return;
+        if (Math.abs(dx) < FocusController.EPSILON && Math.abs(dy) < FocusController.EPSILON) return;
 
         const d = Math.sqrt(dx ** 2 + dy ** 2);
         const v = clamp(d / dt, -this.maxSpeed, this.maxSpeed);
