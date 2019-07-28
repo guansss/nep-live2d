@@ -1,7 +1,7 @@
 import './LAppDefine';
-import './Live2DFramework';
-import './LAppModel';
 import './LAppLive2DManager';
+import './LAppModel';
+import './Live2DFramework';
 
 var live2DMgr;
 
@@ -16,10 +16,6 @@ var deviceToScreen = null;
 var drag = false;
 
 function main() {
-    live2DMgr = new LAppLive2DManager();
-
-    initL2dCanvas('gl-canvas');
-    initListener();
     init();
 
     setTimeout(function() {
@@ -33,51 +29,6 @@ function main() {
     }, 500);
 }
 
-function initL2dCanvas(canvasId) {
-    canvas = document.getElementById(canvasId);
-}
-
-function initListener() {
-    $(document).on('mousedown mouseup mouseout', mouseEvent);
-
-    //    var no = 0, max = 88;
-    //    $('#btnChangeBg').on('click', function () {
-    //        if (--no >= 0)
-    //            live2DMgr.models[0].startMotion('tap_body', no, 2);
-    //        else
-    //            no++;
-    //        log(no);
-    //    });
-    //    $('#btn1').on('click', function () {
-    //        live2DMgr.models[0].startMotion('tap_body', no, 2);
-    //        log(no);
-    //    });
-    //    $('#btn2').on('click', function () {
-    //        if (++no < max)
-    //            live2DMgr.models[0].startMotion('tap_body', no, 2);
-    //        else
-    //            no--;
-    //        log(no);
-    //    });
-
-    // Click events can be caught in another way
-    //    eventTarget.addEventListener("click", mouseEvent, false);
-
-    // These events are useless, see comments in mouseEvent()
-    //    eventTarget.addEventListener('mousewheel', mouseEvent, false);
-    //    eventTarget.addEventListener('contextmenu', mouseEvent, false);
-
-    // These are events in mobile browsers, also useless for WE
-    //    eventTarget.addEventListener("touchstart", touchEvent, false);
-    //    eventTarget.addEventListener("touchend", touchEvent, false);
-    //    eventTarget.addEventListener("touchmove", touchEvent, false);
-
-    // Currently no model changing
-    //    btnChangeModel = document.getElementById("btnChange");
-    //    btnChangeModel.addEventListener("click", function (e) {
-    //        changeModel();
-    //    });
-}
 
 function init() {
     $('#console').css({
@@ -229,67 +180,6 @@ function followPointer(event) {
         log('onMouseMove device( x:' + event.clientX + ' y:' + event.clientY + ' ) view( x:' + vx + ' y:' + vy + ')');
 
     dragMgr.setPoint(vx, vy);
-}
-
-function lookFront() {
-    dragMgr.setPoint(0, 0);
-}
-
-var mouseDown = false;
-
-function mouseEvent(e) {
-    e.preventDefault();
-
-    switch (e.type) {
-        case 'mousedown':
-            // This can be omitted because WE will only pass the left-click event (tested)
-            //if ("button" in e && e.button !== 0) return;
-
-            modelAction(e, false);
-
-            mouseDown = true;
-            drag = false;
-
-            if (!MyTools.ffEnabled) $('body').on('mousemove', mouseEvent);
-
-            if (MyTools.ffEnabled && MyTools.ffAutoReleaseTimeout > 0) MyTools.clearAutoRelease();
-            break;
-
-        case 'mousemove':
-            drag = true;
-            followPointer(e);
-
-            if (!mouseDown && MyTools.ffEnabled && MyTools.ffAutoReleaseTimeout > 0) MyTools.updateAutoRelease();
-            break;
-
-        // Triggered when user's cursor moves to another visible element or leaves the current monitor
-        case 'mouseout':
-            // If caused by moving to another element, then ignore it.
-            if (e.clientX >= 0) break;
-            else if (MyTools.ffEnabled) lookFront();
-
-        case 'mouseup':
-            //if ("button" in e && e.button != 0) return;
-
-            // WE will somehow pass the 'mouseup' event even when the focus is not on wallpaper but another window.
-            // May be a glitch?
-            // Anyway just added var mouseDown to filter it.
-            if (mouseDown) {
-                mouseDown = false;
-
-                if (!MyTools.ffEnabled) {
-                    $('body').off('mousemove', mouseEvent);
-                    lookFront();
-                }
-
-                if (!drag) {
-                    modelAction(e, true);
-
-                    if (MyTools.ffEnabled && MyTools.ffClickToRelease) lookFront();
-                }
-            }
-            break;
-    }
 }
 
 function transformViewX(deviceX) {
