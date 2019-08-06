@@ -31,11 +31,6 @@ function main() {
 
 
 function init() {
-    $('#console').css({
-        left: innerWidth - screen.availWidth,
-        bottom: innerHeight - screen.availHeight,
-    });
-
     // A temporary way to fix problems with 21:9 resolutions.
     var ultraWide = innerWidth / innerHeight > 2;
 
@@ -53,49 +48,6 @@ function init() {
     canvas.height = innerHeight;
 
     dragMgr = new L2DTargetPoint();
-
-    var left = LAppDefine.VIEW_LOGICAL_LEFT;
-    var right = LAppDefine.VIEW_LOGICAL_RIGHT;
-    var bottom = -ratio;
-    var top = ratio;
-
-    viewMatrix = new L2DViewMatrix();
-    viewMatrix.setScreenRect(left, right, bottom, top);
-    viewMatrix.setMaxScreenRect(
-        LAppDefine.VIEW_LOGICAL_MAX_LEFT,
-        LAppDefine.VIEW_LOGICAL_MAX_RIGHT,
-        LAppDefine.VIEW_LOGICAL_MAX_BOTTOM,
-        LAppDefine.VIEW_LOGICAL_MAX_TOP,
-    );
-
-    viewMatrix.setMaxScale(/*LAppDefine.VIEW_MAX_SCALE*/ 2);
-    viewMatrix.setMinScale(/*LAppDefine.VIEW_MIN_SCALE*/ 0.01);
-
-    projMatrix = new L2DMatrix44();
-
-    // Why 0.8??? IT'S... you know.
-    var offsetY = ultraWide ? 0.8 * l2dViewToCanvasScale : 0;
-    projMatrix.translate(-l2dViewToCanvasScale * l2dViewToCanvasScale, offsetY);
-    projMatrix.scale(l2dViewToCanvasScale, l2dViewToCanvasScale * (canvas.width / canvas.height));
-
-    var horPixelsToLogical = (right * 2) / (innerWidth - MyTools.canvasBaseWidth / 2);
-    var verPixelsToLogical = (bottom * 2) / MyTools.canvasBaseHeight;
-
-    deviceToScreen = new L2DMatrix44();
-    deviceToScreen.translate(
-        -(innerWidth - MyTools.canvasBaseWidth / 2),
-        -(innerHeight - MyTools.canvasBaseHeight / 2),
-    );
-    deviceToScreen.multScale(horPixelsToLogical, verPixelsToLogical);
-
-    gl = getWebGLContext();
-    if (!gl) {
-        error('Failed to create WebGL context.');
-        return;
-    }
-
-    Live2D.setGL(gl);
-    MyTools.setModelGL(gl);
 
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 

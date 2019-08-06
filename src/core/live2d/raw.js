@@ -172,19 +172,8 @@ L2DModelMatrix.prototype.setWidth = function(w /*float*/) {
 //============================================================
 function L2DViewMatrix() {
     L2DMatrix44.prototype.constructor.call(this);
-    this.screenLeft = null;
-    this.screenRight = null;
-    this.screenTop = null;
-    this.screenBottom = null;
-    this.maxLeft = null;
-    this.maxRight = null;
-    this.maxTop = null;
-    this.maxBottom = null;
-    this.max = Number.MAX_VALUE;
-    this.min = 0;
-}
 
-L2DViewMatrix.prototype = new L2DMatrix44(); //L2DViewMatrix extends L2DMatrix44
+}
 
 L2DViewMatrix.prototype.getMaxScale = function() {
     return this.max;
