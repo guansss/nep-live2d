@@ -25,7 +25,7 @@ export default class Live2DModel implements Tagged {
 
     static async create(file: string, webGLContext: WebGLRenderingContext) {
         const modelSettings = await loadModelSettings(file);
-        if (!modelSettings) return;
+        if (!modelSettings) throw `Failed to load model settings from "${file}"`;
 
         let internalModel: Live2DModelWebGL | undefined = undefined;
         const textures: WebGLTexture[] = [];
@@ -154,7 +154,7 @@ export default class Live2DModel implements Tagged {
         }
     }
 
-    update(dt: number, now: DOMHighResTimeStamp) {
+    update(dt: number) {
         if (!this.internalModel) return;
 
         this.internalModel.loadParam();

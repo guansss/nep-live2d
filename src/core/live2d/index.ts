@@ -31,32 +31,7 @@ function main() {
 
 
 function init() {
-    // A temporary way to fix problems with 21:9 resolutions.
-    var ultraWide = innerWidth / innerHeight > 2;
-
-    // Why 0.618??? ----------------------> IT'S GOD'S CHOICE
-    var l2dViewToCanvasScale = 0.618;
-
-    MyTools.canvasLastHeight = MyTools.canvasBaseHeight = ultraWide ? innerHeight * 1.5 : innerHeight;
-    MyTools.canvasLastWidth = MyTools.canvasBaseWidth = l2dViewToCanvasScale * innerWidth;
-    var ratio = MyTools.canvasBaseHeight / MyTools.canvasBaseWidth;
-
-    // Set canvas' size as screen's to trick the 'drawing' system (or anything)-
-    // for setting the max drawing size to screen's.
-    // Otherwise some of the model may be clipped after scaling.
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-
-    dragMgr = new L2DTargetPoint();
-
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
-
-    if (ultraWide) {
-        MyTools.scale(innerHeight / MyTools.canvasBaseHeight);
-        MyTools.canvasBaseWidth = MyTools.canvasLastWidth;
-        MyTools.canvasBaseHeight = MyTools.canvasLastHeight;
-        MyTools.modelScale = 1;
-    }
 
     startDraw();
 }

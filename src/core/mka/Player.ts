@@ -6,7 +6,7 @@ export default abstract class Player {
      * @param dt - Delta time
      * @returns True if the content is actually updated.
      */
-    abstract update(dt: number): boolean;
+    abstract update(dt: DOMHighResTimeStamp): boolean;
 
     attach() {}
 

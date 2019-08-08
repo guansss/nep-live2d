@@ -6,6 +6,8 @@
  */
 
 declare class Live2D {
+    static setGL(gl: WebGLRenderingContext, index: number): void;
+
     static getError(): unknown | undefined;
 }
 
