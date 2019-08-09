@@ -24,8 +24,8 @@ declare module '@pixi/display' {
  */
 declare module 'glmw' {
     type WASMAddress = number;
-    type mat4Address = WASMAddress;
-    type vec3Address = WASMAddress;
+    type MAT4 = WASMAddress;
+    type VEC3 = WASMAddress;
 
     class Base {
         static create(): WASMAddress;
@@ -34,14 +34,16 @@ declare module 'glmw' {
     }
 
     export class mat4 extends Base {
-        static scale(out: mat4Address, a: mat4Address, v: vec3Address): void;
+        static scale(out: MAT4, a: MAT4, v: VEC3): MAT4;
 
-        static fromScaling(out: mat4Address, v: vec3): mat4Address;
+        static fromScaling(out: MAT4, v: vec3): MAT4;
+
+        static translate(out: MAT4, a: MAT4, v: VEC3): MAT4
     }
 
     export class vec3 extends Base {
-        static fromValues(x: number, y: number, z: number): vec3Address;
+        static fromValues(x: number, y: number, z: number): VEC3;
 
-        static transformMat4(out: vec3Address, a: vec3Address, m: mat4Address): void
+        static transformMat4(out: VEC3, a: VEC3, m: MAT4): VEC3
     }
 }

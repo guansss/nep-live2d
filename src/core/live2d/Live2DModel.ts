@@ -6,6 +6,7 @@ import ModelSettings from '@/core/live2d/ModelSettings';
 import MotionManager from '@/core/live2d/MotionManager';
 import { log, Tagged } from '@/core/utils/log';
 import { randomID } from '@/core/utils/string';
+import { mat4 } from 'glmw';
 
 export default class Live2DModel implements Tagged {
     tag = Live2DModel.name + '(uninitialized)';
@@ -18,7 +19,8 @@ export default class Live2DModel implements Tagged {
     modelSettings: ModelSettings;
     motionManager: MotionManager;
 
-    modelMatrix = null; // L2DModelMatrix
+    modelMatrix = mat4.create();
+
     eyeBlink: Live2DEyeBlink;
     physics?: Live2DPhysics;
     pose?: Live2DPose;
