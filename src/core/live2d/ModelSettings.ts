@@ -1,10 +1,8 @@
-import logger from '@/core/utils/log';
+import { log, Tagged } from '@/core/utils/log';
 import { cloneWithCamelCase } from '@/core/utils/misc';
 import { get, set } from 'lodash';
 // @ts-ignore
 import { resolve as urlResolve } from 'url';
-
-const log = logger('ModelSettings');
 
 export interface MotionDefinition {
     readonly name?: string
@@ -35,7 +33,9 @@ export interface ExpressionDefinition {
     readonly file: string;
 }
 
-export default class ModelSettings {
+export default class ModelSettings implements Tagged {
+    tag = ModelSettings.name;
+
     readonly name?: string;
 
     // files
@@ -67,7 +67,7 @@ export default class ModelSettings {
         this.copy(cloneWithCamelCase(json));
         this.convertPaths(basePath);
 
-        log(JSON.stringify(this, null, 2));
+        log(this, JSON.stringify(this, null, 2));
     }
 
     /**
