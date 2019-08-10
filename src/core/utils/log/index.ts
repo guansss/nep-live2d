@@ -13,7 +13,7 @@ const logs: LogRecord[] = [];
 export function log(sender?: Tagged, ...messages: any[]) {
     logs.push({
         tag: sender && sender.tag,
-        message: messages.map(m => m.toString()).join(' '),
+        message: messages.map(m => m && m.toString()).join(' '),
         error: false,
     });
 
@@ -23,7 +23,7 @@ export function log(sender?: Tagged, ...messages: any[]) {
 export function error(sender?: Tagged, ...messages: any[]) {
     logs.push({
         tag: sender && sender.tag,
-        message: messages.map(m => m.toString()).join(' '),
+        message: messages.map(m => m && m.toString()).join(' '),
         error: true,
     });
 
