@@ -14,7 +14,7 @@ export async function loadModelSettings(file?: string) {
     log(logSender, `Loading model settings:`, file);
 
     const url = urlParse(file);
-    const baseDir = dirname(url.pathname);
+    const baseDir = dirname(url.pathname || '');
     const json = await getJSON(file);
 
     return new ModelSettings(json, baseDir);
@@ -34,9 +34,7 @@ export async function loadModel(file?: string) {
     return model;
 }
 
-export async function loadTexture(file?: string, gl: WebGLRenderingContext) {
-    if (!file) throw 'Missing texture file';
-
+export async function loadTexture(file: string, gl: WebGLRenderingContext) {
     log(logSender, 'Loading texture:', file || '(missing)');
 
     const image = new Image();

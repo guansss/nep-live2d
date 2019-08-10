@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import VueApp from '@/VueApp';
-import App from '@/App';
+import VueApp from './VueApp';
+import { App } from './App';
 
 Vue.config.productionTip = false;
 
-const vm = new Vue({
+new Vue({
     render(h) {
         const vueApp = h(VueApp);
         new App(vueApp);

@@ -1,5 +1,4 @@
-import { clamp } from '@/core/utils/math';
-import { random } from 'lodash';
+import { clamp, random } from 'lodash';
 
 enum EyeState {
     Idle,

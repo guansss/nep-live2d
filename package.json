@@ -9,8 +9,8 @@
   "scripts": {
     "test": "jest",
     "setup": "babel-node --presets @babel/env scripts/setup.js",
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve": "vue-cli-service serve src/main.js",
+    "build": "vue-cli-service build src/main.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
