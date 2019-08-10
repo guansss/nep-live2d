@@ -5,7 +5,7 @@
 
 import chalk from 'chalk';
 import fs from 'fs';
-import vue$loadEnv from '@vue/cli-service/lib/util/loadEnv';
+import dotenv from 'dotenv';
 
 const ENV_FILE = '.env.local';
 
@@ -21,7 +21,7 @@ function loadEnv() {
         return;
     }
 
-    const env = vue$loadEnv(ENV_FILE);
+    const env = dotenv.config({ path: ENV_FILE, debug: true }).parsed;
     let checkPassed = true;
 
     Object.entries(ENV_VARS).forEach(([key, validator]) => {
