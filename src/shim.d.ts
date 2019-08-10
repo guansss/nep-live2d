@@ -27,6 +27,8 @@ declare module 'glmw' {
     type MAT4 = WASMAddress;
     type VEC3 = WASMAddress;
 
+    export function init(): Promise<true>;
+
     class Base {
         static create(): WASMAddress;
 
