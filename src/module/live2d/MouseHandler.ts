@@ -1,4 +1,4 @@
-import { log, Tagged } from '@/core/utils/log';
+import { Tagged } from '@/core/utils/log';
 import { Cancelable, debounce, throttle } from 'lodash';
 
 export default class MouseHandler implements Tagged {
@@ -96,17 +96,11 @@ export default class MouseHandler implements Tagged {
         }
     }
 
-    focus(x: number, y: number) {
-        log(this, 'focus', x, y);
-    }
+    focus(x: number, y: number) {}
 
-    press(x: number, y: number) {
-        log(this, 'press', x, y);
-    }
+    press(x: number, y: number) {}
 
-    clearFocus() {
-        log(this, 'clear focus');
-    }
+    clearFocus() {}
 
     lostFocus: (() => void) | (() => void) & Cancelable = () => {
         // initialize self on first call

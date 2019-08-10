@@ -5,7 +5,7 @@ import { get, set } from 'lodash';
 import { resolve as urlResolve } from 'url';
 
 export interface MotionDefinition {
-    readonly name?: string
+    readonly name?: string;
 
     /** `*.mtn` file. */
     readonly file: string;
