@@ -1,3 +1,4 @@
+import Mka from '@/core/mka/Mka';
 import VueApp from '@/VueApp.vue';
 import { VueConstructor } from 'vue';
 
@@ -6,9 +7,13 @@ export interface Module {
 }
 
 export class App {
-    vueApp: VueApp;
+    readonly mka: Mka;
+    readonly vueApp: VueApp;
 
     constructor(vueApp: VueApp) {
+        const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+        this.mka = new Mka(canvas);
+
         this.vueApp = vueApp;
     }
 

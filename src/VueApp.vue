@@ -1,6 +1,5 @@
 <template>
     <div id="app">
-        <canvas ref="canvas"></canvas>
         <template v-for="(child, i) in children">
             <component :is="child" :key="i"></component>
         </template>
@@ -8,7 +7,6 @@
 </template>
 
 <script lang="ts">
-import Mka from '@/core/mka';
 import { VueConstructor } from 'vue';
 import { Component, Ref, Vue } from 'vue-property-decorator';
 
@@ -18,18 +16,8 @@ export default class VueApp extends Vue {
 
     readonly children: VueConstructor[] = [];
 
-    mka!: Mka;
-
     addChild(componentClass: VueConstructor) {
         (this.children as VueConstructor[]).push(componentClass);
-    }
-
-    created() {
-        this.mka = new Mka(this.canvas);
-    }
-
-    beforeDestroy() {
-        this.mka.destroy();
     }
 }
 </script>
@@ -37,6 +25,11 @@ export default class VueApp extends Vue {
 *
     box-sizing: border-box
     margin: 0
+
+#canvas
+    position absolute
+    width 100vw
+    height 100vh
 
 #app
     height: 100vh
@@ -46,8 +39,4 @@ export default class VueApp extends Vue {
     -webkit-font-smoothing: antialiased
     -moz-osx-font-smoothing: grayscale
 
-.bg
-    display: block
-    width: 100%
-    height: 100%
 </style>
