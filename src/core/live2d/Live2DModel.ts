@@ -32,18 +32,20 @@ export default class Live2DModel implements Tagged {
         let internalModel: Live2DModelWebGL | undefined = undefined;
         const textures: WebGLTexture[] = [];
 
-        [
-            async () => {
-                internalModel = await loadModel(modelSettings.model);
-            },
-            async () => {
-                modelSettings.textures
-                    .map(async (file, i) => (textures[i] = loadTexture(file, webGLContext)))
-                    .forEach(async promise => await promise);
-            },
-        ]
-            .map(fun => fun())
-            .forEach(async promise => await promise);
+        await Promise.all(
+            [
+                async () => {
+                    internalModel = await loadModel(modelSettings.model);
+                },
+                async () => {
+                    const promises = modelSettings.textures.map(async (file, i) => (textures[i] = loadTexture(file, webGLContext)));
+
+                    for (const promise of promises) {
+                        await promise;
+                    }
+                },
+            ].map(fun => fun()),
+        );
 
         return new Live2DModel(internalModel!, webGLContext, modelSettings, textures);
     }
