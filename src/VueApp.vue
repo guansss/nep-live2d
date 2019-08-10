@@ -1,40 +1,37 @@
 <template>
     <div id="app">
-        <img class="bg" :src="backgroundImage" />
-        <component :is="child" :key="child.name"></component>
+        <canvas ref="canvas"></canvas>
+        <template v-for="(child, i) in children">
+            <component :is="child" :key="i"></component>
+        </template>
     </div>
 </template>
 
 <script lang="ts">
 import Mka from '@/core/mka';
-import Vue, { VueConstructor } from 'vue';
+import { VueConstructor } from 'vue';
+import { Component, Ref, Vue } from 'vue-property-decorator';
 
-export default Vue.extend({
-    name: 'app',
-    components: {},
-    data: () => ({
-        backgroundImage: '',
-        children: [],
-    }),
+@Component
+export default class VueApp extends Vue {
+    @Ref() readonly canvas!: HTMLCanvasElement;
+
+    readonly children: VueConstructor[] = [];
+
+    mka!: Mka;
+
+    addChild(componentClass: VueConstructor) {
+        (this.children as VueConstructor[]).push(componentClass);
+    }
+
     created() {
-        const mka = new Mka(this.$refs.canvas as HTMLCanvasElement);
+        this.mka = new Mka(this.canvas);
+    }
 
-        this.mka = mka;
-    },
-    mounted() {
-        this.backgroundImage = '/image/bg_forest.jpg';
-    },
-    methods: {
-        addChild(componentClass: VueConstructor) {
-            (this.children as VueConstructor[]).push(componentClass);
-        },
-    },
     beforeDestroy() {
-        if (this.mka) {
-            this.mka.destroy();
-        }
-    },
-});
+        this.mka.destroy();
+    }
+}
 </script>
 <style lang="stylus">
 *
