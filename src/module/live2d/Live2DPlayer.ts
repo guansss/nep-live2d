@@ -35,6 +35,7 @@ export default class Live2DPlayer extends Player {
     async addSprite(modelSettingsFile: string) {
         const sprite = await Live2DSprite.create(modelSettingsFile, this.gl);
         this.sprites.push(sprite);
+        this.mka!.pixiApp.stage.addChild(sprite);
     }
 
     removeSprite(index: number) {
