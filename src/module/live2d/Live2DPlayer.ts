@@ -1,4 +1,5 @@
 import FocusController from '@/core/live2d/FocusController';
+import Mka from '@/core/mka/Mka';
 import Player from '@/core/mka/Player';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import MouseHandler from '@/module/live2d/MouseHandler';
@@ -16,15 +17,15 @@ export default class Live2DPlayer extends Player {
     mouseHandler: MouseHandler;
     focusController: FocusController;
 
-    constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
+    constructor(mka: Mka) {
         super();
 
-        this.gl = gl;
-        this.mouseHandler = new MouseHandler(canvas);
+        this.gl = mka.gl;
+        this.mouseHandler = new MouseHandler(this.gl.canvas);
         this.focusController = new FocusController();
 
         // height = 2
-        const width = (2 * gl.drawingBufferWidth) / gl.drawingBufferHeight;
+        const width = (2 * this.gl.drawingBufferWidth) / this.gl.drawingBufferHeight;
         mat4.ortho(this.projectionMatrix, width / 2, -width / 2, -1, 1, -1, 1);
 
         mat4.mul(this.projectionViewMatrix, this.projectionViewMatrix, this.projectionMatrix);

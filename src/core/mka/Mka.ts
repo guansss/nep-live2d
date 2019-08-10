@@ -8,6 +8,11 @@ export default class Mka implements Tagged {
 
     readonly pixiApp: PIXIApplication;
 
+    get gl() {
+        // @ts-ignore
+        return this.pixiApp.renderer.gl;
+    }
+
     /**
      * Stores all players by names.
      */
@@ -21,7 +26,9 @@ export default class Mka implements Tagged {
     private rafId = 0;
 
     constructor(canvas: HTMLCanvasElement) {
-        this.pixiApp = new PIXIApplication();
+        this.pixiApp = new PIXIApplication({
+            view: canvas,
+        });
 
         this.rafId = requestAnimationFrame(this.tick);
     }
@@ -32,7 +39,7 @@ export default class Mka implements Tagged {
 
         for (const player of Object.values(this.players)) {
             if (player.enabled && !player.paused) {
-                player.update(delta);
+                player.update();
             }
         }
 
@@ -48,6 +55,8 @@ export default class Mka implements Tagged {
 
         log(this, `Add player "${name}"`);
         this.players[name] = player;
+        player.mka = this;
+        player.attach();
     }
 
     getPlayer(name: string) {

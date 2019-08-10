@@ -1,4 +1,8 @@
+import Mka from '@/core/mka/Mka';
+
 export default abstract class Player {
+    mka?: Mka;
+
     enabled = true;
     paused = false;
 
