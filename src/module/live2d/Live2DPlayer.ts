@@ -21,6 +21,8 @@ export default class Live2DPlayer extends Player {
         super();
 
         this.gl = mka.gl;
+        Live2D.setGL(this.gl);
+
         this.mouseHandler = new MouseHandler(this.gl.canvas);
         this.focusController = new FocusController();
 
