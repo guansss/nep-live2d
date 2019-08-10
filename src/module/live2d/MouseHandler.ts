@@ -1,5 +1,5 @@
 import { log, Tagged } from '@/core/utils/log';
-import { Cancelable, debounce } from 'lodash';
+import { Cancelable, debounce, throttle } from 'lodash';
 
 export default class MouseHandler implements Tagged {
     tag = MouseHandler.name;
@@ -58,14 +58,14 @@ export default class MouseHandler implements Tagged {
         }
     }
 
-    mouseMove(e: MouseEvent) {
+    mouseMove = throttle((e: MouseEvent) => {
         this.dragging = true;
         this.focus(e.clientX, e.clientY);
 
         if (!this.pressed && !this.focusOnPress) {
             this.lostFocus();
         }
-    }
+    }, 100);
 
     mouseUp(e: MouseEvent) {
         // only handle left mouse button
@@ -97,14 +97,15 @@ export default class MouseHandler implements Tagged {
     }
 
     focus(x: number, y: number) {
-
+        log(this, 'focus', x, y);
     }
 
     press(x: number, y: number) {
-
+        log(this, 'press', x, y);
     }
 
     clearFocus() {
+        log(this, 'clear focus');
     }
 
     lostFocus: (() => void) | (() => void) & Cancelable = () => {
