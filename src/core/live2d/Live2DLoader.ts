@@ -14,7 +14,7 @@ export async function loadModelSettings(file?: string) {
     log(logSender, `Loading model settings:`, file);
 
     const url = urlParse(file);
-    const baseDir = dirname(url.pathname || '');
+    const baseDir = dirname(url.pathname || '') + '/';
     const json = await getJSON(file);
 
     return new ModelSettings(json, baseDir);

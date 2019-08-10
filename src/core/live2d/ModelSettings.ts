@@ -175,7 +175,7 @@ export default class ModelSettings implements Tagged {
             }
         };
         const convertArray = (obj: object, arrayPath: string, propertyPath: string) => {
-            const array: [] = get(this, arrayPath);
+            const array: [] = get(obj, arrayPath);
 
             if (Array.isArray(array)) {
                 array.forEach(obj => convertProperty(obj, propertyPath));
@@ -190,7 +190,11 @@ export default class ModelSettings implements Tagged {
         convertArray(this, 'textures', 'file');
         convertArray(this, 'expressions', 'file');
 
-        Object.entries(this.motions).forEach(([group]) => convertArray(this.motions, group, 'file'));
+        Object.keys(this.motions).forEach(group => convertArray(this.motions, group, 'file'));
+
+        if (Array.isArray(this.textures)) {
+            this.textures.forEach((texture, i) => convertProperty(this.textures, i));
+        }
     }
 }
 
