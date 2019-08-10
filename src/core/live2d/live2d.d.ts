@@ -6,6 +6,8 @@
  */
 
 declare class Live2D {
+    static setGL(gl: WebGLRenderingContext, index: number): void;
+
     static getError(): unknown | undefined;
 }
 
@@ -20,7 +22,7 @@ declare class Live2DModelWebGL {
 
     setTexture(index: number, texture: WebGLTexture): void;
 
-    setMatrix(matrix: any): void;
+    setMatrix(matrix: Float32Array): void;
 
     setParamFloat(id: string | number, value: number, weight?: number): unknown;
 

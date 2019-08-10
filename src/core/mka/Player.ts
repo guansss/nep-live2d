@@ -3,10 +3,9 @@ export default abstract class Player {
     paused = false;
 
     /**
-     * @param dt - Delta time
      * @returns True if the content is actually updated.
      */
-    abstract update(dt: number): boolean;
+    abstract update(): boolean;
 
     attach() {}
 
