@@ -1,6 +1,9 @@
+import { log, Tagged } from '@/core/utils/log';
 import { Cancelable, debounce } from 'lodash';
 
-export default class MouseHandler {
+export default class MouseHandler implements Tagged {
+    tag = MouseHandler.name;
+
     /** Only focus when mouse is pressed */
     private focusOnPress = false;
 
@@ -111,9 +114,8 @@ export default class MouseHandler {
     };
 
     updateLostFocus() {
-        if ((this.lostFocus as (() => void) & Cancelable).cancel) {
-            this.lostFocus = debounce(() => this.clearFocus(), this.lostFocusTimeout);
-        }
+        this.cancelLostFocus();
+        this.lostFocus = debounce(() => this.clearFocus(), this.lostFocusTimeout);
     }
 
     cancelLostFocus() {
@@ -140,6 +142,8 @@ export default class MouseHandler {
         this.lostFocusTimeout = value > 0 ? value : Infinity;
         if (value === Infinity) {
             this.cancelLostFocus();
+        } else {
+            this.updateLostFocus();
         }
     }
 }
