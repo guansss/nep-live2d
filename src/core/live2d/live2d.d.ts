@@ -68,6 +68,8 @@ declare class Live2DMotion extends AMotion {
 }
 
 declare class MotionQueueManager {
+    motions: unknown[];
+
     /** @returns size of internal motion arrays */
     startMotion(motion: AMotion, neverUsedArg?: boolean): number;
 

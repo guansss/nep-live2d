@@ -22,7 +22,7 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
     readonly internalModel: Live2DModelWebGL;
 
     definitions: { [group: string]: MotionDefinition[] };
-    motions: { [group: string]: Live2DMotion[] } = {};
+    motionGroups: { [group: string]: Live2DMotion[] } = {};
 
     expressionManager?: ExpressionManager;
 
@@ -51,7 +51,7 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
 
     private async loadMotions() {
         // initialize all motion groups with empty arrays
-        Object.keys(this.definitions).forEach(group => (this.motions[group] = []));
+        Object.keys(this.definitions).forEach(group => (this.motionGroups[group] = []));
 
         // preload idle motions
         if (this.definitions[Group.Idle]) {
@@ -77,7 +77,7 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
             const buffer = await getArrayBuffer(definition.file);
             const motion = Live2DMotion.loadMotion(buffer);
 
-            this.motions[group][index] = motion;
+            this.motionGroups[group][index] = motion;
             return motion;
         } catch (e) {
             error(this, `Failed to load motion [${definition.name}]: ${definition.file}`, e);
@@ -95,7 +95,7 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
             this.expressionManager && this.expressionManager.resetExpression();
         }
 
-        let motion = this.motions[group] && (this.motions[group][index] || (await this.loadMotion(group, index)));
+        let motion = this.motionGroups[group] && (this.motionGroups[group][index] || (await this.loadMotion(group, index)));
         if (!motion) return;
 
         const definition = this.definitions[group][index];
