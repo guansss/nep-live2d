@@ -16,7 +16,7 @@ export class App {
         module.install(this);
     }
 
-    addChild(componentClass: VueConstructor) {
+    addComponent(componentClass: VueConstructor) {
         this.vueApp.$options.methods!.addChild.call(this.vueApp, componentClass);
     }
 }
