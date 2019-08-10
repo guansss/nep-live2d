@@ -6,7 +6,7 @@ import ModelSettings from '@/core/live2d/ModelSettings';
 import MotionManager from '@/core/live2d/MotionManager';
 import { log, Tagged } from '@/core/utils/log';
 import { randomID } from '@/core/utils/string';
-import { mat4 } from 'glmw';
+import { MAT4, mat4, vec3 } from 'glmw';
 
 export default class Live2DModel implements Tagged {
     tag = Live2DModel.name + '(uninitialized)';
@@ -88,42 +88,41 @@ export default class Live2DModel implements Tagged {
     }
 
     private setup() {
-        this.modelMatrix = new L2DModelMatrix(this.internalModel.getCanvasWidth(), this.internalModel.getCanvasHeight());
-        this.modelMatrix.setWidth(2);
-        this.modelMatrix.setCenterPosition(0, 0);
-
         if (this.modelSettings.layout) {
-            [
-                ['width', 'setWidth'],
-                ['height', 'setHeight'],
-                ['x', 'setX'],
-                ['y', 'setY'],
-                ['center_x', 'centerX'],
-                ['center_y', 'centerY'],
-                ['top', 'top'],
-                ['right', 'right'],
-                ['bottom', 'bottom'],
-                ['left', 'left'],
-            ].forEach(([paramId, method]) => {
-                const value = modelSettings.layout![paramId];
-                if (value) {
-                    (this.modelMatrix[method] as (param: number) => void)(value);
-                }
-            });
+            const values = {
+                width: 2,
+                height: 2,
+                centerX: 0,
+                centerY: 0,
+            };
+            Object.assign(values, this.modelSettings.layout);
+
+            mat4.fromTranslation(
+                this.modelMatrix,
+                vec3.fromValues(values.centerX - values.width / 2, values.centerY - values.height / 2, 0),
+            );
         }
 
-        if (modelSettings.initParams) {
-            modelSettings.initParams.forEach(({ id, value }) => this.internalModel.setParamFloat(id, value));
+        if (this.modelSettings.initParams) {
+            this.modelSettings.initParams.forEach(({ id, value }) => this.internalModel.setParamFloat(id, value));
         }
-        if (modelSettings.initOpacities) {
-            modelSettings.initOpacities.forEach(({ id, value }) => this.internalModel.setPartsOpacity(id, value));
+        if (this.modelSettings.initOpacities) {
+            this.modelSettings.initOpacities.forEach(({ id, value }) => this.internalModel.setPartsOpacity(id, value));
         }
 
         this.internalModel.saveParam();
     }
 
+    translate(dx: number, dy: number) {
+        mat4.translate(this.modelMatrix, this.modelMatrix, vec3.fromValues(dx, dy, 0));
+    }
+
+    scale(factor: number) {
+        mat4.scale(this.modelMatrix, this.modelMatrix, vec3.fromValues(factor, factor, 1));
+    }
+
     hit(x: number, y: number) {
-        this.log(`Hit (${x}, ${y})`);
+        log(this, `Hit (${x}, ${y})`);
 
         if (this.internalModel && this.modelSettings && this.modelSettings.hitAreas) {
             this.modelSettings.hitAreas.forEach(({ name, id }) => {
@@ -145,18 +144,19 @@ export default class Live2DModel implements Tagged {
                         if (py < top) top = py;
                         if (py > bottom) bottom = py;
                     }
-                    const tx = this.modelMatrix.invertTransformX(x);
-                    const ty = this.modelMatrix.invertTransformY(y);
-
-                    if (left <= tx && tx <= right && top <= ty && ty <= bottom) {
-                        // TODO: Fire a touch event with `name`
-                    }
+                    // const tx = this.modelMatrix.invertTransformX(x);
+                    // const ty = this.modelMatrix.invertTransformY(y);
+                    //
+                    // if (left <= tx && tx <= right && top <= ty && ty <= bottom) {
+                    //     // TODO: Fire a touch event with `name`
+                    // }
                 }
             });
         }
     }
 
-    update(dt: number) {
+    update(transform: MAT4) {
+        const dt = 16; // TODO: calculate dt
         if (!this.internalModel) return;
 
         this.internalModel.loadParam();
@@ -173,14 +173,11 @@ export default class Live2DModel implements Tagged {
 
         this.internalModel.update();
 
-        MatrixStack.push();
-        MatrixStack.multMatrix(this.modelMatrix.getArray());
+        const matrix = mat4.clone(transform);
+        mat4.mul(matrix, transform, this.modelMatrix);
 
-        this.tmpMatrix = MatrixStack.getMatrix();
-        this.internalModel.setMatrix(this.tmpMatrix);
+        this.internalModel.setMatrix(mat4.view(matrix));
         this.internalModel.draw();
-
-        MatrixStack.pop();
     }
 
     release() {

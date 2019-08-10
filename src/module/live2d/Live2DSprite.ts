@@ -6,10 +6,14 @@ export default class Live2DSprite extends DisplayObject {
 
     model: Live2DModel;
 
-    constructor(modelSettingsFile: string) {
-        super();
+    static async create(modelSettingsFile: string, gl: WebGLRenderingContext) {
+        const model = await Live2DModel.create(modelSettingsFile, gl);
+        return new Live2DSprite(model);
+    }
 
-        console.log(`Live2DSprite initialized with "${modelSettingsFile}"`);
+    private constructor(model: Live2DModel) {
+        super();
+        this.model = model;
     }
 
     set x(value: number) {
@@ -30,17 +34,21 @@ export default class Live2DSprite extends DisplayObject {
 
     set(x: number, y: number) {
         const position = this.transform.position;
-
         const dx = x - position.x;
         const dy = y - position.y;
 
         position.x = x;
         position.y = y;
 
-        mat4.translate(this.modelMatrix, this.modelMatrix, vec3.fromValues(dx, dy, 0));
+        this.model.translate(dx, dy);
     }
 
     render() {
 
+    }
+
+    destroy() {
+        this.model.release();
+        super.destroy();
     }
 }

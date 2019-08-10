@@ -22,7 +22,7 @@ declare class Live2DModelWebGL {
 
     setTexture(index: number, texture: WebGLTexture): void;
 
-    setMatrix(matrix: any): void;
+    setMatrix(matrix: Float32Array): void;
 
     setParamFloat(id: string | number, value: number, weight?: number): unknown;
 

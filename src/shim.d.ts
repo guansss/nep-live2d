@@ -30,15 +30,31 @@ declare module 'glmw' {
     class Base {
         static create(): WASMAddress;
 
+        static clone(a: WASMAddress): WASMAddress;
+
         static view(address: WASMAddress): Float32Array;
     }
 
     export class mat4 extends Base {
         static scale(out: MAT4, a: MAT4, v: VEC3): MAT4;
 
+        static fromTranslation(out: MAT4, v: VEC3): MAT4
+
         static fromScaling(out: MAT4, v: vec3): MAT4;
 
+        static ortho(
+            out: MAT4,
+            left: number,
+            right: number,
+            bottom: number,
+            top: number,
+            near: number,
+            far: number,
+        ): MAT4;
+
         static translate(out: MAT4, a: MAT4, v: VEC3): MAT4
+
+        static mul(out: MAT4, a: MAT4, b: MAT4): MAT4
     }
 
     export class vec3 extends Base {
