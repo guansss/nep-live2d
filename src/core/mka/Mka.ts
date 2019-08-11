@@ -37,9 +37,14 @@ export default class Mka implements Tagged {
     private tick(now: number) {
         const delta = now - this.lastUpdated;
 
-        for (const player of Object.values(this.players)) {
+        for (const [name, player] of Object.entries(this.players)) {
             if (player.enabled && !player.paused) {
-                player.update();
+                try {
+                    player.update();
+                } catch (e) {
+                    error(this, `(${name})`, e);
+                    throw e;
+                }
             }
         }
 
