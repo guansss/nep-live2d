@@ -14,6 +14,9 @@ export class App {
         const canvas = document.getElementById('canvas') as HTMLCanvasElement;
         this.mka = new Mka(canvas);
 
+        // TODO: Remove this in release
+        eval('window.mka = this.mka');
+
         this.vueApp = vueApp;
     }
 

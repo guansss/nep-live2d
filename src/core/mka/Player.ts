@@ -1,10 +1,10 @@
 import Mka from '@/core/mka/Mka';
 
 export default abstract class Player {
-    mka?: Mka;
+    readonly mka?: Mka;
 
-    enabled = true;
-    paused = false;
+    readonly enabled: boolean = true;
+    readonly paused: boolean = false;
 
     /**
      * @returns True if the content is actually updated.
@@ -25,3 +25,5 @@ export default abstract class Player {
 
     destroy() {}
 }
+
+export type InternalPlayer = { -readonly [P in keyof Player]: Player[P] };

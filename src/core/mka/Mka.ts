@@ -1,10 +1,16 @@
-import Player from '@/core/mka/Player';
+import Player, { InternalPlayer } from '@/core/mka/Player';
 import { error, log, Tagged } from '@/core/utils/log';
 import { Application as PIXIApplication } from '@pixi/app';
 import autobind from 'autobind-decorator';
 
 export default class Mka implements Tagged {
     tag = Mka.name;
+
+    private _paused = false;
+
+    get paused() {
+        return this._paused;
+    }
 
     readonly pixiApp: PIXIApplication;
 
@@ -13,10 +19,7 @@ export default class Mka implements Tagged {
         return this.pixiApp.renderer.gl;
     }
 
-    /**
-     * Stores all players by names.
-     */
-    private readonly players: { [name: string]: Player } = {};
+    private readonly players: { [name: string]: InternalPlayer } = {};
 
     private lastUpdated = performance.now();
 
@@ -33,25 +36,6 @@ export default class Mka implements Tagged {
         this.rafId = requestAnimationFrame(this.tick);
     }
 
-    @autobind
-    private tick(now: number) {
-        const delta = now - this.lastUpdated;
-
-        for (const [name, player] of Object.entries(this.players)) {
-            if (player.enabled && !player.paused) {
-                try {
-                    player.update();
-                } catch (e) {
-                    error(this, `(${name})`, e);
-                    throw e;
-                }
-            }
-        }
-
-        this.lastUpdated = performance.now();
-        this.rafId = requestAnimationFrame(this.tick);
-    }
-
     addPlayer(name: string, player: Player) {
         if (this.players[name]) {
             log(this, `Player "${name}" already exists, ignored.`);
@@ -60,12 +44,61 @@ export default class Mka implements Tagged {
 
         log(this, `Add player "${name}"`);
         this.players[name] = player;
-        player.mka = this;
+        this.players[name].mka = this;
         player.attach();
     }
 
     getPlayer(name: string) {
         return this.players[name];
+    }
+
+    @autobind
+    private tick(now: number) {
+        const delta = now - this.lastUpdated;
+
+        this.forEachPlayer(player => {
+            if (player.enabled && !player.paused) {
+                player.update();
+            }
+        });
+
+        this.lastUpdated = performance.now();
+        this.rafId = requestAnimationFrame(this.tick);
+    }
+
+    pause() {
+        this._paused = true;
+        cancelAnimationFrame(this.rafId);
+
+        this.forEachPlayer(player => {
+            if (player.enabled) {
+                player.paused = true;
+                player.pause();
+            }
+        });
+    }
+
+    resume() {
+        this._paused = false;
+
+        this.forEachPlayer(player => {
+            if (player.enabled) {
+                player.paused = false;
+                player.resume();
+            }
+        });
+
+        requestAnimationFrame(this.tick);
+    }
+
+    forEachPlayer(fn: (player: InternalPlayer, name: string) => void) {
+        for (const [name, player] of Object.entries(this.players)) {
+            try {
+                fn(player, name);
+            } catch (e) {
+                error(this, `(${name})`, e);
+            }
+        }
     }
 
     destroy() {

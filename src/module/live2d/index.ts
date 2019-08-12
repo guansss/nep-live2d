@@ -16,7 +16,6 @@ export default class Live2DModule implements Module, Tagged {
     }
 
     loadModels() {
-        console.log(process.env);
         const basePath = process.env.VUE_APP_LIVE2D_PATH + '/';
         const models = process.env.VUE_APP_LIVE2D_MODELS;
 
