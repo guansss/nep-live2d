@@ -1,7 +1,6 @@
 import { log, Tagged } from '@/core/utils/log';
 import { cloneWithCamelCase } from '@/core/utils/misc';
 import { get, set } from 'lodash';
-// @ts-ignore
 import { resolve as urlResolve } from 'url';
 
 export interface MotionDefinition {
@@ -167,7 +166,7 @@ export default class ModelSettings implements Tagged {
      * Converts each file from relative path to absolute path.
      */
     private convertPaths(basePath: string) {
-        const convertProperty = (obj: object, propertyPath: string) => {
+        const convertProperty = (obj: object, propertyPath: string | number) => {
             const path: string = get(obj, propertyPath);
 
             if (path) {
