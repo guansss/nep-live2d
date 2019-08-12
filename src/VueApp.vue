@@ -8,12 +8,10 @@
 
 <script lang="ts">
 import { VueConstructor } from 'vue';
-import { Component, Ref, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 
 @Component
 export default class VueApp extends Vue {
-    @Ref() readonly canvas!: HTMLCanvasElement;
-
     readonly children: VueConstructor[] = [];
 
     addChild(componentClass: VueConstructor) {

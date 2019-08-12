@@ -180,7 +180,14 @@ export default class Live2DModel implements Tagged {
         const matrix = mat4.clone(transform);
         mat4.mul(matrix, transform, this.modelMatrix);
 
-        this.internalModel.setMatrix(mat4.view(matrix));
+        const arr = new Float32Array(16);
+        const src = [0.00079, 0, 0, 0, 0, -0.00095, 0, 0, 0, 0, 1, 0, -0.8, 1.3, 0, 1];
+        for (let i = 0; i < 16; i++) {
+            arr[i] = src[i];
+        }
+
+        this.internalModel.setMatrix(arr);
+        // this.internalModel.setMatrix(mat4.view(matrix));
         this.internalModel.draw();
     }
 

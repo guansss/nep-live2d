@@ -32,15 +32,21 @@ declare module 'glmw' {
     class Base {
         static create(): WASMAddress;
 
-        static clone(a: WASMAddress): WASMAddress;
+        static clone<T extends WASMAddress>(a: T): T;
 
-        static identity(out: WASMAddress): WASMAddress;
+        static identity<T extends WASMAddress>(out: T): T;
 
         static view(address: WASMAddress): Float32Array;
     }
 
     export class mat4 extends Base {
-        static scale(out: MAT4, a: MAT4, v: VEC3): MAT4;
+        // prettier-ignore
+        static fromValues(
+            m00: number, m01: number, m02: number, m03: number,
+            m10: number, m11: number, m12: number, m13: number,
+            m20: number, m21: number, m22: number, m23: number,
+            m30: number, m31: number, m32: number, m33: number,
+        ): MAT4;
 
         static fromTranslation(out: MAT4, v: VEC3): MAT4;
 
@@ -59,6 +65,8 @@ declare module 'glmw' {
         ): MAT4;
 
         static translate(out: MAT4, a: MAT4, v: VEC3): MAT4;
+
+        static scale(out: MAT4, a: MAT4, v: VEC3): MAT4;
 
         static mul(out: MAT4, a: MAT4, b: MAT4): MAT4;
     }

@@ -1,11 +1,14 @@
 import FocusController from '@/core/live2d/FocusController';
 import Mka from '@/core/mka/Mka';
 import Player from '@/core/mka/Player';
+import { log, Tagged } from '@/core/utils/log';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import MouseHandler from '@/module/live2d/MouseHandler';
 import { mat4 } from 'glmw';
 
-export default class Live2DPlayer extends Player {
+export default class Live2DPlayer extends Player implements Tagged {
+    tag = Live2DPlayer.name;
+
     readonly sprites: Live2DSprite[] = [];
 
     viewMatrix = mat4.create();
@@ -32,6 +35,8 @@ export default class Live2DPlayer extends Player {
 
         mat4.mul(this.projectionViewMatrix, this.projectionViewMatrix, this.projectionMatrix);
         mat4.mul(this.projectionViewMatrix, this.projectionViewMatrix, this.viewMatrix);
+
+        log(this, mat4.view(this.viewMatrix), mat4.view(this.projectionMatrix), mat4.view(this.projectionViewMatrix));
     }
 
     async addSprite(modelSettingsFile: string) {

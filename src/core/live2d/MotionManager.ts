@@ -95,7 +95,8 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
             this.expressionManager && this.expressionManager.resetExpression();
         }
 
-        let motion = this.motionGroups[group] && (this.motionGroups[group][index] || (await this.loadMotion(group, index)));
+        let motion =
+            this.motionGroups[group] && (this.motionGroups[group][index] || (await this.loadMotion(group, index)));
         if (!motion) return;
 
         const definition = this.definitions[group][index];
