@@ -34,7 +34,7 @@ export async function loadModel(file?: string) {
     return model;
 }
 
-export async function loadTexture(file: string, gl: WebGLRenderingContext) {
+export async function loadTexture(file: string, gl: WebGLRenderingContext, premultipliedAlpha = false) {
     log(logSender, 'Loading texture:', file || '(missing)');
 
     const image = new Image();
@@ -48,12 +48,10 @@ export async function loadTexture(file: string, gl: WebGLRenderingContext) {
     const texture = gl.createTexture();
     if (!texture) throw 'Failed to create texture using WebGL';
 
-    // not sure if these are necessary
-    //
-    // if (!this.coreModel.isPremultipliedAlpha()) {
-    //     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-    // }
-    // gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    if (!premultipliedAlpha) {
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+    }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
