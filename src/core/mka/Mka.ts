@@ -31,6 +31,8 @@ export default class Mka implements Tagged {
     constructor(canvas: HTMLCanvasElement) {
         this.pixiApp = new PIXIApplication({
             view: canvas,
+            width: canvas.offsetWidth,
+            height: canvas.offsetHeight,
         });
 
         this.rafId = requestAnimationFrame(this.tick);
