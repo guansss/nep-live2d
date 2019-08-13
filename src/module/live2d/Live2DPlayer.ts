@@ -4,7 +4,7 @@ import Player from '@/core/mka/Player';
 import { log, Tagged } from '@/core/utils/log';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import MouseHandler from '@/module/live2d/MouseHandler';
-import { mat4 } from 'glmw';
+import { mat4, vec3 } from 'glmw';
 
 export default class Live2DPlayer extends Player implements Tagged {
     tag = Live2DPlayer.name;
@@ -29,12 +29,17 @@ export default class Live2DPlayer extends Player implements Tagged {
         this.mouseHandler = new MouseHandler(this.gl.canvas);
         this.focusController = new FocusController();
 
+        mat4.lookAt(this.viewMatrix, vec3.fromValues(0, 0, -1), vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
+        // const scaling = 1 / this.gl.drawingBufferHeight;
+        // mat4.fromScaling(this.viewMatrix, vec3.fromValues(scaling, -scaling, 1));
+        // mat4.translate(this.viewMatrix, this.viewMatrix, vec3.fromValues(-1, -1, 0));
+
+
         // height = 2
         const width = (2 * this.gl.drawingBufferWidth) / this.gl.drawingBufferHeight;
-        mat4.ortho(this.projectionMatrix, width / 2, -width / 2, -1, 1, -1, 1);
+        mat4.ortho(this.projectionMatrix, -width / 2, width / 2, -1, 1, -1, 1);
 
-        mat4.mul(this.projectionViewMatrix, this.projectionViewMatrix, this.projectionMatrix);
-        mat4.mul(this.projectionViewMatrix, this.projectionViewMatrix, this.viewMatrix);
+        mat4.mul(this.projectionViewMatrix, this.projectionMatrix, this.viewMatrix);
 
         log(this, mat4.view(this.viewMatrix), mat4.view(this.projectionMatrix), mat4.view(this.projectionViewMatrix));
     }

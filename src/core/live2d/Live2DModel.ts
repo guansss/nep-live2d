@@ -179,6 +179,7 @@ export default class Live2DModel implements Tagged {
 
         const matrix = mat4.clone(transform);
         mat4.mul(matrix, transform, this.modelMatrix);
+        log(this, mat4.view(transform), mat4.view(this.modelMatrix), mat4.view(matrix));
 
         const arr = new Float32Array(16);
         const src = [0.00079, 0, 0, 0, 0, -0.00095, 0, 0, 0, 0, 1, 0, -0.8, 1.3, 0, 1];
@@ -186,8 +187,8 @@ export default class Live2DModel implements Tagged {
             arr[i] = src[i];
         }
 
-        this.internalModel.setMatrix(arr);
-        // this.internalModel.setMatrix(mat4.view(matrix));
+        // this.internalModel.setMatrix(arr);
+        this.internalModel.setMatrix(mat4.view(matrix));
         this.internalModel.draw();
     }
 
