@@ -34,7 +34,6 @@ export default class Live2DPlayer extends Player implements Tagged {
         // mat4.fromScaling(this.viewMatrix, vec3.fromValues(scaling, -scaling, 1));
         // mat4.translate(this.viewMatrix, this.viewMatrix, vec3.fromValues(-1, -1, 0));
 
-
         // height = 2
         const width = (2 * this.gl.drawingBufferWidth) / this.gl.drawingBufferHeight;
         mat4.ortho(this.projectionMatrix, -width / 2, width / 2, -1, 1, -1, 1);
@@ -46,6 +45,11 @@ export default class Live2DPlayer extends Player implements Tagged {
 
     async addSprite(modelSettingsFile: string) {
         const sprite = await Live2DSprite.create(modelSettingsFile, this.gl);
+        sprite.position.x = -1;
+        sprite.position.y = -1;
+        sprite.scale.x = 1 / this.gl.drawingBufferWidth;
+        sprite.scale.y = 1 / this.gl.drawingBufferHeight;
+
         this.sprites.push(sprite);
         this.mka!.pixiApp.stage.addChild(sprite);
     }
@@ -59,6 +63,6 @@ export default class Live2DPlayer extends Player implements Tagged {
 
     /** @override */
     update() {
-        return this.sprites.some(sprite => sprite.update(this.projectionViewMatrix));
+        return this.sprites.some(sprite => sprite.update());
     }
 }

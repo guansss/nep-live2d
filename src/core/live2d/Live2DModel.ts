@@ -6,7 +6,6 @@ import ModelSettings from '@/core/live2d/ModelSettings';
 import MotionManager from '@/core/live2d/MotionManager';
 import { log, Tagged } from '@/core/utils/log';
 import { randomID } from '@/core/utils/string';
-import { MAT4, mat4, vec3 } from 'glmw';
 
 export default class Live2DModel implements Tagged {
     tag = Live2DModel.name + '(uninitialized)';
@@ -18,8 +17,6 @@ export default class Live2DModel implements Tagged {
     name: string;
     modelSettings: ModelSettings;
     motionManager: MotionManager;
-
-    modelMatrix = mat4.create();
 
     eyeBlink: Live2DEyeBlink;
     physics?: Live2DPhysics;
@@ -99,12 +96,12 @@ export default class Live2DModel implements Tagged {
                 centerX: 0,
                 centerY: 0,
             };
-            Object.assign(values, this.modelSettings.layout);
+            Object.assign(this, this.modelSettings.layout);
 
-            mat4.fromTranslation(
-                this.modelMatrix,
-                vec3.fromValues(values.centerX - values.width / 2, values.centerY - values.height / 2, 0),
-            );
+            // mat4.fromTranslation(
+            //     this.modelMatrix,
+            //     vec3.fromValues(values.centerX - values.width / 2, values.centerY - values.height / 2, 0),
+            // );
         }
 
         if (this.modelSettings.initParams) {
@@ -115,14 +112,6 @@ export default class Live2DModel implements Tagged {
         }
 
         this.internalModel.saveParam();
-    }
-
-    translate(dx: number, dy: number) {
-        mat4.translate(this.modelMatrix, this.modelMatrix, vec3.fromValues(dx, dy, 0));
-    }
-
-    scale(factor: number) {
-        mat4.scale(this.modelMatrix, this.modelMatrix, vec3.fromValues(factor, factor, 1));
     }
 
     hit(x: number, y: number) {
@@ -159,7 +148,7 @@ export default class Live2DModel implements Tagged {
         }
     }
 
-    update(transform: MAT4) {
+    update(transform: Float32Array) {
         const dt = 16; // TODO: calculate dt
         if (!this.internalModel) return;
 
@@ -176,19 +165,7 @@ export default class Live2DModel implements Tagged {
         this.pose && this.pose.update(dt);
 
         this.internalModel.update();
-
-        const matrix = mat4.clone(transform);
-        mat4.mul(matrix, transform, this.modelMatrix);
-        log(this, mat4.view(transform), mat4.view(this.modelMatrix), mat4.view(matrix));
-
-        const arr = new Float32Array(16);
-        const src = [0.00079, 0, 0, 0, 0, -0.00095, 0, 0, 0, 0, 1, 0, -0.8, 1.3, 0, 1];
-        for (let i = 0; i < 16; i++) {
-            arr[i] = src[i];
-        }
-
-        // this.internalModel.setMatrix(arr);
-        this.internalModel.setMatrix(mat4.view(matrix));
+        this.internalModel.setMatrix(transform);
         this.internalModel.draw();
     }
 
