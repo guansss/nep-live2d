@@ -1,4 +1,4 @@
-import { log, Tagged } from '@/core/utils/log';
+import { Tagged } from '@/core/utils/log';
 import { cloneWithCamelCase } from '@/core/utils/misc';
 import { get, set } from 'lodash';
 import { resolve as urlResolve } from 'url';
@@ -65,8 +65,6 @@ export default class ModelSettings implements Tagged {
 
         this.copy(cloneWithCamelCase(json));
         this.convertPaths(basePath);
-
-        log(this, JSON.stringify(this, null, 2));
     }
 
     /**
@@ -140,7 +138,7 @@ export default class ModelSettings implements Tagged {
                 if (Array.isArray(motionGroup)) {
                     this.motions[group] = motionGroup
 
-                    // filter out the motions without `file` defined
+                        // filter out the motions without `file` defined
                         .filter(motion => motion && typeof motion.file === 'string')
 
                         // copy only the valid properties
