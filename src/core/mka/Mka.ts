@@ -56,16 +56,20 @@ export default class Mka implements Tagged {
 
     @autobind
     private tick(now: number) {
-        const delta = now - this.lastUpdated;
+        if (!this._paused) {
+            const delta = now - this.lastUpdated;
 
-        this.forEachPlayer(player => {
-            if (player.enabled && !player.paused) {
-                player.update();
-            }
-        });
+            this.forEachPlayer(player => {
+                if (player.enabled && !player.paused) {
+                    player.update();
+                }
+            });
 
-        this.lastUpdated = performance.now();
-        this.rafId = requestAnimationFrame(this.tick);
+            this.pixiApp.render();
+
+            this.lastUpdated = performance.now();
+            this.rafId = requestAnimationFrame(this.tick);
+        }
     }
 
     pause() {

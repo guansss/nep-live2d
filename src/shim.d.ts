@@ -19,6 +19,10 @@ declare module '@pixi/display' {
     export { DisplayObject } from 'pixi.js';
 }
 
+declare module '@pixi/math' {
+    export { Matrix, Point } from 'pixi.js';
+}
+
 /**
  * glmw shims
  */
