@@ -85,25 +85,6 @@ export default class Live2DModel implements Tagged {
                 .catch(e => log(this, e));
         }
 
-        this.setup();
-    }
-
-    private setup() {
-        if (this.modelSettings.layout) {
-            const values = {
-                width: 2,
-                height: 2,
-                centerX: 0,
-                centerY: 0,
-            };
-            Object.assign(this, this.modelSettings.layout);
-
-            // mat4.fromTranslation(
-            //     this.modelMatrix,
-            //     vec3.fromValues(values.centerX - values.width / 2, values.centerY - values.height / 2, 0),
-            // );
-        }
-
         if (this.modelSettings.initParams) {
             this.modelSettings.initParams.forEach(({ id, value }) => this.internalModel.setParamFloat(id, value));
         }
@@ -150,7 +131,6 @@ export default class Live2DModel implements Tagged {
 
     update(transform: Float32Array) {
         const dt = 16; // TODO: calculate dt
-        if (!this.internalModel) return;
 
         this.internalModel.loadParam();
 

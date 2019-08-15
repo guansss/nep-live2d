@@ -11,16 +11,25 @@ declare module '*.vue' {
  * PIXI shims
  * @see https://github.com/pixijs/pixi.js/issues/5397
  */
+declare module '@pixi/core' {
+    export { Renderer } from 'pixi.js';
+}
+
 declare module '@pixi/app' {
     export { Application } from 'pixi.js';
 }
 
 declare module '@pixi/display' {
-    export { DisplayObject } from 'pixi.js';
+    export { DisplayObject, Container } from 'pixi.js';
+}
+
+declare module '@pixi/interaction' {
+    import { interaction } from 'pixi.js';
+    export default interaction;
 }
 
 declare module '@pixi/math' {
-    export { Matrix } from 'pixi.js';
+    export { Matrix, Point } from 'pixi.js';
 }
 
 /**

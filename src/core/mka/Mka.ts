@@ -1,7 +1,11 @@
 import Player, { InternalPlayer } from '@/core/mka/Player';
 import { error, log, Tagged } from '@/core/utils/log';
 import { Application as PIXIApplication } from '@pixi/app';
+import { Renderer } from '@pixi/core';
+import { InteractionManager } from '@pixi/interaction';
 import autobind from 'autobind-decorator';
+
+Renderer.registerPlugin('interaction', InteractionManager);
 
 export default class Mka implements Tagged {
     tag = Mka.name;
@@ -56,16 +60,20 @@ export default class Mka implements Tagged {
 
     @autobind
     private tick(now: number) {
-        const delta = now - this.lastUpdated;
+        if (!this._paused) {
+            const delta = now - this.lastUpdated;
 
-        this.forEachPlayer(player => {
-            if (player.enabled && !player.paused) {
-                player.update();
-            }
-        });
+            this.forEachPlayer(player => {
+                if (player.enabled && !player.paused) {
+                    player.update();
+                }
+            });
 
-        this.lastUpdated = performance.now();
-        this.rafId = requestAnimationFrame(this.tick);
+            this.pixiApp.render();
+
+            this.lastUpdated = performance.now();
+            this.rafId = requestAnimationFrame(this.tick);
+        }
     }
 
     pause() {
