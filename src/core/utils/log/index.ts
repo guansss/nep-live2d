@@ -17,6 +17,8 @@ export function log(sender?: Tagged, ...messages: any[]) {
         error: false,
     });
 
+    // eval('if(logs.length > 100) window.mka && window.mka.pause()');
+
     console.log(`[${sender ? sender.tag : ''}]`, ...messages);
 }
 
@@ -26,6 +28,8 @@ export function error(sender?: Tagged, ...messages: any[]) {
         message: messages.map(m => m && m.toString()).join(' '),
         error: true,
     });
+
+    // eval('if(logs.length > 100) window.mka && window.mka.pause()');
 
     console.error(`[${sender ? sender.tag : ''}]`, ...messages);
 }

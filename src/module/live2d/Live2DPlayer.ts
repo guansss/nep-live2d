@@ -10,16 +10,22 @@ export default class Live2DPlayer extends Player implements Tagged {
 
     readonly sprites: Live2DSprite[] = [];
 
-    mouseHandler: MouseHandler;
     focusController: FocusController;
+    mouseHandler: MouseHandler;
 
     constructor(mka: Mka) {
         super();
 
         Live2D.setGL(mka.gl);
 
-        this.mouseHandler = new MouseHandler(mka.gl.canvas);
         this.focusController = new FocusController();
+
+        this.mouseHandler = new MouseHandler(document.documentElement);
+        this.mouseHandler.focus = (x, y) =>
+            this.focusController.focus(
+                (x * 2) / document.documentElement.offsetWidth - 1,
+                (-y * 2) / document.documentElement.offsetHeight + 1,
+            );
     }
 
     async addSprite(modelSettingsFile: string) {
@@ -40,6 +46,24 @@ export default class Live2DPlayer extends Player implements Tagged {
 
     /** @override */
     update() {
+        // TODO: calculate dt
+        this.focusController.update(16);
+
+        const rect = this.mka!.pixiApp.view.getBoundingClientRect();
+
+        this.sprites.forEach(sprite => {
+            this.focusController.updateModel(
+                sprite.model.internalModel,
+                rect.left + sprite.position.x,
+                rect.top + sprite.position.y,
+            );
+        });
+
         return true;
+    }
+
+    destroy() {
+        this.mouseHandler.destroy();
+        super.destroy();
     }
 }

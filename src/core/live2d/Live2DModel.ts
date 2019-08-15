@@ -10,9 +10,9 @@ import { randomID } from '@/core/utils/string';
 export default class Live2DModel implements Tagged {
     tag = Live2DModel.name + '(uninitialized)';
 
-    private readonly internalModel: Live2DModelWebGL;
-    private readonly webGLContext: WebGLRenderingContext;
-    private readonly textures: WebGLTexture[] = [];
+    readonly internalModel: Live2DModelWebGL;
+    readonly webGLContext: WebGLRenderingContext;
+    readonly textures: WebGLTexture[] = [];
 
     name: string;
     modelSettings: ModelSettings;
@@ -132,14 +132,14 @@ export default class Live2DModel implements Tagged {
     update(transform: Float32Array) {
         const dt = 16; // TODO: calculate dt
 
-        this.internalModel.loadParam();
+        // this.internalModel.loadParam();
 
         const updated = this.motionManager.update();
         if (!updated) {
             this.eyeBlink.update(dt);
         }
 
-        this.internalModel.saveParam();
+        // this.internalModel.saveParam();
 
         this.physics && this.physics.update(dt);
         this.pose && this.pose.update(dt);

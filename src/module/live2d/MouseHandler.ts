@@ -1,4 +1,5 @@
 import { Tagged } from '@/core/utils/log';
+import autobind from 'autobind-decorator';
 import { Cancelable, debounce, throttle } from 'lodash';
 
 export default class MouseHandler implements Tagged {
@@ -9,8 +10,6 @@ export default class MouseHandler implements Tagged {
 
     readonly element: HTMLElement;
 
-    private readonly mouseMoveHandler = (e: MouseEvent) => this.mouseMove(e);
-
     /** How long will the focus last. Setting 0 or negative will behave the same as `Infinity` */
     private lostFocusTimeout: DOMHighResTimeStamp = Infinity;
 
@@ -19,29 +18,41 @@ export default class MouseHandler implements Tagged {
 
     constructor(element: HTMLElement) {
         this.element = element;
-        element.addEventListener('mousedown', e => this.mouseDown(e), { passive: true });
-        element.addEventListener('mouseup', e => this.mouseUp(e), { passive: true });
-        element.addEventListener('mouseout', e => this.mouseOut(e), { passive: true });
 
-        // maybe adding these will make it support mobile browsers?
-        // (will also require handling 'touchmove' and ignoring `button` property for touch events)
-        //
-        // element.addEventListener('touchstart', e => this.mouseDown(e), { passive: true });
-        // element.addEventListener('touchend', e => this.mouseUp(e), { passive: true });
+        this.addGeneralListeners();
 
         if (!this.focusOnPress) {
             this.addMouseMoveListener();
         }
     }
 
+    addGeneralListeners() {
+        this.element.addEventListener('mousedown', this.mouseDown, { passive: true });
+        this.element.addEventListener('mouseup', this.mouseUp, { passive: true });
+        this.element.addEventListener('mouseout', this.mouseOut, { passive: true });
+
+        // maybe adding these will make it support mobile browsers?
+        // (will also require handling 'touchmove' and ignoring `button` property for touch events)
+        //
+        // element.addEventListener('touchstart', e => this.mouseDown(e), { passive: true });
+        // element.addEventListener('touchend', e => this.mouseUp(e), { passive: true });
+    }
+
+    removeGeneralListeners() {
+        this.element.removeEventListener('mousedown', this.mouseDown);
+        this.element.removeEventListener('mouseup', this.mouseUp);
+        this.element.removeEventListener('mouseout', this.mouseOut);
+    }
+
     addMouseMoveListener() {
-        this.element.addEventListener('mousemove', this.mouseMoveHandler, { passive: true });
+        this.element.addEventListener('mousemove', this.mouseMove, { passive: true });
     }
 
     removeMouseMoveListener() {
-        this.element.removeEventListener('mousemove', this.mouseMoveHandler);
+        this.element.removeEventListener('mousemove', this.mouseMove);
     }
 
+    @autobind
     mouseDown(e: MouseEvent) {
         // only handle left mouse button
         if (e.button !== 0) return;
@@ -67,6 +78,7 @@ export default class MouseHandler implements Tagged {
         }
     }, 100);
 
+    @autobind
     mouseUp(e: MouseEvent) {
         // only handle left mouse button
         if (e.button !== 0) return;
@@ -89,6 +101,7 @@ export default class MouseHandler implements Tagged {
     /**
      * Will be triggered when cursor leaves the element
      */
+    @autobind
     mouseOut(e: MouseEvent) {
         if (!this.focusOnPress) {
             this.clearFocus();
@@ -96,8 +109,10 @@ export default class MouseHandler implements Tagged {
         }
     }
 
+    // to be overridden
     focus(x: number, y: number) {}
 
+    // to be overridden
     press(x: number, y: number) {}
 
     clearFocus() {}
@@ -140,5 +155,10 @@ export default class MouseHandler implements Tagged {
         } else {
             this.updateLostFocus();
         }
+    }
+
+    destroy() {
+        this.removeGeneralListeners();
+        this.removeMouseMoveListener();
     }
 }

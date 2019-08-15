@@ -2,8 +2,9 @@ import Player, { InternalPlayer } from '@/core/mka/Player';
 import { error, log, Tagged } from '@/core/utils/log';
 import { Application as PIXIApplication } from '@pixi/app';
 import autobind from 'autobind-decorator';
+import { EventEmitter } from 'eventemitter3';
 
-export default class Mka implements Tagged {
+export default class Mka extends EventEmitter implements Tagged {
     tag = Mka.name;
 
     private _paused = false;
@@ -29,6 +30,8 @@ export default class Mka implements Tagged {
     private rafId = 0;
 
     constructor(canvas: HTMLCanvasElement) {
+        super();
+
         this.pixiApp = new PIXIApplication({
             view: canvas,
             width: canvas.offsetWidth,

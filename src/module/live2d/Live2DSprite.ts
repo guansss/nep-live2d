@@ -44,8 +44,8 @@ export default class Live2DSprite extends DisplayObject implements Tagged {
     }
 
     updateTransformByGL(gl: WebGLRenderingContext) {
-        this.drawingScaleX = this.width / 2 / gl.drawingBufferWidth;
-        this.drawingScaleY = -this.height / 2 / gl.drawingBufferHeight; // flip Y
+        this.drawingScaleX = this.width / gl.drawingBufferWidth;
+        this.drawingScaleY = -this.height / gl.drawingBufferHeight; // flip Y
     }
 
     /** @override */

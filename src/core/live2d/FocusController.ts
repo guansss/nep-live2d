@@ -1,11 +1,12 @@
+import { log } from '@/core/utils/log';
 import { clamp } from 'lodash';
 
-export default class FocusController {
-    /** Minimum distance to respond */
-    static EPSILON = 0.01;
+/** Minimum distance to respond */
+const EPSILON = 0.01;
 
-    maxSpeed = 0.08;
-    maxAccSpeed = 0.1;
+export default class FocusController {
+    maxSpeed = 0.01;
+    maxAccSpeed = 0.008;
 
     targetX = 0;
     targetY = 0;
@@ -13,27 +14,34 @@ export default class FocusController {
     y = 0;
     v = 0;
 
-    constructor() {}
-
     focus(x: number, y: number) {
-        this.x = x;
-        this.y = y;
+        this.targetX = x;
+        this.targetY = y;
     }
 
     update(dt: DOMHighResTimeStamp) {
         const dx = this.targetX - this.x;
         const dy = this.targetY - this.y;
 
-        if (Math.abs(dx) < FocusController.EPSILON && Math.abs(dy) < FocusController.EPSILON) return;
+        if (Math.abs(dx) < EPSILON && Math.abs(dy) < EPSILON) return;
 
         const d = Math.sqrt(dx ** 2 + dy ** 2);
-        const v = clamp(d / dt, -this.maxSpeed, this.maxSpeed);
+        const v = clamp(d / dt, 0, this.maxSpeed);
         const a = clamp((v - this.v) / dt, -this.maxAccSpeed, this.maxAccSpeed);
         this.v += a * dt;
 
+        // log(
+        //     { tag: 'fc' },
+        //     this.v.toFixed(3),
+        //     this.targetX.toFixed(3),
+        //     this.targetY.toFixed(3),
+        //     this.x.toFixed(3),
+        //     this.y.toFixed(3),
+        // );
+
         const dd = this.v * dt;
-        this.x += dx / dd;
-        this.y += dy / dd;
+        this.x += (dd * dx) / d;
+        this.y += (dd * dy) / d;
 
         // ==========================================================================================
         // Hmm, I can't understand this.
@@ -52,5 +60,23 @@ export default class FocusController {
         //     this.vy *= max_v / cur_v;
         // }
         // ==========================================================================================
+    }
+
+    updateModel(model: Live2DModelWebGL, offsetX: number, offsetY: number) {
+        const x = this.x + offsetX;
+        const y = this.y + offsetY;
+        log(
+            { tag: 'fc' },
+            x, y, offsetX, offsetY,
+        );
+
+        model.setParamFloat('PARAM_ANGLE_X', x * 30, 1);
+        model.setParamFloat('PARAM_ANGLE_Y', y * 30, 1);
+        model.addToParamFloat('PARAM_ANGLE_Z', x * y * -30, 1);
+
+        model.addToParamFloat('PARAM_BODY_ANGLE_X', x * 10, 1);
+
+        model.addToParamFloat('PARAM_EYE_BALL_X', x, 1);
+        model.addToParamFloat('PARAM_EYE_BALL_Y', y, 1);
     }
 }
