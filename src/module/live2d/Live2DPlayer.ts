@@ -13,10 +13,21 @@ export default class Live2DPlayer extends Player implements Tagged {
     focusController: FocusController;
     mouseHandler: MouseHandler;
 
+    canvasRect: ClientRect = {
+        bottom: 0,
+        left: 0,
+        right: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+    };
+
     constructor(mka: Mka) {
         super();
 
         Live2D.setGL(mka.gl);
+
+        this.updateByGL(mka.gl);
 
         this.focusController = new FocusController();
 
@@ -33,6 +44,9 @@ export default class Live2DPlayer extends Player implements Tagged {
 
         const sprite = await Live2DSprite.create(modelSettingsFile, this.mka.gl);
         sprite.updateTransformByGL(this.mka.gl);
+        // sprite.scale.set(0.5, 0.5);
+        // sprite.position.x = -100;
+        // sprite.position.y = -100;
         this.sprites.push(sprite);
         this.mka.pixiApp.stage.addChild(sprite);
     }
@@ -44,18 +58,27 @@ export default class Live2DPlayer extends Player implements Tagged {
         }
     }
 
+    /**
+     * Needs to be called when WebGL context changes
+     */
+    updateByGL(gl: WebGLRenderingContext) {
+        this.canvasRect = gl.canvas.getBoundingClientRect();
+
+        this.sprites.forEach(sprite => sprite.updateTransformByGL(gl));
+    }
+
     /** @override */
     update() {
         // TODO: calculate dt
         this.focusController.update(16);
 
-        const rect = this.mka!.pixiApp.view.getBoundingClientRect();
+        const rect = this.canvasRect;
 
         this.sprites.forEach(sprite => {
             this.focusController.updateModel(
-                sprite.model.internalModel,
-                rect.left + sprite.position.x,
-                rect.top + sprite.position.y,
+                sprite.model,
+                rect.left + sprite.position.x / rect.width,
+                rect.top + sprite.position.y / rect.height,
             );
         });
 

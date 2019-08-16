@@ -1,5 +1,5 @@
 import Live2DModel from '@/core/live2d/Live2DModel';
-import { Tagged } from '@/core/utils/log';
+import { log, Tagged } from '@/core/utils/log';
 import { Renderer } from '@pixi/core';
 import { DisplayObject } from '@pixi/display';
 
@@ -60,8 +60,10 @@ export default class Live2DSprite extends DisplayObject implements Tagged {
         transform[1] = wt.c;
         transform[4] = wt.b;
         transform[5] = wt.d * this.drawingScaleY;
-        transform[12] = wt.tx + (this.centerX - this.width / 2);
-        transform[13] = wt.ty - (this.centerY - this.height / 2);
+        transform[12] = wt.tx * this.drawingScaleX + (this.centerX - this.width / 2);
+        transform[13] = wt.ty * this.drawingScaleY - (this.centerY - this.height / 2);
+
+        log(this, transform);
 
         this.model.update(transform);
     }

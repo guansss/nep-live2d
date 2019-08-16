@@ -1,4 +1,4 @@
-import { log } from '@/core/utils/log';
+import Live2DModel from '@/core/live2d/Live2DModel';
 import { clamp } from 'lodash';
 
 /** Minimum distance to respond */
@@ -62,21 +62,8 @@ export default class FocusController {
         // ==========================================================================================
     }
 
-    updateModel(model: Live2DModelWebGL, offsetX: number, offsetY: number) {
-        const x = this.x + offsetX;
-        const y = this.y + offsetY;
-        log(
-            { tag: 'fc' },
-            x, y, offsetX, offsetY,
-        );
-
-        model.setParamFloat('PARAM_ANGLE_X', x * 30, 1);
-        model.setParamFloat('PARAM_ANGLE_Y', y * 30, 1);
-        model.addToParamFloat('PARAM_ANGLE_Z', x * y * -30, 1);
-
-        model.addToParamFloat('PARAM_BODY_ANGLE_X', x * 10, 1);
-
-        model.addToParamFloat('PARAM_EYE_BALL_X', x, 1);
-        model.addToParamFloat('PARAM_EYE_BALL_Y', y, 1);
+    updateModel(model: Live2DModel, offsetX: number, offsetY: number) {
+        model.focusX = this.x + offsetX;
+        model.focusY = this.y + offsetY;
     }
 }
