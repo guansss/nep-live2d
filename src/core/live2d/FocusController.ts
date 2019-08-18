@@ -30,15 +30,6 @@ export default class FocusController {
         const a = clamp((v - this.v) / dt, -this.maxAccSpeed, this.maxAccSpeed);
         this.v += a * dt;
 
-        // log(
-        //     { tag: 'fc' },
-        //     this.v.toFixed(3),
-        //     this.targetX.toFixed(3),
-        //     this.targetY.toFixed(3),
-        //     this.x.toFixed(3),
-        //     this.y.toFixed(3),
-        // );
-
         const dd = this.v * dt;
         this.x += (dd * dx) / d;
         this.y += (dd * dy) / d;

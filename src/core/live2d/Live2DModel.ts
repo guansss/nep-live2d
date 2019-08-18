@@ -22,6 +22,17 @@ export default class Live2DModel implements Tagged {
     physics?: Live2DPhysics;
     pose?: Live2DPose;
 
+    readonly width: number;
+    readonly height: number;
+
+    /** Typically equals to 2 */
+    readonly logicalWidth: number;
+    readonly logicalHeight: number;
+
+    /** Offset to translate model to center position. */
+    readonly offsetX: number;
+    readonly offsetY: number;
+
     focusX = 0;
     focusY = 0;
 
@@ -66,6 +77,9 @@ export default class Live2DModel implements Tagged {
         this.name = modelSettings.name || randomID();
         this.tag = `${Live2DModel.name}(${this.name})`;
 
+        this.width = internalModel.getCanvasWidth();
+        this.height = internalModel.getCanvasHeight();
+
         textures.forEach((texture, i) => internalModel.setTexture(i, texture));
 
         this.motionManager = new MotionManager(
@@ -87,6 +101,22 @@ export default class Live2DModel implements Tagged {
                 .then(physics => (this.physics = physics))
                 .catch(e => log(this, e));
         }
+
+        const layout = {
+            width: 2,
+            height: 2,
+            centerX: 0,
+            centerY: 0,
+        };
+
+        if (modelSettings.layout) {
+            Object.assign(layout, modelSettings.layout);
+        }
+
+        this.logicalWidth = layout.width;
+        this.logicalHeight = layout.height;
+        this.offsetX = layout.centerX - layout.width / 2;
+        this.offsetY = layout.centerY - layout.height / 2;
 
         if (this.modelSettings.initParams) {
             this.modelSettings.initParams.forEach(({ id, value }) => this.internalModel.setParamFloat(id, value));
@@ -135,34 +165,34 @@ export default class Live2DModel implements Tagged {
     update(transform: Float32Array) {
         const dt = 16; // TODO: calculate dt
 
-        // this.internalModel.loadParam();
+        const model = this.internalModel;
+
+        // model.loadParam();
 
         const updated = this.motionManager.update();
         if (!updated) {
             this.eyeBlink.update(dt);
         }
 
-        // this.internalModel.saveParam();
+        // model.saveParam();
 
         this.physics && this.physics.update(dt);
         this.pose && this.pose.update(dt);
 
         const x = this.focusX;
         const y = this.focusY;
-        const model = this.internalModel;
 
-        model.setParamFloat('PARAM_ANGLE_X', x * 30, 1);
-        model.setParamFloat('PARAM_ANGLE_Y', y * 30, 1);
-        model.addToParamFloat('PARAM_ANGLE_Z', x * y * -30, 1);
-
-        model.addToParamFloat('PARAM_BODY_ANGLE_X', x * 10, 1);
-
+        // update focus
         model.addToParamFloat('PARAM_EYE_BALL_X', x, 1);
         model.addToParamFloat('PARAM_EYE_BALL_Y', y, 1);
+        model.addToParamFloat('PARAM_ANGLE_X', x * 30, 1);
+        model.addToParamFloat('PARAM_ANGLE_Y', y * 30, 1);
+        model.addToParamFloat('PARAM_ANGLE_Z', x * y * -30, 1);
+        model.addToParamFloat('PARAM_BODY_ANGLE_X', x * 10, 1);
 
-        this.internalModel.update();
-        this.internalModel.setMatrix(transform);
-        this.internalModel.draw();
+        model.update();
+        model.setMatrix(transform);
+        model.draw();
     }
 
     release() {

@@ -5,16 +5,16 @@ import { Cancelable, debounce, throttle } from 'lodash';
 export default class MouseHandler implements Tagged {
     tag = MouseHandler.name;
 
+    readonly element: HTMLElement;
+
     /** Only focus when mouse is pressed */
     private focusOnPress = false;
 
-    readonly element: HTMLElement;
-
-    /** How long will the focus last. Setting 0 or negative will behave the same as `Infinity` */
+    /** How long will the focus last. Setting 0 or negative value is equivalent to `Infinity` */
     private lostFocusTimeout: DOMHighResTimeStamp = Infinity;
 
-    pressed = false;
-    dragging = false;
+    private pressed = false;
+    private dragging = false;
 
     constructor(element: HTMLElement) {
         this.element = element;
@@ -57,7 +57,7 @@ export default class MouseHandler implements Tagged {
         // only handle left mouse button
         if (e.button !== 0) return;
 
-        this.focus(e.clientX, e.clientY);
+        this.focus(e.clientX / this.element.offsetWidth, e.clientY / this.element.offsetHeight);
 
         this.pressed = true;
         this.dragging = false;
@@ -71,7 +71,7 @@ export default class MouseHandler implements Tagged {
 
     mouseMove = throttle((e: MouseEvent) => {
         this.dragging = true;
-        this.focus(e.clientX, e.clientY);
+        this.focus(e.clientX / this.element.offsetWidth, e.clientY / this.element.offsetHeight);
 
         if (!this.pressed && !this.focusOnPress) {
             this.lostFocus();
@@ -91,9 +91,9 @@ export default class MouseHandler implements Tagged {
                 this.clearFocus();
             }
 
-            // detect single click event
+            // detect single click
             if (!this.dragging) {
-                this.press(e.clientX, e.clientY);
+                this.press(e.clientX / this.element.offsetWidth, e.clientY / this.element.offsetHeight);
             }
         }
     }
