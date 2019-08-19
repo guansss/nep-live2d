@@ -29,6 +29,9 @@ export default class Live2DModel implements Tagged {
     readonly logicalWidth: number;
     readonly logicalHeight: number;
 
+    readonly logicalScaleX: number;
+    readonly logicalScaleY: number;
+
     /** Offset to translate model to center position. */
     readonly offsetX: number;
     readonly offsetY: number;
@@ -77,9 +80,6 @@ export default class Live2DModel implements Tagged {
         this.name = modelSettings.name || randomID();
         this.tag = `${Live2DModel.name}(${this.name})`;
 
-        this.width = internalModel.getCanvasWidth();
-        this.height = internalModel.getCanvasHeight();
-
         textures.forEach((texture, i) => internalModel.setTexture(i, texture));
 
         this.motionManager = new MotionManager(
@@ -89,6 +89,8 @@ export default class Live2DModel implements Tagged {
             modelSettings.expressions,
         );
         this.eyeBlink = new Live2DEyeBlink(internalModel);
+
+        this.initLayout();
 
         if (this.modelSettings.pose) {
             loadPose(this.modelSettings.pose, internalModel)
@@ -102,22 +104,6 @@ export default class Live2DModel implements Tagged {
                 .catch(e => log(this, e));
         }
 
-        const layout = {
-            width: 2,
-            height: 2,
-            centerX: 0,
-            centerY: 0,
-        };
-
-        if (modelSettings.layout) {
-            Object.assign(layout, modelSettings.layout);
-        }
-
-        this.logicalWidth = layout.width;
-        this.logicalHeight = layout.height;
-        this.offsetX = layout.centerX - layout.width / 2;
-        this.offsetY = layout.centerY - layout.height / 2;
-
         if (this.modelSettings.initParams) {
             this.modelSettings.initParams.forEach(({ id, value }) => this.internalModel.setParamFloat(id, value));
         }
@@ -126,6 +112,28 @@ export default class Live2DModel implements Tagged {
         }
 
         this.internalModel.saveParam();
+    }
+
+    initLayout() {
+        this.width = this.internalModel.getCanvasWidth();
+        this.height = this.internalModel.getCanvasHeight();
+
+        const layout = {
+            width: 2,
+            height: 2,
+            centerX: 0,
+            centerY: 0,
+        };
+
+        if (this.modelSettings.layout) {
+            Object.assign(layout, this.modelSettings.layout);
+        }
+
+        this.logicalWidth = layout.width;
+        this.logicalHeight = layout.height;
+
+        this.offsetX = layout.centerX - layout.width / 2;
+        this.offsetY = layout.centerY - layout.height / 2;
     }
 
     hit(x: number, y: number) {
@@ -191,7 +199,11 @@ export default class Live2DModel implements Tagged {
         model.addToParamFloat('PARAM_BODY_ANGLE_X', x * 10, 1);
 
         model.update();
+
+        transform[12] += 1;
+        transform[13] += 1;
         model.setMatrix(transform);
+
         model.draw();
     }
 

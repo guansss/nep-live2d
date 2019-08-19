@@ -21,10 +21,6 @@ export default class Live2DSprite extends DisplayObject implements Tagged {
     drawingScaleX = 1;
     drawingScaleY = 1;
 
-    /** The scale from WebGL's context size to model's canvas size. */
-    canvasScaleX = 1;
-    canvasScaleY = 1;
-
     private _width: number;
     private _height: number;
 
@@ -62,9 +58,6 @@ export default class Live2DSprite extends DisplayObject implements Tagged {
     updateTransformByGL(gl: WebGLRenderingContext) {
         this.drawingScaleX = this.model.logicalWidth / gl.drawingBufferWidth;
         this.drawingScaleY = -this.model.logicalHeight / gl.drawingBufferHeight; // flip Y
-
-        this.canvasScaleX = this.model.width / gl.drawingBufferWidth;
-        this.canvasScaleY = this.model.height / gl.drawingBufferHeight;
     }
 
     /** @override */
@@ -76,11 +69,11 @@ export default class Live2DSprite extends DisplayObject implements Tagged {
 
         // put sprite's 3x3 matrix into model's 4x4 matrix
         transform[0] = wt.a * this.drawingScaleX;
-        transform[1] = wt.c;
-        transform[4] = wt.b;
+        transform[1] = wt.c * this.drawingScaleY;
+        transform[4] = wt.b * this.drawingScaleX;
         transform[5] = wt.d * this.drawingScaleY;
-        transform[12] = wt.tx * this.drawingScaleX + wt.a * this.canvasScaleX * this.model.offsetX;
-        transform[13] = wt.ty * this.drawingScaleY - wt.d * this.canvasScaleY * this.model.offsetY;
+        transform[12] = wt.tx * this.drawingScaleX;
+        transform[13] = wt.ty * this.drawingScaleY;
 
         this.model.update(transform);
     }

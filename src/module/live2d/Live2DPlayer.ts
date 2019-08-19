@@ -41,7 +41,7 @@ export default class Live2DPlayer extends Player implements Tagged {
         const sprite = await Live2DSprite.create(modelSettingsFile, this.mka.gl);
         sprite.updateTransformByGL(this.mka.gl);
         sprite.scale.set(0.5, 0.5);
-        sprite.position.x = 500;
+        // sprite.position.x = 500;
         this.sprites.push(sprite);
         this.mka.pixiApp.stage.addChild(sprite);
     }
