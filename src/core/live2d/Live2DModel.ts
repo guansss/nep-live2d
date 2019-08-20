@@ -25,12 +25,9 @@ export default class Live2DModel implements Tagged {
     readonly width: number;
     readonly height: number;
 
-    /** Typically equals to 2 */
+    /** Logical size in Live2D drawing, typically equals to 2 */
     readonly logicalWidth: number;
     readonly logicalHeight: number;
-
-    readonly logicalScaleX: number;
-    readonly logicalScaleY: number;
 
     /** Offset to translate model to center position. */
     readonly offsetX: number;
@@ -90,8 +87,6 @@ export default class Live2DModel implements Tagged {
         );
         this.eyeBlink = new Live2DEyeBlink(internalModel);
 
-        this.initLayout();
-
         if (this.modelSettings.pose) {
             loadPose(this.modelSettings.pose, internalModel)
                 .then(pose => (this.pose = pose))
@@ -104,6 +99,23 @@ export default class Live2DModel implements Tagged {
                 .catch(e => log(this, e));
         }
 
+        this.width = internalModel.getCanvasWidth();
+        this.height = internalModel.getCanvasHeight();
+
+        const layout = Object.assign(
+            {
+                width: 2,
+                height: 2,
+                centerX: 0,
+                centerY: 0,
+            },
+            modelSettings.layout,
+        );
+        this.logicalWidth = layout.width;
+        this.logicalHeight = layout.height;
+        this.offsetX = layout.centerX - layout.width / 2;
+        this.offsetY = layout.centerY - layout.height / 2;
+
         if (this.modelSettings.initParams) {
             this.modelSettings.initParams.forEach(({ id, value }) => this.internalModel.setParamFloat(id, value));
         }
@@ -112,28 +124,6 @@ export default class Live2DModel implements Tagged {
         }
 
         this.internalModel.saveParam();
-    }
-
-    initLayout() {
-        this.width = this.internalModel.getCanvasWidth();
-        this.height = this.internalModel.getCanvasHeight();
-
-        const layout = {
-            width: 2,
-            height: 2,
-            centerX: 0,
-            centerY: 0,
-        };
-
-        if (this.modelSettings.layout) {
-            Object.assign(layout, this.modelSettings.layout);
-        }
-
-        this.logicalWidth = layout.width;
-        this.logicalHeight = layout.height;
-
-        this.offsetX = layout.centerX - layout.width / 2;
-        this.offsetY = layout.centerY - layout.height / 2;
     }
 
     hit(x: number, y: number) {
@@ -200,10 +190,9 @@ export default class Live2DModel implements Tagged {
 
         model.update();
 
-        transform[12] += 1;
-        transform[13] += 1;
+        transform[12] += this.offsetX;
+        transform[13] -= this.offsetY;
         model.setMatrix(transform);
-
         model.draw();
     }
 
