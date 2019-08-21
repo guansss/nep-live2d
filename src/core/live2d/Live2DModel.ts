@@ -10,9 +10,9 @@ import { randomID } from '@/core/utils/string';
 export default class Live2DModel implements Tagged {
     tag = Live2DModel.name + '(uninitialized)';
 
-    private readonly internalModel: Live2DModelWebGL;
-    private readonly webGLContext: WebGLRenderingContext;
-    private readonly textures: WebGLTexture[] = [];
+    readonly internalModel: Live2DModelWebGL;
+    readonly webGLContext: WebGLRenderingContext;
+    readonly textures: WebGLTexture[] = [];
 
     name: string;
     modelSettings: ModelSettings;
@@ -21,6 +21,17 @@ export default class Live2DModel implements Tagged {
     eyeBlink: Live2DEyeBlink;
     physics?: Live2DPhysics;
     pose?: Live2DPose;
+
+    readonly width: number;
+    readonly height: number;
+
+    /** Logical size in Live2D drawing, typically equals to 2 */
+    readonly logicalWidth: number;
+    readonly logicalHeight: number;
+
+    /** Offset to translate model to center position. */
+    readonly offsetX: number;
+    readonly offsetY: number;
 
     static async create(file: string, webGLContext: WebGLRenderingContext) {
         const modelSettings = await loadModelSettings(file);
@@ -85,6 +96,23 @@ export default class Live2DModel implements Tagged {
                 .catch(e => log(this, e));
         }
 
+        this.width = internalModel.getCanvasWidth();
+        this.height = internalModel.getCanvasHeight();
+
+        const layout = Object.assign(
+            {
+                width: 2,
+                height: 2,
+                centerX: 0,
+                centerY: 0,
+            },
+            modelSettings.layout,
+        );
+        this.logicalWidth = layout.width;
+        this.logicalHeight = layout.height;
+        this.offsetX = layout.centerX - layout.width / 2;
+        this.offsetY = layout.centerY - layout.height / 2;
+
         if (this.modelSettings.initParams) {
             this.modelSettings.initParams.forEach(({ id, value }) => this.internalModel.setParamFloat(id, value));
         }
@@ -132,21 +160,26 @@ export default class Live2DModel implements Tagged {
     update(transform: Float32Array) {
         const dt = 16; // TODO: calculate dt
 
-        this.internalModel.loadParam();
+        const model = this.internalModel;
+
+        // model.loadParam();
 
         const updated = this.motionManager.update();
         if (!updated) {
             this.eyeBlink.update(dt);
         }
 
-        this.internalModel.saveParam();
+        // model.saveParam();
 
         this.physics && this.physics.update(dt);
         this.pose && this.pose.update(dt);
 
-        this.internalModel.update();
-        this.internalModel.setMatrix(transform);
-        this.internalModel.draw();
+        model.update();
+
+        transform[12] += this.offsetX;
+        transform[13] -= this.offsetY;
+        model.setMatrix(transform);
+        model.draw();
     }
 
     release() {

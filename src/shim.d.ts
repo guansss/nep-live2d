@@ -11,6 +11,10 @@ declare module '*.vue' {
  * PIXI shims
  * @see https://github.com/pixijs/pixi.js/issues/5397
  */
+declare module '@pixi/core' {
+    export { Renderer } from 'pixi.js';
+}
+
 declare module '@pixi/app' {
     export { Application } from 'pixi.js';
 }

@@ -16,8 +16,14 @@ declare class Live2DModelWebGL {
 
     static loadModel(buffer: ArrayBuffer): Live2DModelWebGL;
 
+    /**
+     * @returns The width of model's Live2D drawing canvas but NOT the html canvas element.
+     */
     getCanvasWidth(): number;
 
+    /**
+     * @returns The height of model's Live2D drawing canvas but NOT the html canvas element.
+     */
     getCanvasHeight(): number;
 
     setTexture(index: number, texture: WebGLTexture): void;
@@ -70,7 +76,9 @@ declare class Live2DMotion extends AMotion {
 declare class MotionQueueManager {
     motions: unknown[];
 
-    /** @returns size of internal motion arrays */
+    /**
+     * @returns The size of internal motion arrays.
+     */
     startMotion(motion: AMotion, neverUsedArg?: boolean): number;
 
     stopAllMotions(): void;

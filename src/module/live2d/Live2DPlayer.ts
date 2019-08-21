@@ -18,12 +18,13 @@ export default class Live2DPlayer extends Player implements Tagged {
 
         Live2D.setGL(mka.gl);
 
-        this.mouseHandler = new MouseHandler(mka.gl.canvas);
+        this.updateByGL(mka.gl);
+
         this.focusController = new FocusController();
     }
 
     async addSprite(modelSettingsFile: string) {
-        if (!this.mka) throw 'Live2DPlayer must be attached to Mka before adding sprite.';
+        if (!this.mka) throw 'Live2DPlayer must be attached to Mka to create sprites.';
 
         const sprite = await Live2DSprite.create(modelSettingsFile, this.mka.gl);
         sprite.updateTransformByGL(this.mka.gl);
@@ -36,6 +37,13 @@ export default class Live2DPlayer extends Player implements Tagged {
             this.sprites[index].destroy();
             this.sprites.splice(index, 1);
         }
+    }
+
+    /**
+     * Needs to be called when WebGL context changes.
+     */
+    updateByGL(gl: WebGLRenderingContext) {
+        this.sprites.forEach(sprite => sprite.updateTransformByGL(gl));
     }
 
     /** @override */
