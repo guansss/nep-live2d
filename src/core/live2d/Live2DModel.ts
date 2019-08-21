@@ -33,6 +33,11 @@ export default class Live2DModel implements Tagged {
     readonly offsetX: number;
     readonly offsetY: number;
 
+
+    focusX = 0;
+    focusY = 0;
+
+
     static async create(file: string, webGLContext: WebGLRenderingContext) {
         const modelSettings = await loadModelSettings(file);
         if (!modelSettings) throw `Failed to load model settings from "${file}"`;
@@ -173,6 +178,14 @@ export default class Live2DModel implements Tagged {
 
         this.physics && this.physics.update(dt);
         this.pose && this.pose.update(dt);
+
+        // update focus
+        model.addToParamFloat('PARAM_EYE_BALL_X', this.focusX, 1);
+        model.addToParamFloat('PARAM_EYE_BALL_Y', this.focusY, 1);
+        model.addToParamFloat('PARAM_ANGLE_X', this.focusX * 30, 1);
+        model.addToParamFloat('PARAM_ANGLE_Y', this.focusY * 30, 1);
+        model.addToParamFloat('PARAM_ANGLE_Z', this.focusX * this.focusY * -30, 1);
+        model.addToParamFloat('PARAM_BODY_ANGLE_X', this.focusX * 10, 1);
 
         model.update();
 

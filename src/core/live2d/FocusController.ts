@@ -1,11 +1,11 @@
 import { clamp } from 'lodash';
 
-export default class FocusController {
-    /** Minimum distance to respond */
-    static EPSILON = 0.01;
+/** Minimum distance to respond */
+const EPSILON = 0.01;
 
-    maxSpeed = 0.08;
-    maxAccSpeed = 0.1;
+export default class FocusController {
+    maxSpeed = 0.01;
+    maxAccSpeed = 0.008;
 
     targetX = 0;
     targetY = 0;
@@ -13,27 +13,25 @@ export default class FocusController {
     y = 0;
     v = 0;
 
-    constructor() {}
-
     focus(x: number, y: number) {
-        this.x = x;
-        this.y = y;
+        this.targetX = x;
+        this.targetY = y;
     }
 
     update(dt: DOMHighResTimeStamp) {
         const dx = this.targetX - this.x;
         const dy = this.targetY - this.y;
 
-        if (Math.abs(dx) < FocusController.EPSILON && Math.abs(dy) < FocusController.EPSILON) return;
+        if (Math.abs(dx) < EPSILON && Math.abs(dy) < EPSILON) return;
 
         const d = Math.sqrt(dx ** 2 + dy ** 2);
-        const v = clamp(d / dt, -this.maxSpeed, this.maxSpeed);
+        const v = clamp(d / dt, 0, this.maxSpeed);
         const a = clamp((v - this.v) / dt, -this.maxAccSpeed, this.maxAccSpeed);
         this.v += a * dt;
 
         const dd = this.v * dt;
-        this.x += dx / dd;
-        this.y += dy / dd;
+        this.x += (dd * dx) / d;
+        this.y += (dd * dy) / d;
 
         // ==========================================================================================
         // Hmm, I can't understand this.

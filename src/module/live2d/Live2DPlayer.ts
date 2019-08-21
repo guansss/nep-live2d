@@ -2,16 +2,19 @@ import FocusController from '@/core/live2d/FocusController';
 import Mka from '@/core/mka/Mka';
 import Player from '@/core/mka/Player';
 import { Tagged } from '@/core/utils/log';
+import { clamp } from '@/core/utils/math';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import MouseHandler from '@/module/live2d/MouseHandler';
+
+const mouseHandingElement = document.documentElement;
 
 export default class Live2DPlayer extends Player implements Tagged {
     tag = Live2DPlayer.name;
 
     readonly sprites: Live2DSprite[] = [];
 
-    mouseHandler: MouseHandler;
     focusController: FocusController;
+    mouseHandler: MouseHandler;
 
     constructor(mka: Mka) {
         super();
@@ -21,6 +24,9 @@ export default class Live2DPlayer extends Player implements Tagged {
         this.updateByGL(mka.gl);
 
         this.focusController = new FocusController();
+
+        this.mouseHandler = new MouseHandler(mouseHandingElement);
+        this.mouseHandler.focus = (x, y) => this.focusController.focus(x * 2 - 1, y * 2 - 1);
     }
 
     async addSprite(modelSettingsFile: string) {
@@ -48,6 +54,36 @@ export default class Live2DPlayer extends Player implements Tagged {
 
     /** @override */
     update() {
+        // TODO: calculate dt
+        this.updateFocus(16);
+
         return true;
+    }
+
+    private updateFocus(dt: number) {
+        this.focusController.update(dt);
+
+        /*
+            pixelX = (x + 1) / 2 * canvasWidth
+
+          logicalX = (pixelX - spriteX) * 2 / spriteWidth - 1
+
+                   = ((x + 1) * canvasWidth - spriteX * 2) / spriteWidth - 1
+                      |-------------------|
+                              tmpX
+        */
+
+        const tmpX = (this.focusController.x + 1) * mouseHandingElement.offsetWidth;
+        const tmpY = (this.focusController.y + 1) * mouseHandingElement.offsetHeight;
+
+        this.sprites.forEach(sprite => {
+            sprite.model.focusX = clamp((tmpX - sprite.position.x * 2) / sprite.width - 1, -1, 1);
+            sprite.model.focusY = -clamp((tmpY - sprite.position.y * 2) / sprite.height - 1, -1, 1);
+        });
+    }
+
+    destroy() {
+        this.mouseHandler.destroy();
+        super.destroy();
     }
 }
