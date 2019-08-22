@@ -60,6 +60,24 @@ export default class Live2DSprite extends DisplayObject implements Tagged {
         this.drawingScaleY = -this.model.logicalHeight / gl.drawingBufferHeight; // flip Y
     }
 
+    /**
+     * @event Live2DSprite#hit
+     * @type {string} - The name of hit area.
+     */
+    /**
+     * Perform hit action on sprite.
+     *
+     * @param x - The x position in world space.
+     * @param y - The y position in world space.
+     *
+     * @fires Live2DSprite#hit
+     */
+    hit(x: number, y: number) {
+        this.model
+            .hitTest((x - this.position.x) / this.scale.x, (y - this.position.y) / this.scale.y)
+            .forEach(hitAreaName => this.emit('hit', hitAreaName));
+    }
+
     /** @override */
     render(renderer: Renderer) {
         this.updateTransform();

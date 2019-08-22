@@ -1,10 +1,11 @@
 import FocusController from '@/core/live2d/FocusController';
 import Mka from '@/core/mka/Mka';
 import Player from '@/core/mka/Player';
-import { Tagged } from '@/core/utils/log';
+import { log, Tagged } from '@/core/utils/log';
 import { clamp } from '@/core/utils/math';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import MouseHandler from '@/module/live2d/MouseHandler';
+import { EventEmitter } from '@pixi/utils';
 
 const mouseHandingElement = document.documentElement;
 
@@ -26,7 +27,12 @@ export default class Live2DPlayer extends Player implements Tagged {
         this.focusController = new FocusController();
 
         this.mouseHandler = new MouseHandler(mouseHandingElement);
-        this.mouseHandler.focus = (x, y) => this.focusController.focus(x * 2 - 1, y * 2 - 1);
+        this.mouseHandler.focus = (x, y) =>
+            this.focusController.focus(
+                (x / mouseHandingElement.offsetWidth) * 2 - 1,
+                (y / mouseHandingElement.offsetHeight) * 2 - 1,
+            );
+        this.mouseHandler.press = (x, y) => this.sprites.forEach(sprite => sprite.hit(x, y));
     }
 
     async addSprite(modelSettingsFile: string) {

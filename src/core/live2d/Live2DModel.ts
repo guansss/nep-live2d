@@ -33,10 +33,8 @@ export default class Live2DModel implements Tagged {
     readonly offsetX: number;
     readonly offsetY: number;
 
-
     focusX = 0;
     focusY = 0;
-
 
     static async create(file: string, webGLContext: WebGLRenderingContext) {
         const modelSettings = await loadModelSettings(file);
@@ -128,38 +126,46 @@ export default class Live2DModel implements Tagged {
         this.internalModel.saveParam();
     }
 
-    hit(x: number, y: number) {
+    /**
+     * Hit test on model.
+     *
+     * @param x - The x position in model canvas.
+     * @param y - The y position in model canvas.
+     *
+     * @returns The names of hit areas that have passed the test.
+     */
+    hitTest(x: number, y: number): string[] {
         log(this, `Hit (${x}, ${y})`);
 
-        if (this.internalModel && this.modelSettings && this.modelSettings.hitAreas) {
-            this.modelSettings.hitAreas.forEach(({ name, id }) => {
-                let drawIndex = this.internalModel.getDrawDataIndex(id);
+        if (this.internalModel && this.modelSettings.hitAreas) {
+            return this.modelSettings.hitAreas
+                .filter(({ name, id }) => {
+                    let drawIndex = this.internalModel.getDrawDataIndex(id);
 
-                if (drawIndex >= 0) {
-                    const points = this.internalModel.getTransformedPoints(drawIndex);
-                    let left = this.internalModel.getCanvasWidth();
-                    let right = 0;
-                    let top = this.internalModel.getCanvasHeight();
-                    let bottom = 0;
+                    if (drawIndex >= 0) {
+                        const points = this.internalModel.getTransformedPoints(drawIndex);
+                        let left = this.internalModel.getCanvasWidth();
+                        let right = 0;
+                        let top = this.internalModel.getCanvasHeight();
+                        let bottom = 0;
 
-                    for (let i = 0; i < points.length; i += 2) {
-                        const px = points[i];
-                        const py = points[i + 1];
+                        for (let i = 0; i < points.length; i += 2) {
+                            const px = points[i];
+                            const py = points[i + 1];
 
-                        if (px < left) left = px;
-                        if (px > right) right = px;
-                        if (py < top) top = py;
-                        if (py > bottom) bottom = py;
+                            if (px < left) left = px;
+                            if (px > right) right = px;
+                            if (py < top) top = py;
+                            if (py > bottom) bottom = py;
+                        }
+
+                        return left <= x && x <= right && top <= y && y <= bottom;
                     }
-                    // const tx = this.modelMatrix.invertTransformX(x);
-                    // const ty = this.modelMatrix.invertTransformY(y);
-                    //
-                    // if (left <= tx && tx <= right && top <= ty && ty <= bottom) {
-                    //     // TODO: Fire a touch event with `name`
-                    // }
-                }
-            });
+                })
+                .map(hitArea => hitArea.name);
         }
+
+        return [];
     }
 
     update(transform: Float32Array) {

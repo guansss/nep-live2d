@@ -59,7 +59,7 @@ export default class MouseHandler implements Tagged {
         // only handle left mouse button
         if (e.button !== 0) return;
 
-        this.focus(e.clientX / this.element.offsetWidth, e.clientY / this.element.offsetHeight);
+        this.focus(e.clientX, e.clientY);
 
         this.pressed = true;
         this.dragging = false;
@@ -73,7 +73,7 @@ export default class MouseHandler implements Tagged {
 
     mouseMove = throttle((e: MouseEvent) => {
         this.dragging = true;
-        this.focus(e.clientX / this.element.offsetWidth, e.clientY / this.element.offsetHeight);
+        this.focus(e.clientX, e.clientY);
 
         if (!this.pressed && !this.focusOnPress) {
             this.loseFocus();
@@ -95,7 +95,7 @@ export default class MouseHandler implements Tagged {
 
             // detect single click
             if (!this.dragging) {
-                this.press(e.clientX / this.element.offsetWidth, e.clientY / this.element.offsetHeight);
+                this.press(e.clientX, e.clientY);
             }
         }
     }
@@ -159,6 +159,7 @@ export default class MouseHandler implements Tagged {
     }
 
     destroy() {
+        this.cancelLoseFocus();
         this.removeGeneralListeners();
         this.removeMouseMoveListener();
     }
