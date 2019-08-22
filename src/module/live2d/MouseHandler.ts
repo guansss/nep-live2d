@@ -125,7 +125,9 @@ export default class MouseHandler implements Tagged {
     loseFocus!: (() => void) & Cancelable;
 
     private updateLoseFocus() {
-        this.cancelLoseFocus();
+        if (this.loseFocus) {
+            this.cancelLoseFocus();
+        }
         this.loseFocus = debounce(() => this.clearFocus(), this.loseFocusTimeout);
     }
 
