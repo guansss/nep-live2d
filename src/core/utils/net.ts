@@ -1,4 +1,4 @@
-import { error, log, Tagged } from '../log';
+import { error, log, Tagged } from './log';
 
 const enum ResultType {
     JSON,
@@ -40,7 +40,6 @@ async function ajax(url: string, { type }: { type?: ResultType } = {}) {
             try {
                 result = JSON.parse(resultText);
             } catch (e) {
-                //noinspection ExceptionCaughtLocallyJS
                 throw 'Failed to parse JSON: ' + resultText;
             }
             break;
