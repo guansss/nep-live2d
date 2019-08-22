@@ -4650,11 +4650,6 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
-glmw@^0.1.3:
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/glmw/-/glmw-0.1.3.tgz#26ecc2337793b98b81d532838ca5cdc495a8888f"
-  integrity sha512-zNrSMGThxXnvvcvsuAFp2Q8A1Hy/GtOolpdzUTKhOiH1nnTowO8fwK68wDRmGSbcZeG6s3gIlEP1fAO7dvoqRA==
-
 glob-parent@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/glob-parent/-/glob-parent-3.1.0.tgz#9e6af6299d8d3bd2bd40430832bd113df906c5ae"
