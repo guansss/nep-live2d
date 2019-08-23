@@ -57,7 +57,8 @@
       "@vue/typescript"
     ],
     "rules": {
-      "no-console": "off"
+      "no-console": "off",
+      "no-inner-declarations": "off"
     },
     "parserOptions": {
       "parser": "@typescript-eslint/parser"

@@ -88,10 +88,10 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
         }
     }
 
-    async startMotionByPriority(group: string, index: number, priority: Priority = Priority.Normal) {
-        if (priority <= this.currentPriority) {
+    async startMotionByPriority(group: string, index: number, priority: Priority = Priority.Normal): Promise<boolean> {
+        if (priority != Priority.Force && priority <= this.currentPriority) {
             log(this, 'Cannot start motion because another motion of higher priority is running');
-            return;
+            return false;
         }
         this.currentPriority = priority;
 
@@ -101,12 +101,13 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
 
         const motion =
             (this.motionGroups[group] && this.motionGroups[group][index]) || (await this.loadMotion(group, index));
-        if (!motion) return;
+        if (!motion) return false;
 
-        const definition = this.definitions[group][index];
-        log(this, 'Starting motion:', definition);
+        log(this, 'Starting motion:', this.definitions[group][index]);
 
         this.startMotion(motion);
+
+        return true;
     }
 
     startRandomMotion(group: string, priority: Priority = Priority.Normal) {

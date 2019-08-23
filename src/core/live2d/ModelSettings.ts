@@ -69,9 +69,6 @@ export default class ModelSettings implements Tagged {
 
     /**
      * Validates and copies properties from JSON.
-     *
-     * The `json` param borrows `ModelSettings` type to prevent the annoying type checking,
-     * types will be manually checked.
      */
     private copy(json: any) {
         // begin essential properties
@@ -187,7 +184,10 @@ export default class ModelSettings implements Tagged {
         convertArray(this, 'textures', 'file');
         convertArray(this, 'expressions', 'file');
 
-        Object.keys(this.motions).forEach(group => convertArray(this.motions, group, 'file'));
+        Object.keys(this.motions).forEach(group => {
+            convertArray(this.motions, group, 'file');
+            convertArray(this.motions, group, 'sound');
+        });
 
         if (Array.isArray(this.textures)) {
             this.textures.forEach((texture, i) => convertProperty(this.textures, i));

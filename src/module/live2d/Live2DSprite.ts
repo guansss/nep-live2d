@@ -53,6 +53,19 @@ export default class Live2DSprite extends DisplayObject implements Tagged {
         this.model = model;
         this._width = model.width;
         this._height = model.height;
+
+        const originalFn = this.model.motionManager.startMotionByPriority.bind(this.model.motionManager);
+
+        /**
+         * @fires Live2DSprite#motion
+         */
+        this.model.motionManager.startMotionByPriority = async (group, index, priority) => {
+            const started = await originalFn(group, index, priority);
+            if (started) {
+                this.emit('motion', group, index);
+            }
+            return started;
+        };
     }
 
     updateTransformByGL(gl: WebGLRenderingContext) {
@@ -60,10 +73,6 @@ export default class Live2DSprite extends DisplayObject implements Tagged {
         this.drawingScaleY = -this.model.logicalHeight / gl.drawingBufferHeight; // flip Y
     }
 
-    /**
-     * @event Live2DSprite#hit
-     * @type {string} - The name of hit area.
-     */
     /**
      * Performs hit action on sprite.
      *
@@ -101,3 +110,15 @@ export default class Live2DSprite extends DisplayObject implements Tagged {
         super.destroy();
     }
 }
+
+/**
+ * @event Live2DSprite#hit
+ * @param {string} - The name of hit area.
+ */
+
+/**
+ * @event Live2DSprite#motion
+ * @param {Live2DMotion} motion
+ * @param {string} group
+ * @param {number} index
+ */
