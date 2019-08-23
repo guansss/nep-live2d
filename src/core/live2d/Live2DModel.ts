@@ -185,13 +185,15 @@ export default class Live2DModel implements Tagged {
         this.physics && this.physics.update(dt);
         this.pose && this.pose.update(dt);
 
-        // update focus
-        model.addToParamFloat('PARAM_EYE_BALL_X', this.focusX, 1);
-        model.addToParamFloat('PARAM_EYE_BALL_Y', this.focusY, 1);
-        model.addToParamFloat('PARAM_ANGLE_X', this.focusX * 30, 1);
-        model.addToParamFloat('PARAM_ANGLE_Y', this.focusY * 30, 1);
-        model.addToParamFloat('PARAM_ANGLE_Z', this.focusX * this.focusY * -30, 1);
-        model.addToParamFloat('PARAM_BODY_ANGLE_X', this.focusX * 10, 1);
+        // update focus and natural movements
+        const t = (performance.now() / 1000) * 2 * Math.PI;
+        model.addToParamFloat('PARAM_EYE_BALL_X', this.focusX);
+        model.addToParamFloat('PARAM_EYE_BALL_Y', this.focusY);
+        model.addToParamFloat('PARAM_ANGLE_X', this.focusX * 30 + 15 * Math.sin(t / 6.5345) * 0.5);
+        model.addToParamFloat('PARAM_ANGLE_Y', this.focusY * 30 + 8 * Math.sin(t / 3.5345) * 0.5);
+        model.addToParamFloat('PARAM_ANGLE_Z', this.focusX * this.focusY * -30 + 10 * Math.sin(t / 5.5345) * 0.5);
+        model.addToParamFloat('PARAM_BODY_ANGLE_X', this.focusX * 10 + 4 * Math.sin(t / 15.5345) * 0.5);
+        model.setParamFloat('PARAM_BREATH', 0.5 + 0.5 * Math.sin(t / 3.2345));
 
         model.update();
 
