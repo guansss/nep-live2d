@@ -91,20 +91,16 @@ declare class MotionQueueManager {
     updateParam(model: Live2DModelWebGL): boolean;
 }
 
-declare interface PhysicsHairSrc {
-    SRC_TO_X: string;
-    SRC_TO_Y: string;
-    SRC_TO_G_ANGLE: string;
-}
-
-declare interface PhysicsHairTarget {
-    TARGET_FROM_ANGLE: string;
-    TARGET_FROM_ANGLE_V: string;
-}
-
 declare class PhysicsHair {
-    static Src: PhysicsHairSrc;
-    static Target: PhysicsHairTarget;
+    static Src: {
+        SRC_TO_X: string;
+        SRC_TO_Y: string;
+        SRC_TO_G_ANGLE: string;
+    };
+    static Target: {
+        TARGET_FROM_ANGLE: string;
+        TARGET_FROM_ANGLE_V: string;
+    };
 
     setup(length: number, regist: number, mass: number): unknown;
 
