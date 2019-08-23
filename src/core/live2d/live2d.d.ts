@@ -85,7 +85,10 @@ declare class MotionQueueManager {
 
     isFinished(): boolean;
 
-    updateParam(model: Live2DModelWebGL): any;
+    /**
+     * @returns True if parameters are updated by any motion.
+     */
+    updateParam(model: Live2DModelWebGL): boolean;
 }
 
 declare interface PhysicsHairSrc {

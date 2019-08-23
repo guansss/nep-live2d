@@ -116,13 +116,17 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
 
     update() {
         if (this.isFinished()) {
+            if (this.currentPriority > Priority.Idle) {
+                this.expressionManager && this.expressionManager.restoreExpression();
+            }
             this.currentPriority = Priority.None;
-            this.expressionManager && this.expressionManager.restoreExpression();
             this.startRandomMotion(Group.Idle, Priority.Idle);
         }
 
+        const updated = this.updateParam(this.internalModel);
+
         this.expressionManager && this.expressionManager.update();
 
-        return this.updateParam(this.internalModel);
+        return updated;
     }
 }
