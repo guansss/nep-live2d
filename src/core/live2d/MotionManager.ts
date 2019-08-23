@@ -3,7 +3,7 @@ import { ExpressionDefinition, MotionDefinition } from '@/core/live2d/ModelSetti
 import { error, log, Tagged } from '@/core/utils/log';
 import { getArrayBuffer } from '@/core/utils/net';
 
-enum Priority {
+export enum Priority {
     None = 0,
     Idle = 1,
     Normal = 2,
@@ -105,7 +105,7 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
         this.startMotion(motion);
     }
 
-    startRandomMotion(group: Group, priority: Priority = Priority.Normal) {
+    startRandomMotion(group: string, priority: Priority = Priority.Normal) {
         const groupDefinitions = this.definitions[group];
 
         if (groupDefinitions && groupDefinitions.length > 0) {

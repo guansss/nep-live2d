@@ -65,7 +65,7 @@ export default class Live2DSprite extends DisplayObject implements Tagged {
      * @type {string} - The name of hit area.
      */
     /**
-     * Perform hit action on sprite.
+     * Performs hit action on sprite.
      *
      * @param x - The x position in world space.
      * @param y - The y position in world space.

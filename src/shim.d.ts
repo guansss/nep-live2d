@@ -15,12 +15,17 @@ declare module '@pixi/core' {
     export { Renderer } from 'pixi.js';
 }
 
+declare module '@pixi/utils' {
+    import { utils } from 'pixi.js';
+    export import EventEmitter = utils.EventEmitter;
+}
+
 declare module '@pixi/app' {
     export { Application } from 'pixi.js';
 }
 
 declare module '@pixi/display' {
-    export { DisplayObject } from 'pixi.js';
+    export { DisplayObject, Container } from 'pixi.js';
 }
 
 declare module '@pixi/math' {

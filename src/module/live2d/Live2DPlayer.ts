@@ -1,17 +1,20 @@
 import FocusController from '@/core/live2d/FocusController';
 import Mka from '@/core/mka/Mka';
 import Player from '@/core/mka/Player';
-import { log, Tagged } from '@/core/utils/log';
+import { Tagged } from '@/core/utils/log';
 import { clamp } from '@/core/utils/math';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import MouseHandler from '@/module/live2d/MouseHandler';
-import { EventEmitter } from '@pixi/utils';
+import { Container } from '@pixi/display';
 
 const mouseHandingElement = document.documentElement;
 
 export default class Live2DPlayer extends Player implements Tagged {
     tag = Live2DPlayer.name;
 
+    gl: WebGLRenderingContext;
+
+    readonly container = new Container();
     readonly sprites: Live2DSprite[] = [];
 
     focusController: FocusController;
@@ -20,9 +23,10 @@ export default class Live2DPlayer extends Player implements Tagged {
     constructor(mka: Mka) {
         super();
 
-        Live2D.setGL(mka.gl);
+        this.gl = mka.gl;
+        this.updateByGL(this.gl);
 
-        this.updateByGL(mka.gl);
+        Live2D.setGL(this.gl);
 
         this.focusController = new FocusController();
 
@@ -33,21 +37,23 @@ export default class Live2DPlayer extends Player implements Tagged {
                 (y / mouseHandingElement.offsetHeight) * 2 - 1,
             );
         this.mouseHandler.press = (x, y) => this.sprites.forEach(sprite => sprite.hit(x, y));
+
+        mka.pixiApp.stage.addChild(this.container);
     }
 
     async addSprite(modelSettingsFile: string) {
-        if (!this.mka) throw 'Live2DPlayer must be attached to Mka to create sprites.';
-
-        const sprite = await Live2DSprite.create(modelSettingsFile, this.mka.gl);
-        sprite.updateTransformByGL(this.mka.gl);
+        const sprite = await Live2DSprite.create(modelSettingsFile, this.gl);
+        sprite.updateTransformByGL(this.gl);
         this.sprites.push(sprite);
-        this.mka.pixiApp.stage.addChild(sprite);
+        this.container.addChild(sprite);
     }
 
     removeSprite(index: number) {
         if (this.sprites[index]) {
-            this.sprites[index].destroy();
+            const sprite = this.sprites[index];
+            this.container.removeChild(sprite);
             this.sprites.splice(index, 1);
+            sprite.destroy();
         }
     }
 

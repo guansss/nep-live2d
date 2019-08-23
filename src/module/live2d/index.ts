@@ -6,6 +6,8 @@ import { resolve as urlResolve } from 'url';
 export default class Live2DModule implements Module, Tagged {
     tag = Live2DModule.name;
 
+    name = 'Live2D';
+
     player!: Live2DPlayer;
 
     install(app: App): void {
