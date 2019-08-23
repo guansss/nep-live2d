@@ -14,6 +14,8 @@ enum Group {
     Idle = 'idle',
 }
 
+const DEFAULT_FADE_TIMEOUT = 500;
+
 export default class MotionManager extends MotionQueueManager implements Tagged {
     static readonly Priority = Priority;
 
@@ -76,6 +78,8 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
         try {
             const buffer = await getArrayBuffer(definition.file);
             const motion = Live2DMotion.loadMotion(buffer);
+            motion.setFadeIn(definition.fadeIn! > 0 ? definition.fadeIn! : DEFAULT_FADE_TIMEOUT);
+            motion.setFadeOut(definition.fadeOut! > 0 ? definition.fadeOut! : DEFAULT_FADE_TIMEOUT);
 
             this.motionGroups[group][index] = motion;
             return motion;
