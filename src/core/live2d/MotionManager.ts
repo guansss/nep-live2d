@@ -127,6 +127,13 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
 
         this.expressionManager && this.expressionManager.update();
 
+        const t = (performance.now() / 1000) * 2 * Math.PI;
+        this.internalModel.addToParamFloat('PARAM_ANGLE_X', Number(15 * Math.sin(t / 6.5345)), 0.5);
+        this.internalModel.addToParamFloat('PARAM_ANGLE_Y', Number(8 * Math.sin(t / 3.5345)), 0.5);
+        this.internalModel.addToParamFloat('PARAM_ANGLE_Z', Number(10 * Math.sin(t / 5.5345)), 0.5);
+        this.internalModel.addToParamFloat('PARAM_BODY_ANGLE_X', Number(4 * Math.sin(t / 15.5345)), 0.5);
+        this.internalModel.setParamFloat('PARAM_BREATH', Number(0.5 + 0.5 * Math.sin(t / 3.2345)), 1);
+
         return updated;
     }
 }
