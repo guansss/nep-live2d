@@ -29,7 +29,7 @@ export class App {
         module.install(this);
     }
 
-    addComponent(componentClass: VueConstructor) {
-        this.vueApp.$options.methods!.addChild.call(this.vueApp, componentClass);
+    async addComponent(componentClass: VueConstructor) {
+        return (this.vueApp as any).addChild(componentClass);
     }
 }

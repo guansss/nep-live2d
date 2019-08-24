@@ -6,12 +6,10 @@ import Modules from './module';
 Vue.config.productionTip = false;
 
 new Vue({
-    render(h) {
-        const vueApp = h(VueApp);
+    render: h => h(VueApp, { ref: 'vueApp' }),
+    mounted() {
+        const app = new App(/** @type {VueApp} */ this.$refs.vueApp);
 
-        const app = new App(vueApp);
         Modules.forEach(Module => app.use(new Module()));
-
-        return vueApp;
     },
 }).$mount('#app');

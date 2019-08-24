@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <template v-for="(child, i) in children">
-            <component :is="child" :key="i"></component>
+            <component :is="child" :key="i" ref="children"></component>
         </template>
     </div>
 </template>
@@ -14,8 +14,12 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class VueApp extends Vue {
     readonly children: VueConstructor[] = [];
 
-    addChild(componentClass: VueConstructor) {
-        (this.children as VueConstructor[]).push(componentClass);
+    async addChild(componentClass: VueConstructor) {
+        const index = this.children.length;
+        this.children.push(componentClass);
+
+        await this.$nextTick();
+        return (this.$refs.children as Vue[])[index];
     }
 }
 </script>
