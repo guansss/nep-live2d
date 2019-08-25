@@ -8,7 +8,7 @@ The project is based on Live2D WebGL SDK 2.1, and thus models of newer or older 
 
 ## Setup
 
-### Dependencies
+#### Dependencies
 
 It's recommended to use [Yarn](https://yarnpkg.com) as package manager, *npm* is fine though.
 
@@ -16,7 +16,7 @@ It's recommended to use [Yarn](https://yarnpkg.com) as package manager, *npm* is
 yarn install
 ```
 
-### Source files
+#### Source files
 
 Due to copyright restrictions, the sources of Live2D SDK and Live2D models are not provided, you need to supply them by yourself.
 
@@ -35,7 +35,24 @@ The final file structure should be like:
     └── live2d.min.js
 ```
 
-### Environment
+#### Migration
+
+The URL format in Live2D model settings file has been changed to the "standard" format supported by browsers, URLs are now parsed by [url.resolve()](https://nodejs.org/dist/latest-v12.x/docs/api/url.html#url_url_resolve_from_to).
+
+As a result, the prefixes of certain file paths in model settings file need to be changed from `./` to `../`, for example:
+
+``` json5
+// neptune/normal.model.json
+{
+    // ...
+
+    "pose": "../general/pose.json",     // changed from "./general/pose.json"
+
+    // ...
+}
+```
+
+#### Environment
 
 Create `.env.local` file at project root, add `VUE_APP_LIVE2D_PATH` and `VUE_APP_LIVE2D_MODELS` variables into it.
 
@@ -51,6 +68,8 @@ For more information about the format of this file, see [dotenv](https://github.
 ## Serving
 
 ### Sering for browsers
+
+Currently there is no configuration interfaces for Wallpaper Engine, so it's fine to open via browsers.
 
 ``` sh
 yarn serve
