@@ -1,6 +1,6 @@
 import Mka from '@/core/mka/Mka';
 import VueApp from '@/VueApp.vue';
-import { VueConstructor } from 'vue';
+import Vue, { VueConstructor } from 'vue';
 
 export interface Module {
     name: string;
@@ -30,6 +30,6 @@ export class App {
     }
 
     async addComponent(componentClass: VueConstructor) {
-        return (this.vueApp as any).addChild(componentClass);
+        return (this.vueApp as any).addChild(componentClass) as Vue;
     }
 }

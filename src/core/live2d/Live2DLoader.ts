@@ -76,11 +76,3 @@ export async function loadPhysics(file: string, internalModel: Live2DModelWebGL)
     const json = await getJSON(file);
     return new Live2DPhysics(internalModel!, json);
 }
-
-export async function loadSubtitle(file?: string) {
-    if (!file) throw 'Missing subtitle file';
-
-    log(logSender, 'Loading subtitle:', file);
-
-    return await getJSON(file);
-}
