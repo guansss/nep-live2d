@@ -9,13 +9,14 @@ interface Language {
     name: string;
     description?: string;
     font?: string;
+    style?: string;
     subtitles: Subtitle[];
 }
 
 export interface Subtitle {
     name: string;
     text: string;
-    font?: string;
+    style?: string;
     duration?: number;
 }
 
@@ -38,16 +39,21 @@ export default class SubtitleManager implements Tagged {
 
         if (file) {
             try {
-                const subtitles = (await getJSON(file)) as SubtitleJSON;
+                const languages = (await getJSON(file)) as SubtitleJSON;
 
-                // apply language-scope fonts into subtitles without specified font
-                subtitles.forEach(language => {
+                languages.forEach(language => {
+                    language.style = (language.style || '') + ';';
+
+                    // append `font` to `style`
+                    language.style += language.font ? 'font-family:' + language.font : '';
+
+                    // apply language style to each subtitle
                     language.subtitles.forEach(subtitle => {
-                        subtitle.font = subtitle.font || language.font;
+                        subtitle.style = language.style + ';' + (subtitle.style || '');
                     });
                 });
 
-                this.subtitles[file] = subtitles;
+                this.subtitles[file] = languages;
             } catch (e) {
                 error(this, `Failed to load subtitles for [${model.name}] from ${file}`, e);
             }
