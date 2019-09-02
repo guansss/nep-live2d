@@ -11,7 +11,7 @@ export default class Live2DEventModule implements Module, Tagged {
 
     sprites: Live2DSprite[] = [];
 
-    install(app: App): void {
+    constructor(app: App) {
         const live2dModule = app.modules['Live2D'];
 
         if (!(live2dModule && live2dModule instanceof Live2DModule)) return;

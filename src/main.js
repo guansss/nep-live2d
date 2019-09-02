@@ -10,6 +10,6 @@ new Vue({
     mounted() {
         const app = new App(/** @type {VueApp} */ this.$refs.vueApp);
 
-        Modules.forEach(Module => app.use(new Module()));
+        Modules.forEach(Module => app.use(Module));
     },
 }).$mount('#app');

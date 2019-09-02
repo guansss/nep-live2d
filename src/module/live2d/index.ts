@@ -10,7 +10,7 @@ export default class Live2DModule implements Module, Tagged {
 
     player!: Live2DPlayer;
 
-    install(app: App): void {
+    constructor(app: App) {
         this.player = new Live2DPlayer(app.mka!);
         app.mka!.addPlayer('live2d', this.player);
 
