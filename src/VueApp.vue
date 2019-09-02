@@ -3,14 +3,18 @@
         <template v-for="(child, i) in children">
             <component :is="child" :key="i" ref="children"></component>
         </template>
+        <Settings />
     </div>
 </template>
 
 <script lang="ts">
+import Settings from '@/components/Settings/Settings';
 import { VueConstructor } from 'vue';
 import { Component, Vue } from 'vue-property-decorator';
 
-@Component
+@Component({
+    components: { Settings },
+})
 export default class VueApp extends Vue {
     readonly children: VueConstructor[] = [];
 

@@ -16,6 +16,7 @@
   "dependencies": {
     "@pixi/display": "5.1.0",
     "autobind-decorator": "^2.4.0",
+    "eventemitter3": "^4.0.0",
     "lodash": "^4.17.15",
     "pixi.js": "^5.1.0",
     "raw-loader": "^3.1.0",
@@ -23,15 +24,18 @@
   },
   "devDependencies": {
     "@babel/node": "^7.5.5",
+    "@babel/plugin-proposal-decorators": "^7.4.4",
     "@babel/preset-typescript": "^7.3.3",
     "@types/lodash": "^4.14.136",
     "@types/node": "^12.6.8",
     "@vue/cli-plugin-babel": "^3.9.2",
     "@vue/cli-plugin-eslint": "^3.9.2",
     "@vue/cli-plugin-typescript": "^3.9.0",
+    "@vue/cli-plugin-unit-jest": "^3.11.0",
     "@vue/cli-service": "^3.9.3",
     "@vue/eslint-config-prettier": "^5.0.0",
     "@vue/eslint-config-typescript": "^4.0.0",
+    "@vue/test-utils": "^1.0.0-beta.29",
     "babel-eslint": "^10.0.2",
     "chalk": "^2.4.2",
     "dotenv": "^8.0.0",
@@ -39,9 +43,12 @@
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-vue": "^5.2.3",
     "jest": "^24.8.0",
+    "jest-canvas-mock": "^2.1.1",
+    "jest-localstorage-mock": "^2.4.0",
     "shelljs": "^0.8.3",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
+    "ts-jest": "^24.0.2",
     "typescript": "^3.5.3",
     "vue-property-decorator": "^8.2.1",
     "vue-template-compiler": "^2.6.10"
@@ -79,8 +86,38 @@
     "Chrome >= 67"
   ],
   "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts",
+      "vue"
+    ],
+    "transform": {
+      "^.+\\.vue$": "vue-jest",
+      ".+\\.(css|styl|less|sass|scss|svg|png|jpg|ttf|woff|woff2)$": "jest-transform-stub",
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/"
+    ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "snapshotSerializers": [
+      "jest-serializer-vue"
+    ],
+    "testMatch": [
+      "**/tests/unit/**/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx)"
+    ],
+    "testURL": "http://localhost/",
+    "watchPlugins": [
+      "jest-watch-typeahead/filename",
+      "jest-watch-typeahead/testname"
+    ],
+    "globals": {
+      "ts-jest": {
+        "babelConfig": true
+      }
     }
   }
 }
