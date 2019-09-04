@@ -23,7 +23,7 @@ export class App extends EventEmitter implements Tagged {
     constructor(vueApp: VueApp) {
         super();
 
-        const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+        const canvas = (vueApp as any).canvas as HTMLCanvasElement;
         this.mka = new Mka(canvas);
 
         // TODO: Remove this in release
