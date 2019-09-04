@@ -1,8 +1,10 @@
 import { App, Module } from '@/App';
 import { EventEntity } from '@/core/utils/EventEmitter';
 import { error, Tagged } from '@/core/utils/log';
+import Settings from '@/module/config/Settings.vue';
 import get from 'lodash/get';
 import set from 'lodash/set';
+import Vue, { VueConstructor } from 'vue';
 
 export interface Config {
     [key: string]: any;
@@ -34,8 +36,12 @@ export default class ConfigModule implements Module, Tagged {
 
     readonly config: Config = {};
 
+    settingsModulePromise: Promise<Settings>;
+
     constructor(private app: App) {
         this.read();
+
+        this.settingsModulePromise = app.addComponent(Settings);
 
         app.on('config', this.onConfig, this);
 
@@ -49,6 +55,10 @@ export default class ConfigModule implements Module, Tagged {
         });
 
         app.emit('configInit', this.config);
+    }
+
+    async addSetting(componentClass: VueConstructor) {
+        return ((await this.settingsModulePromise) as any).addSetting(componentClass) as Vue;
     }
 
     onConfig(path: string, value: any) {

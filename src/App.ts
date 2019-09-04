@@ -1,6 +1,6 @@
 import Mka from '@/core/mka/Mka';
 import EventEmitter from '@/core/utils/EventEmitter';
-import { error, Tagged } from '@/core/utils/log';
+import { error, log, Tagged } from '@/core/utils/log';
 import VueApp from '@/VueApp.vue';
 import Vue, { VueConstructor } from 'vue';
 
@@ -33,6 +33,7 @@ export class App extends EventEmitter implements Tagged {
     }
 
     use(M: ModuleConstructor) {
+        log(this, `Installing module "${M.name}"`);
         try {
             const module = new M(this);
             this.modules[module.name] = module;
