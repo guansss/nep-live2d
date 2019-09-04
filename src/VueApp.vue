@@ -1,5 +1,6 @@
 <template>
     <div id="app">
+        <canvas id="canvas" ref="canvas"></canvas>
         <template v-for="(child, i) in children">
             <component :is="child" :key="i" ref="children"></component>
         </template>
@@ -8,10 +9,12 @@
 
 <script lang="ts">
 import { VueConstructor } from 'vue';
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Ref, Vue } from 'vue-property-decorator';
 
 @Component
 export default class VueApp extends Vue {
+    @Ref('canvas') readonly canvas!: HTMLCanvasElement;
+
     readonly children: VueConstructor[] = [];
 
     async addChild(componentClass: VueConstructor) {
