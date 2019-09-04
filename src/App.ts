@@ -1,7 +1,7 @@
 import Mka from '@/core/mka/Mka';
+import EventEmitter from '@/core/utils/EventEmitter';
 import { error, Tagged } from '@/core/utils/log';
 import VueApp from '@/VueApp.vue';
-import { EventEmitter } from '@pixi/utils';
 import Vue, { VueConstructor } from 'vue';
 
 export interface ModuleConstructor {
