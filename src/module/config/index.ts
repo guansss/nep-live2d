@@ -9,6 +9,8 @@ export interface Config {
 }
 
 export interface App {
+    on(event: 'configInit', fn: (config: Config) => void, context?: any): this;
+
     on(
         event: 'configUpdate',
         fn: (path: string, oldValue: any, newValue: any, config: Config) => void,
@@ -21,7 +23,7 @@ export interface App {
 }
 
 /**
- * Handles configurations, must be installed before other modules that listen for related events.
+ * Handles configurations, must be installed before other modules that listen for `configInit` events.
  */
 export default class ConfigModule implements Module, Tagged {
     tag = ConfigModule.name;
@@ -35,6 +37,8 @@ export default class ConfigModule implements Module, Tagged {
     constructor(private app: App) {
         this.read();
 
+        app.on('config', this.onConfig, this);
+
         // immediately call listener of `configInit` when it's added
         app.on('newListener', (event: string, listener: EventEntity, context: any) => {
             if (event === 'configInit') {
@@ -44,7 +48,6 @@ export default class ConfigModule implements Module, Tagged {
             }
         });
 
-        app.on('config', this.onConfig, this);
         app.emit('configInit', this.config);
     }
 
