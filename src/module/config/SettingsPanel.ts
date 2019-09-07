@@ -57,4 +57,8 @@ export default class SettingsPanel extends Vue {
         this.panel.style.left = this.configModule.getConfig('config.settings.positionX', this.panel.style.left);
         this.panel.style.top = this.configModule.getConfig('config.settings.positionY', this.panel.style.top);
     }
+
+    refresh() {
+        location.reload();
+    }
 }

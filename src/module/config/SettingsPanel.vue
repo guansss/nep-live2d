@@ -11,7 +11,10 @@
                     {{ tab }}
                 </div>
             </div>
-            <div class="selectable right">
+            <div class="selectable right" @click="refresh">
+                <div class="refresh"></div>
+            </div>
+            <div class="selectable">
                 <div class="close"></div>
             </div>
         </div>
@@ -23,8 +26,7 @@
 <script lang="ts" src="./SettingsPanel.ts"></script>
 
 <style scoped lang="stylus">
-$themeColor = #333
-$backgroundColor = #FFFFFFCC
+@require './reusable/vars'
 
 .settings
     position absolute
@@ -104,4 +106,44 @@ $backgroundColor = #FFFFFFCC
         height: 2px;
         background-color: currentColor;
         transform: rotate(45deg);
+
+.refresh
+    position relative
+    margin 8px 16px 0
+    width 18px
+    height 18px
+    border-radius 50%
+    border-top solid 2px currentColor
+    border-right solid 2px transparent
+    border-bottom solid 2px currentColor
+    border-left solid 2px currentColor
+    transform rotate(22.5deg)
+
+    &:before
+        content ''
+        position absolute
+        top -2px
+        left -2px
+        width 14px
+        height 14px
+        border-radius 50%
+        border-top solid 2px transparent
+        border-right solid 2px transparent
+        border-bottom solid 2px currentColor
+        border-left solid 2px transparent
+        transform-origin 50% 50%
+        transform rotate(-60deg)
+
+    &:after
+        content ''
+        position absolute
+        left 10px
+        top -2px
+        width 0
+        height 0
+        border-top solid 4px transparent
+        border-right solid 4px transparent
+        border-bottom solid 4px transparent
+        border-left solid 4px currentColor
+        transform rotate(30deg)
 </style>
