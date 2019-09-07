@@ -14,6 +14,7 @@ import { Component, Ref, Vue } from 'vue-property-decorator';
 @Component
 export default class VueApp extends Vue {
     @Ref('canvas') readonly canvas!: HTMLCanvasElement;
+    @Ref('children') readonly childrenRef!: Vue[];
 
     readonly children: VueConstructor[] = [];
 
@@ -22,7 +23,7 @@ export default class VueApp extends Vue {
         this.children.push(componentClass);
 
         await this.$nextTick();
-        return (this.$refs.children as Vue[])[index];
+        return this.childrenRef[index];
     }
 }
 </script>

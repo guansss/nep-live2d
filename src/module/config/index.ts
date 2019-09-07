@@ -1,6 +1,7 @@
 import { App, Module } from '@/App';
 import { EventEntity } from '@/core/utils/EventEmitter';
 import { error, Tagged } from '@/core/utils/log';
+import SettingsPanel from '@/module/config/SettingsPanel.vue';
 import get from 'lodash/get';
 import set from 'lodash/set';
 
@@ -37,7 +38,7 @@ export default class ConfigModule implements Module, Tagged {
     constructor(private app: App) {
         this.read();
 
-        app.on('config', this.onConfig, this);
+        app.on('config', this.setConfig, this);
 
         // immediately call listener of `configInit` when it's added
         app.on('newListener', (event: string, listener: EventEntity, context: any) => {
@@ -49,15 +50,21 @@ export default class ConfigModule implements Module, Tagged {
         });
 
         app.emit('configInit', this.config);
+
+        app.addComponent(SettingsPanel).then(panel => (panel as any).attachTo(this));
     }
 
-    onConfig(path: string, value: any) {
-        const oldValue = get(this.config, path, value);
+    setConfig(path: string, value: any) {
+        const oldValue = get(this.config, path, undefined);
 
         set(this.config, path, value);
         this.save();
 
         this.app.emit('configUpdate', path, oldValue, value, this.config);
+    }
+
+    getConfig(path: string, defaultValue: any) {
+        return get(this.config, path, defaultValue);
     }
 
     read() {
