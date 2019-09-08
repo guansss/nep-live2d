@@ -37,6 +37,7 @@
     max-width 100%
     max-height 100%
     overflow auto
+    user-select none
     color $themeColor
     font-size 16px
     background-color $backgroundColor
@@ -60,7 +61,6 @@
     display flex
     background-color rgba($themeColor, 0.1)
     cursor move
-    user-select none
 
     &:before
         content ''

@@ -14,7 +14,7 @@ export interface App {
 
     on(
         event: 'configUpdate',
-        fn: (path: string, oldValue: any, newValue: any, config: Config) => void,
+        fn: (path: string, newValue: any, oldValue: any, config: Config) => void,
         context?: any,
     ): this;
 
@@ -51,7 +51,9 @@ export default class ConfigModule implements Module, Tagged {
 
         app.emit('configInit', this.config);
 
-        app.addComponent(SettingsPanel).then(panel => (panel as any).attachTo(this));
+        SettingsPanel.prototype.configModule = this;
+
+        app.addComponent(SettingsPanel).then();
     }
 
     setConfig(path: string, value: any) {
@@ -60,7 +62,7 @@ export default class ConfigModule implements Module, Tagged {
         set(this.config, path, value);
         this.save();
 
-        this.app.emit('configUpdate', path, oldValue, value, this.config);
+        this.app.emit('configUpdate', path, value, oldValue, this.config);
     }
 
     getConfig(path: string, defaultValue: any) {

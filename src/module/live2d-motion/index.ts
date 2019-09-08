@@ -1,4 +1,5 @@
 import { App, Module } from '@/App';
+import { Config } from '@/module/config';
 import Live2DModule from '@/module/live2d';
 import SoundManager from '@/module/live2d-motion/SoundManager';
 import SubtitleManager from '@/module/live2d-motion/SubtitleManager';
@@ -32,6 +33,17 @@ export default class Live2DMotionModule implements Module {
                     this.processSprite(obj);
                 }
             });
+        });
+
+        app.on('configInit', (config: Config) => {
+            if (config.volume) {
+                this.soundManager.volume = config.volume;
+            }
+        });
+        app.on('configUpdate', (path: string, value: number) => {
+            if (path === 'volume') {
+                this.soundManager.volume = value;
+            }
         });
     }
 
