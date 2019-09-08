@@ -12,13 +12,14 @@ export interface Config {
 export interface App {
     on(event: 'configInit', fn: (config: Config) => void, context?: any): this;
 
-    on(
-        event: 'configUpdate',
-        fn: (path: string, newValue: any, oldValue: any, config: Config) => void,
-        context?: any,
-    ): this;
+    // Will be emitted on each update of config
+    on(event: 'config:*', fn: (path: string, value: any, oldValue: any, config: Config) => void, context?: any): this;
 
-    emit(event: 'config', path: string, oldValue: any, newValue: any, config: Config): this;
+    on(event: 'config:{path}', fn: (value: any, oldValue: any, config: Config) => void, context?: any): this;
+
+    emit(event: 'config:*', path: string, value: any, oldValue: any, config: Config): this;
+
+    emit(event: 'config:{path}', value: any, oldValue: any, config: Config): this;
 
     emit(event: 'config', path: string, value: any): this;
 }
@@ -62,7 +63,8 @@ export default class ConfigModule implements Module, Tagged {
         set(this.config, path, value);
         this.save();
 
-        this.app.emit('configUpdate', path, value, oldValue, this.config);
+        this.app.emit('config:' + path, value, oldValue, this.config);
+        this.app.emit('config:*', path, value, oldValue, this.config);
     }
 
     getConfig(path: string, defaultValue: any) {
