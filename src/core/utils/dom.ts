@@ -46,6 +46,8 @@ export function movable(element: HTMLElement, target?: HTMLElement, listeners: L
 }
 
 function init() {
+    initialized = true;
+
     document.addEventListener('mousedown', (e: MouseEvent) => {
         movableElements.forEach(movableElement => {
             if (e.target === movableElement.element) {
