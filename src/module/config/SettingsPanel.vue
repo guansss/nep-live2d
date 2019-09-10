@@ -1,25 +1,27 @@
 <template>
-    <div class="settings" ref="panel">
-        <div class="toolbar" ref="toolbar">
-            <div class="tabs">
-                <div
-                    v-for="(tab, i) in tabs"
-                    :key="tab"
-                    :class="['tab selectable', { selected: i === selectedTab }]"
-                    @click="selectedTab = i"
-                >
-                    {{ tab }}
+    <div ref="settings" class="settings" :style="style">
+        <div v-if="expanded" ref="content" class="content">
+            <div class="toolbar" ref="toolbar">
+                <div class="tabs">
+                    <div
+                        v-for="(tab, i) in tabs"
+                        :key="tab"
+                        :class="['tab selectable', { selected: i === selectedTab }]"
+                        @click="selectedTab = i"
+                    >
+                        {{ tab }}
+                    </div>
+                </div>
+                <div class="selectable right" @click="refresh">
+                    <div class="refresh"></div>
+                </div>
+                <div class="selectable" @click="close">
+                    <div class="close"></div>
                 </div>
             </div>
-            <div class="selectable right" @click="refresh">
-                <div class="refresh"></div>
-            </div>
-            <div class="selectable">
-                <div class="close"></div>
-            </div>
-        </div>
 
-        <component :is="currentPage" />
+            <component :is="currentPage" />
+        </div>
     </div>
 </template>
 
@@ -30,10 +32,6 @@
 
 .settings
     position absolute
-    top 20vh
-    left 20%
-    width 100vh
-    height 60vh
     max-width 100%
     max-height 100%
     overflow auto
@@ -41,8 +39,13 @@
     color $themeColor
     font-size 16px
     background-color $backgroundColor
-    border-radius 4px
     box-shadow 0 0 2px #BBB
+    transition background-color .2s
+
+.content
+    position relative
+    width 100%
+    height 100%
 
 .selectable
     cursor pointer

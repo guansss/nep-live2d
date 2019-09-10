@@ -1,12 +1,16 @@
-import { movable } from '@/core/utils/dom';
+import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
+import FloatingSwitch from '@/module/config/FloatingSwitch.vue';
 import GeneralSettings from '@/module/config/GeneralSettings.vue';
 import ConfigModule from '@/module/config/index';
-import { Component, Ref, Vue } from 'vue-property-decorator';
+import { Component, Mixins, Ref } from 'vue-property-decorator';
 
-@Component
-export default class SettingsPanel extends Vue {
-    @Ref('panel') readonly panel!: HTMLDivElement;
-    @Ref('toolbar') readonly toolbar!: HTMLDivElement;
+@Component({
+    components: { FloatingSwitch },
+})
+export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
+    @Ref('settings') readonly panel!: HTMLDivElement;
+    @Ref('content') readonly content!: HTMLDivElement;
+    @Ref('toolbar') readonly handle!: HTMLDivElement;
 
     readonly tabs = ['General'];
     readonly pages = [GeneralSettings];
@@ -19,25 +23,25 @@ export default class SettingsPanel extends Vue {
         return this.pages[this.selectedTab];
     }
 
-    private mounted() {
+    protected mounted() {
         // TODO: use theme color from Wallpaper Engine properties
         document.documentElement.style.setProperty('--accentColor', '#AB47BC');
 
-        this.panel.style.left = this.configModule.getConfig('settings.positionX', this.panel.style.left);
-        this.panel.style.top = this.configModule.getConfig('settings.positionY', this.panel.style.top);
+        this.switchTop = this.configModule.getConfig('settings.switchTop', this.switchTop);
+        this.switchLeft = this.configModule.getConfig('settings.switchLeft', this.switchLeft);
 
-        this.setupDragging();
+        this.panelTop = this.configModule.getConfig('settings.panelTop', this.panelTop);
+        this.panelLeft = this.configModule.getConfig('settings.panelLeft', this.panelLeft);
     }
 
-    private setupDragging() {
-        movable(this.toolbar, this.panel, {
-            end: (e: MouseEvent) => {
-                if (this.configModule) {
-                    this.configModule.setConfig('settings.positionX', this.panel.style.left);
-                    this.configModule.setConfig('settings.positionY', this.panel.style.top);
-                }
-            },
-        });
+    protected switchMoveEnded() {
+        this.configModule.setConfig('settings.switchTop', this.switchTop);
+        this.configModule.setConfig('settings.switchLeft', this.switchLeft);
+    }
+
+    protected panelMoveEnded() {
+        this.configModule.setConfig('settings.panelTop', this.panelTop);
+        this.configModule.setConfig('settings.panelLeft', this.panelLeft);
     }
 
     refresh() {
