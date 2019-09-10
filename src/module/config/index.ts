@@ -73,7 +73,7 @@ export default class ConfigModule implements Module, Tagged {
 
     read() {
         try {
-            const json = localStorage.getItem(this.storageKey);
+            const json = localStorage.getItem(this.storageKey) || '{}';
 
             if (json) {
                 Object.assign(this.config, JSON.parse(json));
