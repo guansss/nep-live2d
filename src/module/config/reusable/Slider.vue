@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { movable } from '@/core/utils/dom';
+import Draggable from '@/core/utils/Draggable';
 import { clamp } from '@/core/utils/math';
 import Vue from 'vue';
 import { Component, Model, Prop, Ref } from 'vue-property-decorator';
@@ -57,40 +57,43 @@ export default class Slider extends Vue {
     private setupMovement() {
         let mouseOffsetX = 0;
 
-        const moveListeners = {
-            start: (e: MouseEvent) => {
-                this.pressed = true;
+        const draggableTrack = new Draggable(this.track);
+        const draggableOverlay = new Draggable(this.overlayRef);
 
-                let mouseXInThumb = e.clientX - this.thumb.getBoundingClientRect().left;
+        draggableTrack.onStart = draggableOverlay.onStart = (e: MouseEvent) => {
+            this.pressed = true;
 
-                if (mouseXInThumb < 0 || mouseXInThumb > this.thumb.offsetWidth) {
-                    mouseXInThumb = this.thumb.offsetWidth / 2;
-                }
+            let mouseXInThumb = e.clientX - this.thumb.getBoundingClientRect().left;
 
-                mouseOffsetX = mouseXInThumb + this.track.getBoundingClientRect().left;
+            if (mouseXInThumb < 0 || mouseXInThumb > this.thumb.offsetWidth) {
+                mouseXInThumb = this.thumb.offsetWidth / 2;
+            }
 
-                moveListeners.move(e);
-            },
+            mouseOffsetX = mouseXInThumb + this.track.getBoundingClientRect().left;
 
-            move: (e: MouseEvent) => {
-                const trackWidth = this.track.offsetWidth - this.thumb.offsetWidth;
+            // perform a movement at start
+            draggableTrack.onDrag(e);
 
-                const value =
-                    (clamp(e.clientX - mouseOffsetX, 0, trackWidth) / trackWidth) * (this.max - this.min) + this.min;
-
-                const snappedValue =
-                    this.step === 0 || value === this.max ? value : value - ((value - this.min) % this.step);
-
-                if (snappedValue !== this.value) {
-                    this.$emit('change', snappedValue);
-                }
-            },
-
-            end: () => (this.pressed = false),
+            return true;
         };
 
-        movable(this.track, undefined, moveListeners);
-        movable(this.overlayRef, undefined, moveListeners);
+        draggableTrack.onDrag = draggableOverlay.onDrag = (e: MouseEvent) => {
+            const trackWidth = this.track.offsetWidth - this.thumb.offsetWidth;
+
+            const value =
+                (clamp(e.clientX - mouseOffsetX, 0, trackWidth) / trackWidth) * (this.max - this.min) + this.min;
+
+            const snappedValue =
+                this.step === 0 || value === this.max ? value : value - ((value - this.min) % this.step);
+
+            if (snappedValue !== this.value) {
+                this.$emit('change', snappedValue);
+            }
+
+            return true;
+        };
+
+        draggableTrack.onEnd = draggableOverlay.onEnd = () => (this.pressed = false);
     }
 }
 </script>
@@ -101,7 +104,7 @@ export default class Slider extends Vue {
 .slider
     display flex
     width 240px
-    padding 16px 8px
+    padding 16px
 
 .label
     width 30%
