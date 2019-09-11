@@ -1,5 +1,5 @@
 <template>
-    <div ref="settings" class="settings" :style="style">
+    <div ref="settings" :class="['settings', stateClass]" :style="panelStyle">
         <div v-if="expanded" ref="content" class="content">
             <div class="toolbar" ref="toolbar">
                 <div class="tabs">
@@ -43,6 +43,12 @@
     background-color $backgroundColor
     box-shadow 0 0 2px #BBB
     transition background-color .2s
+
+.switch
+    transition transform .2s, opacity .2s
+
+    &:hover
+        transform none !important
 
 .content
     position relative

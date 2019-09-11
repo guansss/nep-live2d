@@ -38,6 +38,9 @@ export default class VueApp extends Vue {
     box-sizing: border-box
     margin: 0
 
+body
+    overflow hidden
+
 #canvas
     position absolute
     width 100vw
