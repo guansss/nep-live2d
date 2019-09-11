@@ -41,7 +41,7 @@ export class App extends EventEmitter implements Tagged {
         }
     }
 
-    async addComponent(componentClass: VueConstructor) {
-        return (this.vueApp as any).addChild(componentClass) as Vue;
+    async addComponent(componentClass: VueConstructor, props?: any) {
+        return (this.vueApp as any).addChild(componentClass, props) as Vue;
     }
 }

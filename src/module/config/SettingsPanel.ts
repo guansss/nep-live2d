@@ -2,12 +2,15 @@ import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
 import FloatingSwitch from '@/module/config/FloatingSwitch.vue';
 import GeneralSettings from '@/module/config/GeneralSettings.vue';
 import ConfigModule from '@/module/config/index';
-import { Component, Mixins, Ref } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Ref } from 'vue-property-decorator';
 
 @Component({
     components: { FloatingSwitch },
 })
 export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
+    // use getter function to prevent Vue's observation on ConfigModule instance
+    @Prop() readonly configModule!: () => ConfigModule;
+
     @Ref('settings') readonly panel!: HTMLDivElement;
     @Ref('content') readonly content!: HTMLDivElement;
     @Ref('toolbar') readonly handle!: HTMLDivElement;
@@ -17,31 +20,33 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
 
     selectedTab = 0;
 
-    configModule!: ConfigModule;
-
     get currentPage() {
         return this.pages[this.selectedTab];
+    }
+
+    get cachedConfigModule() {
+        return this.configModule();
     }
 
     protected mounted() {
         // TODO: use theme color from Wallpaper Engine properties
         document.documentElement.style.setProperty('--accentColor', '#AB47BC');
 
-        this.switchTop = this.configModule.getConfig('settings.switchTop', this.switchTop);
-        this.switchLeft = this.configModule.getConfig('settings.switchLeft', this.switchLeft);
+        this.switchTop = this.cachedConfigModule.getConfig('settings.switchTop', this.switchTop);
+        this.switchLeft = this.cachedConfigModule.getConfig('settings.switchLeft', this.switchLeft);
 
-        this.panelTop = this.configModule.getConfig('settings.panelTop', this.panelTop);
-        this.panelLeft = this.configModule.getConfig('settings.panelLeft', this.panelLeft);
+        this.panelTop = this.cachedConfigModule.getConfig('settings.panelTop', this.panelTop);
+        this.panelLeft = this.cachedConfigModule.getConfig('settings.panelLeft', this.panelLeft);
     }
 
     protected switchMoveEnded() {
-        this.configModule.setConfig('settings.switchTop', this.switchTop);
-        this.configModule.setConfig('settings.switchLeft', this.switchLeft);
+        this.cachedConfigModule.setConfig('settings.switchTop', this.switchTop);
+        this.cachedConfigModule.setConfig('settings.switchLeft', this.switchLeft);
     }
 
     protected panelMoveEnded() {
-        this.configModule.setConfig('settings.panelTop', this.panelTop);
-        this.configModule.setConfig('settings.panelLeft', this.panelLeft);
+        this.cachedConfigModule.setConfig('settings.panelTop', this.panelTop);
+        this.cachedConfigModule.setConfig('settings.panelLeft', this.panelLeft);
     }
 
     refresh() {

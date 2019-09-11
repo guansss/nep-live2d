@@ -52,9 +52,7 @@ export default class ConfigModule implements Module, Tagged {
 
         app.emit('configInit', this.config);
 
-        SettingsPanel.prototype.configModule = this;
-
-        app.addComponent(SettingsPanel).then();
+        app.addComponent(SettingsPanel, { configModule: () => this }).then();
     }
 
     setConfig(path: string, value: any) {

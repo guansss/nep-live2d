@@ -20,7 +20,9 @@
                 </div>
             </div>
 
-            <component :is="currentPage" />
+            <keep-alive>
+                <component :is="currentPage" />
+            </keep-alive>
         </div>
     </div>
 </template>

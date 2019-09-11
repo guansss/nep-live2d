@@ -2,7 +2,7 @@
     <div id="app">
         <canvas id="canvas" ref="canvas"></canvas>
         <template v-for="(child, i) in children">
-            <component :is="child" :key="i" ref="children"></component>
+            <component :is="child.component" :key="i" ref="children" v-bind="child.props"></component>
         </template>
     </div>
 </template>
@@ -16,11 +16,17 @@ export default class VueApp extends Vue {
     @Ref('canvas') readonly canvas!: HTMLCanvasElement;
     @Ref('children') readonly childrenRef!: Vue[];
 
-    readonly children: VueConstructor[] = [];
+    readonly children: {
+        component: VueConstructor;
+        props?: any;
+    }[] = [];
 
-    async addChild(componentClass: VueConstructor) {
+    async addChild(componentClass: VueConstructor, props?: any) {
         const index = this.children.length;
-        this.children.push(componentClass);
+        this.children.push({
+            component: componentClass,
+            props,
+        });
 
         await this.$nextTick();
         return this.childrenRef[index];
