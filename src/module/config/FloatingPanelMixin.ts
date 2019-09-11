@@ -2,6 +2,9 @@ import Draggable from '@/core/utils/Draggable';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 
+// https://material.io/design/motion/speed.html#easing
+const EASING = 'cubic-bezier(0.4, 0.0, 0.2, 1)';
+
 @Component
 export default class FloatingPanelMixin extends Vue {
     // Refs
@@ -25,8 +28,8 @@ export default class FloatingPanelMixin extends Vue {
 
     animDuration = 300;
 
-    // when will the state change from switch to panel during animation
-    stateChangeFraction = 0.4;
+    // when will the state change between switch and panel during animation
+    stateChangeFraction = 0.3;
 
     get style() {
         // must access dependencies explicitly
@@ -50,28 +53,22 @@ export default class FloatingPanelMixin extends Vue {
     @Watch('expanded')
     expandedChanged(expanded: boolean, wasExpanded: boolean) {
         // Since the content is conditional on `expanded` with `v-if`, its element will be dynamically create and destroy
-        //  every time the dependency changes, we need to do works right after it create and recreates.
+        //  every time the dependency changes, we need to do works right after it create or recreates.
         this.$nextTick(this.setupContent);
     }
 
     protected mounted() {
-        this.panel.style.transformOrigin = '0 0';
-        this.panel.style.borderRadius = this.switchBorderRadius;
-        this.panel.classList.add('switch');
-
         this.setupPanel();
         this.setupContent();
     }
 
     private setupPanel() {
+        this.panel.style.transformOrigin = '0 0';
+        this.panel.style.borderRadius = this.switchBorderRadius;
+        this.panel.classList.add('switch');
+
         // setup draggable for switch mode
         const draggable = new Draggable(this.panel, undefined, 2);
-
-        draggable.onStart = (e: MouseEvent) => {
-            // prevent the click event (maybe)
-            e.preventDefault();
-            return true;
-        };
 
         draggable.onDrag = (e: MouseEvent) => {
             this.switchTop += e._movementY;
@@ -130,19 +127,17 @@ export default class FloatingPanelMixin extends Vue {
                 ],
                 {
                     duration: this.animDuration,
-                    easing: 'ease-out',
+                    easing: EASING,
                 },
             );
 
-            // wait for `this.content` to be rendered
+            // wait for `this.content` to be created and rendered
             this.$nextTick(() => {
-                this.content.style.opacity = '1';
-
                 this.content.animate(
                     [{ opacity: 0 }, { opacity: 1, offset: this.stateChangeFraction }, { opacity: 1 }],
                     {
                         duration: this.animDuration,
-                        easing: 'ease-out',
+                        easing: EASING,
                     },
                 );
             });
@@ -160,12 +155,11 @@ export default class FloatingPanelMixin extends Vue {
             const scaleY = this.switchHeight / (this.panel.offsetHeight || Infinity);
 
             this.panel.style.borderRadius = this.switchBorderRadius;
-            this.content.style.opacity = '0';
 
             this.panel.animate(
                 [
                     { borderRadius: this.panelBorderRadius, transform: 'none' },
-                    { borderRadius: this.panelBorderRadius, offset: 0.7 },
+                    { borderRadius: this.panelBorderRadius, offset: this.stateChangeFraction },
                     {
                         borderRadius: this.switchBorderRadius,
                         transform: `translateX(${distanceX}px) translateY(${distanceY}px) scaleX(${scaleX}) scaleY(${scaleY})`,
@@ -173,7 +167,7 @@ export default class FloatingPanelMixin extends Vue {
                 ],
                 {
                     duration: this.animDuration,
-                    easing: 'ease-out',
+                    easing: EASING,
                 },
             ).onfinish = () => {
                 this.panel.classList.remove('panel');
@@ -182,13 +176,10 @@ export default class FloatingPanelMixin extends Vue {
                 this.expanded = false;
             };
 
-            this.content.animate(
-                [{ opacity: 1 }, { opacity: 1, offset: 1 - this.stateChangeFraction }, { opacity: 0 }],
-                {
-                    duration: this.animDuration,
-                    easing: 'ease-out',
-                },
-            );
+            this.content.animate([{ opacity: 1 }, { opacity: 0, offset: this.stateChangeFraction }, { opacity: 0 }], {
+                duration: this.animDuration,
+                easing: EASING,
+            });
         }
     }
 
