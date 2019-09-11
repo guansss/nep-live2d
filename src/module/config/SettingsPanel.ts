@@ -1,12 +1,9 @@
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
-import FloatingSwitch from '@/module/config/FloatingSwitch.vue';
 import GeneralSettings from '@/module/config/GeneralSettings.vue';
 import ConfigModule from '@/module/config/index';
 import { Component, Mixins, Prop, Ref } from 'vue-property-decorator';
 
-@Component({
-    components: { FloatingSwitch },
-})
+@Component
 export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     // use getter function to prevent Vue's observation on ConfigModule instance
     @Prop() readonly configModule!: () => ConfigModule;

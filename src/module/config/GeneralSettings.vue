@@ -17,7 +17,7 @@ export default class GeneralSettings extends Vue {
     volume = this.configModule.getConfig('volume', 0);
 
     get configModule() {
-        return (this.$parent as SettingsPanel).configModule;
+        return (this.$parent as SettingsPanel).configModule();
     }
 
     @Watch('volume')
