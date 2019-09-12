@@ -1,12 +1,10 @@
 import { App, Module } from '@/App';
-import { Tagged } from '@/core/utils/log';
 import Live2DModule from '@/module/live2d';
 import registerHitEvent from '@/module/live2d-event/hit-event';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import { DisplayObject } from '@pixi/display';
 
-export default class Live2DEventModule implements Module, Tagged {
-    tag = Live2DEventModule.name;
+export default class Live2DEventModule implements Module {
     name = 'Live2DEvent';
 
     sprites: Live2DSprite[] = [];

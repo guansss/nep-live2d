@@ -1,4 +1,3 @@
-import { Tagged } from '@/core/utils/log';
 import { cloneWithCamelCase } from '@/core/utils/misc';
 import { get, set } from 'lodash';
 import { resolve as urlResolve } from 'url';
@@ -32,9 +31,7 @@ export interface ExpressionDefinition {
     readonly file: string;
 }
 
-export default class ModelSettings implements Tagged {
-    tag = ModelSettings.name;
-
+export default class ModelSettings {
     readonly name?: string;
 
     // files
@@ -135,7 +132,7 @@ export default class ModelSettings implements Tagged {
                 if (Array.isArray(motionGroup)) {
                     this.motions[group] = motionGroup
 
-                        // filter out the motions without `file` defined
+                    // filter out the motions without `file` defined
                         .filter(motion => motion && typeof motion.file === 'string')
 
                         // copy only the valid properties

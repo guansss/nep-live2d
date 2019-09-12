@@ -1,11 +1,11 @@
 import { App, Module } from '@/App';
-import { error, Tagged } from '@/core/utils/log';
+import { error } from '@/core/utils/log';
 import Live2DPlayer from '@/module/live2d/Live2DPlayer';
 import { resolve as urlResolve } from 'url';
 
-export default class Live2DModule implements Module, Tagged {
-    tag = Live2DModule.name;
+const TAG = 'Live2DModule';
 
+export default class Live2DModule implements Module {
     name = 'Live2D';
 
     player!: Live2DPlayer;
@@ -25,7 +25,7 @@ export default class Live2DModule implements Module, Tagged {
             models.split(',').forEach(model => {
                 this.player.addSprite(urlResolve(basePath, model)).catch(e => {
                     // TODO: Show friendly error message
-                    error(this, e);
+                    error(TAG, e);
                 });
             });
         }

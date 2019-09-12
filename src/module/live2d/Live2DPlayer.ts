@@ -1,17 +1,14 @@
 import FocusController from '@/core/live2d/FocusController';
 import Mka from '@/core/mka/Mka';
 import Player from '@/core/mka/Player';
-import { Tagged } from '@/core/utils/log';
 import { clamp } from '@/core/utils/math';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import MouseHandler from '@/module/live2d/MouseHandler';
 import { Container } from '@pixi/display';
 
-const mouseHandingElement = document.documentElement;
+const MOUSE_HANDLING_ELEMENT = document.documentElement;
 
-export default class Live2DPlayer extends Player implements Tagged {
-    tag = Live2DPlayer.name;
-
+export default class Live2DPlayer extends Player {
     gl: WebGLRenderingContext;
 
     readonly container = new Container();
@@ -30,11 +27,11 @@ export default class Live2DPlayer extends Player implements Tagged {
 
         this.focusController = new FocusController();
 
-        this.mouseHandler = new MouseHandler(mouseHandingElement);
+        this.mouseHandler = new MouseHandler(MOUSE_HANDLING_ELEMENT);
         this.mouseHandler.focus = (x, y) =>
             this.focusController.focus(
-                (x / mouseHandingElement.offsetWidth) * 2 - 1,
-                (y / mouseHandingElement.offsetHeight) * 2 - 1,
+                (x / MOUSE_HANDLING_ELEMENT.offsetWidth) * 2 - 1,
+                (y / MOUSE_HANDLING_ELEMENT.offsetHeight) * 2 - 1,
             );
         this.mouseHandler.press = (x, y) => this.sprites.forEach(sprite => sprite.hit(x, y));
 
@@ -85,8 +82,8 @@ export default class Live2DPlayer extends Player implements Tagged {
                               tmpX
         */
 
-        const tmpX = (this.focusController.x + 1) * mouseHandingElement.offsetWidth;
-        const tmpY = (this.focusController.y + 1) * mouseHandingElement.offsetHeight;
+        const tmpX = (this.focusController.x + 1) * MOUSE_HANDLING_ELEMENT.offsetWidth;
+        const tmpY = (this.focusController.y + 1) * MOUSE_HANDLING_ELEMENT.offsetHeight;
 
         this.sprites.forEach(sprite => {
             sprite.model.focusX = clamp((tmpX - sprite.position.x * 2) / sprite.width - 1, -1, 1);

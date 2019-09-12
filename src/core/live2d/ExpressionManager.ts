@@ -1,10 +1,10 @@
 import Live2DExpression from '@/core/live2d/Live2DExpression';
 import { ExpressionDefinition } from '@/core/live2d/ModelSettings';
-import { error, log, Tagged } from '@/core/utils/log';
+import { error, log } from '@/core/utils/log';
 import { getJSON } from '@/core/utils/net';
 import { sample } from 'lodash';
 
-export default class ExpressionManager extends MotionQueueManager implements Tagged {
+export default class ExpressionManager extends MotionQueueManager {
     tag: string;
 
     private readonly internalModel: Live2DModelWebGL;
@@ -18,7 +18,7 @@ export default class ExpressionManager extends MotionQueueManager implements Tag
     constructor(name: string, model: Live2DModelWebGL, definitions: ExpressionDefinition[]) {
         super();
 
-        this.tag = `${ExpressionManager.name}(${name})`;
+        this.tag = `ExpressionManager(${name})`;
         this.internalModel = model;
         this.definitions = definitions;
 
@@ -29,11 +29,11 @@ export default class ExpressionManager extends MotionQueueManager implements Tag
     private async loadExpressions() {
         this.definitions.forEach(async ({ name, file }) => {
             try {
-                log(this, `Loading expression [${name}]`);
+                log(this.tag, `Loading expression [${name}]`);
                 const json = await getJSON(file);
                 this.expressions.push(new Live2DExpression(json, name));
             } catch (e) {
-                error(this, `Failed to load expression [${name}]: ${file}`, e);
+                error(this.tag, `Failed to load expression [${name}]: ${file}`, e);
             }
         });
     }
@@ -64,7 +64,7 @@ export default class ExpressionManager extends MotionQueueManager implements Tag
     }
 
     setExpression(expression: Live2DExpression) {
-        log(this, 'Setting expression:', expression.name);
+        log(this.tag, 'Setting expression:', expression.name);
         this.currentExpression = expression;
         this.startMotion(expression);
     }

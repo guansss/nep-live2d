@@ -1,6 +1,6 @@
 import { App, Module } from '@/App';
 import { EventEntity } from '@/core/utils/EventEmitter';
-import { error, Tagged } from '@/core/utils/log';
+import { error } from '@/core/utils/log';
 import SettingsPanel from '@/module/config/SettingsPanel.vue';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -24,12 +24,12 @@ export interface App {
     emit(event: 'config', path: string, value: any): this;
 }
 
+const TAG = 'ConfigModule';
+
 /**
  * Handles configurations, must be installed before other modules that listen for `configInit` events.
  */
-export default class ConfigModule implements Module, Tagged {
-    tag = ConfigModule.name;
-
+export default class ConfigModule implements Module {
     name = 'Config';
 
     storageKey = 'config';
@@ -77,7 +77,7 @@ export default class ConfigModule implements Module, Tagged {
                 Object.assign(this.config, JSON.parse(json));
             }
         } catch (e) {
-            error(this, e);
+            error(TAG, e);
         }
     }
 
@@ -86,7 +86,7 @@ export default class ConfigModule implements Module, Tagged {
             localStorage.setItem(this.storageKey, JSON.stringify(this.config));
             return true;
         } catch (e) {
-            error(this, e);
+            error(TAG, e);
         }
         return false;
     }

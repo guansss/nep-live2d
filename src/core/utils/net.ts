@@ -1,16 +1,16 @@
-import { error, log, Tagged } from './log';
+import { error, log } from './log';
 
 const enum ResultType {
     JSON,
     ArrayBuffer,
 }
 
-const sender = { tag: 'Net' } as Tagged;
+const TAG = 'Net';
 
 async function getJSON(url: string) {
     const json = await ajax(url, { type: ResultType.JSON });
 
-    log(sender, 'Loaded JSON', url, json);
+    log(TAG, 'Loaded JSON', url, json);
 
     return json;
 }
@@ -18,7 +18,7 @@ async function getJSON(url: string) {
 async function getArrayBuffer(url: string) {
     const arrayBuffer: ArrayBuffer = await ajax(url, { type: ResultType.ArrayBuffer });
 
-    log(sender, `Loaded ArrayBuffer(${arrayBuffer.byteLength})`, url);
+    log(TAG, `Loaded ArrayBuffer(${arrayBuffer.byteLength})`, url);
 
     return arrayBuffer;
 }
@@ -28,7 +28,7 @@ async function ajax(url: string, { type }: { type?: ResultType } = {}) {
 
     // status 0 for loading a local file
     if (!(res.status === 0 || res.status === 200)) {
-        error(sender, 'Failed to load', url, `(${res.status})`);
+        error(TAG, 'Failed to load', url, `(${res.status})`);
     }
 
     let result;

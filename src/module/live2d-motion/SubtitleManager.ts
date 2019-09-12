@@ -1,5 +1,5 @@
 import Live2DModel from '@/core/live2d/Live2DModel';
-import { error, Tagged } from '@/core/utils/log';
+import { error } from '@/core/utils/log';
 import { getJSON } from '@/core/utils/net';
 
 type SubtitleJSON = Language[];
@@ -20,11 +20,11 @@ export interface Subtitle {
     duration?: number;
 }
 
+const TAG = 'SubtitleManager';
+
 const DEFAULT_LOCALE = 'default';
 
-export default class SubtitleManager implements Tagged {
-    tag = SubtitleManager.name;
-
+export default class SubtitleManager {
     locale = DEFAULT_LOCALE;
 
     subtitles: { [file: string]: SubtitleJSON } = {};
@@ -55,7 +55,7 @@ export default class SubtitleManager implements Tagged {
 
                 this.subtitles[file] = languages;
             } catch (e) {
-                error(this, `Failed to load subtitles for [${model.name}] from ${file}`, e);
+                error(TAG, `Failed to load subtitles for [${model.name}] from ${file}`, e);
             }
         }
     }

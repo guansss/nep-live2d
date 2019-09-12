@@ -1,20 +1,24 @@
 import Mka from '@/core/mka/Mka';
 import EventEmitter from '@/core/utils/EventEmitter';
-import { error, Tagged } from '@/core/utils/log';
+import { error } from '@/core/utils/log';
 import VueApp from '@/VueApp.vue';
 import Vue, { VueConstructor } from 'vue';
 
 export interface ModuleConstructor {
-    new(app: App): Module;
+    // @formatter:off
+
+    new (app: App): Module;
+
+    // @formatter:on
 }
 
 export interface Module {
     name: string;
 }
 
-export class App extends EventEmitter implements Tagged {
-    tag = App.name;
+const TAG = 'App';
 
+export class App extends EventEmitter {
     readonly mka: Mka;
     readonly vueApp: VueApp;
 
@@ -37,7 +41,7 @@ export class App extends EventEmitter implements Tagged {
             const module = new M(this);
             this.modules[module.name] = module;
         } catch (e) {
-            error(this, `Failed to create module ${M.name}`, e);
+            error(TAG, `Failed to create module ${M.name}`, e);
         }
     }
 

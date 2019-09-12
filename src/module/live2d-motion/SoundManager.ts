@@ -1,7 +1,9 @@
-import { error, Tagged } from '@/core/utils/log';
+import { error } from '@/core/utils/log';
 import { clamp } from '@/core/utils/math';
 
-export default class SoundManager implements Tagged {
+const TAG = 'SoundManager';
+
+export default class SoundManager {
     private _volume = 0.5;
 
     get volume(): number {
@@ -24,7 +26,7 @@ export default class SoundManager implements Tagged {
         const promise = audio.play();
 
         if (promise) {
-            promise.catch(e => error(this, e));
+            promise.catch(e => error(TAG, e));
         }
 
         this.audios.push(audio);

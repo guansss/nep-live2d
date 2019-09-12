@@ -1,17 +1,17 @@
 import Live2DPhysics from '@/core/live2d/Live2DPhysics';
 import Live2DPose from '@/core/live2d/Live2DPose';
 import ModelSettings from '@/core/live2d/ModelSettings';
-import { log, Tagged } from '@/core/utils/log';
+import { log } from '@/core/utils/log';
 import { getArrayBuffer, getJSON } from '@/core/utils/net';
 import { dirname } from 'path';
 import { parse as urlParse } from 'url';
 
-const logSender = { tag: 'Live2DLoader' } as Tagged;
+const TAG = 'Live2DLoader';
 
 export async function loadModelSettings(file?: string) {
     if (!file) throw 'Missing model settings file';
 
-    log(logSender, `Loading model settings:`, file);
+    log(TAG, `Loading model settings:`, file);
 
     const url = urlParse(file);
     const baseDir = dirname(url.pathname || '') + '/';
@@ -23,7 +23,7 @@ export async function loadModelSettings(file?: string) {
 export async function loadModel(file?: string) {
     if (!file) throw 'Missing model file';
 
-    log(logSender, `Loading model:`, file);
+    log(TAG, `Loading model:`, file);
 
     const buffer = await getArrayBuffer(file);
     const model = Live2DModelWebGL.loadModel(buffer);
@@ -35,7 +35,7 @@ export async function loadModel(file?: string) {
 }
 
 export async function loadTexture(file: string, gl: WebGLRenderingContext, premultipliedAlpha = false) {
-    log(logSender, 'Loading texture:', file || '(missing)');
+    log(TAG, 'Loading texture:', file || '(missing)');
 
     const image = new Image();
     image.src = file;
@@ -64,14 +64,14 @@ export async function loadTexture(file: string, gl: WebGLRenderingContext, premu
 }
 
 export async function loadPose(file: string, internalModel: Live2DModelWebGL) {
-    log(logSender, 'Loading pose:', file);
+    log(TAG, 'Loading pose:', file);
 
     const json = await getJSON(file);
     return new Live2DPose(internalModel, json);
 }
 
 export async function loadPhysics(file: string, internalModel: Live2DModelWebGL) {
-    log(logSender, 'Loading physics:', file);
+    log(TAG, 'Loading physics:', file);
 
     const json = await getJSON(file);
     return new Live2DPhysics(internalModel!, json);

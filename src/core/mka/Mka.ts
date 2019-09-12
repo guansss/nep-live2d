@@ -1,11 +1,11 @@
 import Player, { InternalPlayer } from '@/core/mka/Player';
-import { error, log, Tagged } from '@/core/utils/log';
+import { error, log } from '@/core/utils/log';
 import { Application as PIXIApplication } from '@pixi/app';
 import autobind from 'autobind-decorator';
 
-export default class Mka implements Tagged {
-    tag = Mka.name;
+const TAG = 'Mka';
 
+export default class Mka {
     private _paused = false;
 
     get paused() {
@@ -40,11 +40,11 @@ export default class Mka implements Tagged {
 
     addPlayer(name: string, player: Player) {
         if (this.players[name]) {
-            log(this, `Player "${name}" already exists, ignored.`);
+            log(TAG, `Player "${name}" already exists, ignored.`);
             return;
         }
 
-        log(this, `Add player "${name}"`);
+        log(TAG, `Add player "${name}"`);
         this.players[name] = player;
         this.players[name].mka = this;
         player.attach();
@@ -102,7 +102,7 @@ export default class Mka implements Tagged {
             try {
                 fn(player, name);
             } catch (e) {
-                error(this, `(${name})`, e);
+                error(TAG, `(${name})`, e);
             }
         }
     }
@@ -113,13 +113,13 @@ export default class Mka implements Tagged {
         }
 
         Object.entries(this.players).forEach(([name, player]) => {
-            log(this, `Destroying player "${name}"...`);
+            log(TAG, `Destroying player "${name}"...`);
 
             // don't break the loop when error occurs
             try {
                 player.destroy();
             } catch (e) {
-                error(this, e.message, e.stack);
+                error(TAG, e.message, e.stack);
             }
         });
     }

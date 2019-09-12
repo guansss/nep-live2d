@@ -4,11 +4,11 @@ import Live2DPhysics from '@/core/live2d/Live2DPhysics';
 import Live2DPose from '@/core/live2d/Live2DPose';
 import ModelSettings from '@/core/live2d/ModelSettings';
 import MotionManager from '@/core/live2d/MotionManager';
-import { log, Tagged } from '@/core/utils/log';
+import { log } from '@/core/utils/log';
 import { randomID } from '@/core/utils/string';
 
-export default class Live2DModel implements Tagged {
-    tag = Live2DModel.name + '(uninitialized)';
+export default class Live2DModel {
+    tag = 'Live2DModel(uninitialized)';
 
     readonly internalModel: Live2DModelWebGL;
     readonly webGLContext: WebGLRenderingContext;
@@ -75,7 +75,7 @@ export default class Live2DModel implements Tagged {
         this.textures = textures;
 
         this.name = modelSettings.name || randomID();
-        this.tag = `${Live2DModel.name}(${this.name})`;
+        this.tag = `Live2DModel(${this.name})`;
 
         textures.forEach((texture, i) => internalModel.setTexture(i, texture));
 
@@ -90,13 +90,13 @@ export default class Live2DModel implements Tagged {
         if (this.modelSettings.pose) {
             loadPose(this.modelSettings.pose, internalModel)
                 .then(pose => (this.pose = pose))
-                .catch(e => log(this, e));
+                .catch(e => log(this.tag, e));
         }
 
         if (this.modelSettings.physics) {
             loadPhysics(this.modelSettings.physics, internalModel)
                 .then(physics => (this.physics = physics))
-                .catch(e => log(this, e));
+                .catch(e => log(this.tag, e));
         }
 
         this.width = internalModel.getCanvasWidth();
@@ -135,7 +135,7 @@ export default class Live2DModel implements Tagged {
      * @returns The names of hit areas that have passed the test.
      */
     hitTest(x: number, y: number): string[] {
-        log(this, `Hit (${x}, ${y})`);
+        log(this.tag, `Hit (${x}, ${y})`);
 
         if (this.internalModel && this.modelSettings.hitAreas) {
             return this.modelSettings.hitAreas

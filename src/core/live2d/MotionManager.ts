@@ -1,6 +1,6 @@
 import ExpressionManager from '@/core/live2d/ExpressionManager';
 import { ExpressionDefinition, MotionDefinition } from '@/core/live2d/ModelSettings';
-import { error, log, Tagged } from '@/core/utils/log';
+import { error, log } from '@/core/utils/log';
 import { getArrayBuffer } from '@/core/utils/net';
 
 export enum Priority {
@@ -16,7 +16,7 @@ enum Group {
 
 const DEFAULT_FADE_TIMEOUT = 500;
 
-export default class MotionManager extends MotionQueueManager implements Tagged {
+export default class MotionManager extends MotionQueueManager {
     static readonly Priority = Priority;
 
     tag: string;
@@ -38,7 +38,7 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
     ) {
         super();
 
-        this.tag = `${MotionManager.name}(${name})`;
+        this.tag = `MotionManager(${name})`;
         this.internalModel = model;
         this.definitions = motionDefinitions;
 
@@ -64,16 +64,16 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
     }
 
     private async loadMotion(group: string, index: number) {
-        log(this, `Loading motion at ${index} in group "${group}"`);
+        log(this.tag, `Loading motion at ${index} in group "${group}"`);
 
         const definition = this.definitions[group] && this.definitions[group][index];
 
         if (!definition) {
-            error(this, 'Motion not found');
+            error(this.tag, 'Motion not found');
             return;
         }
 
-        log(this, `Loading motion [${definition.name}]`);
+        log(this.tag, `Loading motion [${definition.name}]`);
 
         try {
             const buffer = await getArrayBuffer(definition.file);
@@ -84,13 +84,13 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
             this.motionGroups[group][index] = motion;
             return motion;
         } catch (e) {
-            error(this, `Failed to load motion [${definition.name}]: ${definition.file}`, e);
+            error(this.tag, `Failed to load motion [${definition.name}]: ${definition.file}`, e);
         }
     }
 
     async startMotionByPriority(group: string, index: number, priority: Priority = Priority.Normal): Promise<boolean> {
         if (priority != Priority.Force && priority <= this.currentPriority) {
-            log(this, 'Cannot start motion because another motion of higher priority is running');
+            log(this.tag, 'Cannot start motion because another motion of higher priority is running');
             return false;
         }
         this.currentPriority = priority;
@@ -103,7 +103,7 @@ export default class MotionManager extends MotionQueueManager implements Tagged 
             (this.motionGroups[group] && this.motionGroups[group][index]) || (await this.loadMotion(group, index));
         if (!motion) return false;
 
-        log(this, 'Starting motion:', this.definitions[group][index]);
+        log(this.tag, 'Starting motion:', this.definitions[group][index]);
 
         this.startMotion(motion);
 

@@ -1,11 +1,8 @@
 import Live2DModel from '@/core/live2d/Live2DModel';
-import { Tagged } from '@/core/utils/log';
 import { Renderer } from '@pixi/core';
 import { DisplayObject } from '@pixi/display';
 
-export default class Live2DSprite extends DisplayObject implements Tagged {
-    tag = Live2DSprite.name;
-
+export default class Live2DSprite extends DisplayObject {
     model: Live2DModel;
 
     // temporary 4x4 matrix

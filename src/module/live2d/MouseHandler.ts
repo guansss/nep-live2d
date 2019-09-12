@@ -1,10 +1,7 @@
-import { Tagged } from '@/core/utils/log';
 import autobind from 'autobind-decorator';
 import { Cancelable, debounce, throttle } from 'lodash';
 
-export default class MouseHandler implements Tagged {
-    tag = MouseHandler.name;
-
+export default class MouseHandler {
     readonly element: HTMLElement;
 
     /** Only focus when mouse is pressed */
