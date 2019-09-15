@@ -86,6 +86,10 @@ export default class Live2DSprite extends DisplayObject {
 
     /** @override */
     render(renderer: Renderer) {
+        // IMPORTANT: resetting the renderer is the only way to make Live2D core's drawing methods
+        //  compatible with Pixi's drawing system
+        renderer.reset();
+
         this.updateTransform();
 
         const wt = this.transform.worldTransform;
