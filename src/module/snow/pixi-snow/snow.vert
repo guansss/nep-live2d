@@ -1,10 +1,10 @@
 precision highp float;
 
 attribute vec4 a_position;
-attribute vec4 a_color;
 attribute vec3 a_rotation;
 attribute vec3 a_speed;
 attribute float a_size;
+attribute float a_alpha;
 
 uniform float time;
 uniform mat4 projection;
@@ -12,12 +12,12 @@ uniform vec3 worldSize;
 uniform float gravity;
 uniform float wind;
 
-varying vec4 v_color;
+varying float v_alpha;
 varying float v_rotation;
 
 void main() {
 
-    v_color = a_color;
+    v_alpha = a_alpha;
     v_rotation = a_rotation.x + time * a_rotation.y;
 
     vec3 pos = a_position.xyz;

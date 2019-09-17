@@ -34,7 +34,7 @@ export default class Snow extends Mesh {
                 .addAttribute('a_rotation', Buffer.from([]), 3)
                 .addAttribute('a_speed', Buffer.from([]), 3)
                 .addAttribute('a_size', Buffer.from([]), 1)
-                .addAttribute('a_color', Buffer.from([]), 4),
+                .addAttribute('a_alpha', Buffer.from([]), 1),
             Shader.from(vert, frag, {
                 texture: Texture.from(textureSource, {
                     resourceOptions: {
@@ -77,11 +77,10 @@ export default class Snow extends Mesh {
         const baseSize = 5000;
 
         const position = [];
-        const color = [];
-        const size = [];
         const rotation = [];
         const speed = [];
-        let alpha;
+        const size = [];
+        const alpha = [];
 
         for (let i = (boundWidth / boundHeight) * this.number; i > 0; i--) {
             // prettier-ignore
@@ -92,29 +91,29 @@ export default class Snow extends Mesh {
             );
 
             // prettier-ignore
-            speed.push(
-                1 + Math.random(),
-                1 + Math.random(),
-                Math.random() * 10,
-            ); // x, y, sinusoid
-
-            // prettier-ignore
             rotation.push(
                 Math.random() * 2 * Math.PI,
                 Math.random() * 20,
                 Math.random() * 10,
             ); // angle, speed, sinusoid
 
-            color.push(1, 1, 1, 0.1 + Math.random() * 0.2);
+            // prettier-ignore
+            speed.push(
+                1 + Math.random(),
+                1 + Math.random(),
+                Math.random() * 10,
+            ); // x, y, sinusoid
 
             size.push(baseSize * Math.random());
+
+            alpha.push(0.1 + Math.random() * 0.2);
         }
 
         this.geometry.getBuffer('a_position').update(new Float32Array(position));
         this.geometry.getBuffer('a_rotation').update(new Float32Array(rotation));
         this.geometry.getBuffer('a_speed').update(new Float32Array(speed));
         this.geometry.getBuffer('a_size').update(new Float32Array(size));
-        this.geometry.getBuffer('a_color').update(new Float32Array(color));
+        this.geometry.getBuffer('a_alpha').update(new Float32Array(alpha));
 
         const aspect = boundWidth / boundHeight;
         const fov = 60;
