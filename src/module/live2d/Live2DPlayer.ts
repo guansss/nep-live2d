@@ -21,7 +21,6 @@ export default class Live2DPlayer extends Player {
         super();
 
         this.gl = mka.gl;
-        this.updateByGL(this.gl);
 
         Live2D.setGL(this.gl);
 
@@ -39,8 +38,7 @@ export default class Live2DPlayer extends Player {
     }
 
     async addSprite(modelSettingsFile: string) {
-        const sprite = await Live2DSprite.create(modelSettingsFile, this.gl);
-        sprite.updateTransformByGL(this.gl);
+        const sprite = await Live2DSprite.create(modelSettingsFile);
         this.sprites.push(sprite);
         this.container.addChild(sprite);
     }
@@ -52,13 +50,6 @@ export default class Live2DPlayer extends Player {
             this.sprites.splice(index, 1);
             sprite.destroy();
         }
-    }
-
-    /**
-     * Needs to be called when WebGL context changes.
-     */
-    updateByGL(gl: WebGLRenderingContext) {
-        this.sprites.forEach(sprite => sprite.updateTransformByGL(gl));
     }
 
     /** @override */

@@ -1,5 +1,5 @@
 import Live2DEyeBlink from '@/core/live2d/Live2DEyeBlink';
-import { loadModel, loadModelSettings, loadPhysics, loadPose, loadTexture } from '@/core/live2d/Live2DLoader';
+import { loadModel, loadModelSettings, loadPhysics, loadPose } from '@/core/live2d/Live2DLoader';
 import Live2DPhysics from '@/core/live2d/Live2DPhysics';
 import Live2DPose from '@/core/live2d/Live2DPose';
 import ModelSettings from '@/core/live2d/ModelSettings';
@@ -10,12 +10,7 @@ import { randomID } from '@/core/utils/string';
 export default class Live2DModel {
     tag = 'Live2DModel(uninitialized)';
 
-    readonly internalModel: Live2DModelWebGL;
-    readonly webGLContext: WebGLRenderingContext;
-    readonly textures: WebGLTexture[] = [];
-
     name: string;
-    modelSettings: ModelSettings;
     motionManager: MotionManager;
 
     eyeBlink: Live2DEyeBlink;
@@ -36,48 +31,18 @@ export default class Live2DModel {
     focusX = 0;
     focusY = 0;
 
-    static async create(file: string, webGLContext: WebGLRenderingContext) {
+    static async create(file: string) {
         const modelSettings = await loadModelSettings(file);
         if (!modelSettings) throw `Failed to load model settings from "${file}"`;
 
-        let internalModel: Live2DModelWebGL | undefined = undefined;
-        const textures: WebGLTexture[] = [];
+        const internalModel = await loadModel(modelSettings.model);
 
-        await Promise.all(
-            [
-                async () => {
-                    internalModel = await loadModel(modelSettings.model);
-                },
-                async () => {
-                    const promises = modelSettings.textures.map(
-                        async (file, i) => (textures[i] = await loadTexture(file, webGLContext)),
-                    );
-
-                    for (const promise of promises) {
-                        await promise;
-                    }
-                },
-            ].map(fun => fun()),
-        );
-
-        return new Live2DModel(internalModel!, webGLContext, modelSettings, textures);
+        return new Live2DModel(internalModel!, modelSettings);
     }
 
-    private constructor(
-        internalModel: Live2DModelWebGL,
-        webGLContext: WebGLRenderingContext,
-        modelSettings: ModelSettings,
-        textures: WebGLTexture[],
-    ) {
-        this.internalModel = internalModel;
-        this.webGLContext = webGLContext;
-        this.modelSettings = modelSettings;
-        this.textures = textures;
-
+    private constructor(readonly internalModel: Live2DModelWebGL, public modelSettings: ModelSettings) {
         this.name = modelSettings.name || randomID();
         this.tag = `Live2DModel(${this.name})`;
-
-        textures.forEach((texture, i) => internalModel.setTexture(i, texture));
 
         this.motionManager = new MotionManager(
             this.name,
@@ -87,14 +52,14 @@ export default class Live2DModel {
         );
         this.eyeBlink = new Live2DEyeBlink(internalModel);
 
-        if (this.modelSettings.pose) {
-            loadPose(this.modelSettings.pose, internalModel)
+        if (modelSettings.pose) {
+            loadPose(modelSettings.pose, internalModel)
                 .then(pose => (this.pose = pose))
                 .catch(e => log(this.tag, e));
         }
 
-        if (this.modelSettings.physics) {
-            loadPhysics(this.modelSettings.physics, internalModel)
+        if (modelSettings.physics) {
+            loadPhysics(modelSettings.physics, internalModel)
                 .then(physics => (this.physics = physics))
                 .catch(e => log(this.tag, e));
         }
@@ -116,14 +81,18 @@ export default class Live2DModel {
         this.offsetX = layout.centerX - layout.width / 2;
         this.offsetY = layout.centerY - layout.height / 2;
 
-        if (this.modelSettings.initParams) {
-            this.modelSettings.initParams.forEach(({ id, value }) => this.internalModel.setParamFloat(id, value));
+        if (modelSettings.initParams) {
+            modelSettings.initParams.forEach(({ id, value }) => internalModel.setParamFloat(id, value));
         }
-        if (this.modelSettings.initOpacities) {
-            this.modelSettings.initOpacities.forEach(({ id, value }) => this.internalModel.setPartsOpacity(id, value));
+        if (modelSettings.initOpacities) {
+            modelSettings.initOpacities.forEach(({ id, value }) => internalModel.setPartsOpacity(id, value));
         }
 
-        this.internalModel.saveParam();
+        internalModel.saveParam();
+    }
+
+    bindTexture(index: number, texture: WebGLTexture) {
+        this.internalModel.setTexture(index, texture);
     }
 
     /**
@@ -201,11 +170,5 @@ export default class Live2DModel {
         transform[13] -= this.offsetY;
         model.setMatrix(transform);
         model.draw();
-    }
-
-    release() {
-        if (this.webGLContext) {
-            this.textures.forEach(texture => this.webGLContext.deleteTexture(texture));
-        }
     }
 }

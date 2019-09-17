@@ -34,35 +34,6 @@ export async function loadModel(file?: string) {
     return model;
 }
 
-export async function loadTexture(file: string, gl: WebGLRenderingContext, premultipliedAlpha = false) {
-    log(TAG, 'Loading texture:', file || '(missing)');
-
-    const image = new Image();
-    image.src = file;
-
-    await new Promise((resolve, reject) => {
-        image.onload = resolve;
-        image.onerror = reject;
-    });
-
-    const texture = gl.createTexture();
-    if (!texture) throw 'Failed to create texture using WebGL';
-
-    if (!premultipliedAlpha) {
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-    }
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-    gl.generateMipmap(gl.TEXTURE_2D);
-
-    return texture;
-}
-
 export async function loadPose(file: string, internalModel: Live2DModelWebGL) {
     log(TAG, 'Loading pose:', file);
 
