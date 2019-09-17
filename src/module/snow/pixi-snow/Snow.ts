@@ -19,7 +19,12 @@ export class Wind {
 
 const TAG = 'Snow';
 
+// custom blend mode
+const SNOW_BLEND_MODE = [WebGLRenderingContext.SRC_ALPHA, WebGLRenderingContext.ONE];
+
 export default class Snow extends Mesh {
+    readonly BLEND_MODE = 999;
+
     wind = new Wind();
 
     constructor(readonly textureSource: string, width = 100, height = 100, public number = 100) {
@@ -31,7 +36,11 @@ export default class Snow extends Mesh {
                 .addAttribute('a_size', Buffer.from([]), 1)
                 .addAttribute('a_color', Buffer.from([]), 4),
             Shader.from(vert, frag, {
-                texture: Texture.from(textureSource),
+                texture: Texture.from(textureSource, {
+                    resourceOptions: {
+                        premultiplyAlpha: false,
+                    },
+                }),
                 time: 0,
                 worldSize: [0, 0, 0],
                 gravity: 100,
@@ -48,6 +57,7 @@ export default class Snow extends Mesh {
         this._bounds.maxY = height;
 
         this.state.blend = true;
+        this.state.blendMode = this.BLEND_MODE;
         this.state.depthTest = false;
         this.state.culling = true;
 
@@ -55,7 +65,6 @@ export default class Snow extends Mesh {
     }
 
     protected setup() {
-        console.log(this.shader.uniforms.texture);
         const boundWidth = this._bounds.maxX - this._bounds.minX;
         const boundHeight = this._bounds.maxY - this._bounds.minY;
 
@@ -152,6 +161,11 @@ export default class Snow extends Mesh {
     }
 
     render(renderer: Renderer) {
+        if (!(renderer.state as any).blendModes[this.BLEND_MODE]) {
+            // save the custom blend mode into renderer so we can reference it by setting `this.state.blendMode` as BLEND_MODE
+            (renderer.state as any).blendModes[this.BLEND_MODE] = SNOW_BLEND_MODE;
+        }
+
         super.render(renderer);
     }
 }
