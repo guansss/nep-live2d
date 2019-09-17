@@ -1,6 +1,8 @@
 <template>
     <div class="page">
-        <Slider progress v-model="volume">Volume</Slider>
+        <div class="section" data-title="Snow">
+            <Slider :min="100" :max="10000" v-model="snowNumber">Amount</Slider>
+        </div>
     </div>
 </template>
 
@@ -13,18 +15,18 @@ import { Component, Watch } from 'vue-property-decorator';
 @Component({
     components: { Slider },
 })
-export default class GeneralSettings extends Vue {
-    static title = 'GENERAL';
+export default class EffectsSettings extends Vue {
+    static title = 'EFFECTS';
 
-    volume = this.configModule.getConfig('volume', 0);
+    snowNumber = this.configModule.getConfig('snow.number', 0);
 
     get configModule() {
         return (this.$parent as SettingsPanel).configModule();
     }
 
-    @Watch('volume')
-    volumeChanged(value: any) {
-        this.configModule.setConfig('volume', value);
+    @Watch('snowNumber')
+    snowNumberChanged(value: any) {
+        this.configModule.setConfig('snow.number', value);
     }
 }
 </script>

@@ -27,7 +27,18 @@ export default class Snow extends Mesh {
 
     wind = new Wind();
 
-    constructor(readonly textureSource: string, width = 100, height = 100, public number = 100) {
+    private _number: number;
+
+    get number() {
+        return this._number;
+    }
+
+    set number(value: number) {
+        this._number = value;
+        this.setup();
+    }
+
+    constructor(readonly textureSource: string, width = 100, height = 100, number = 100) {
         super(
             new Geometry()
                 .addAttribute('a_position', Buffer.from([]), 3)
@@ -55,6 +66,8 @@ export default class Snow extends Mesh {
         this._bounds.minY = 0;
         this._bounds.maxX = width;
         this._bounds.maxY = height;
+
+        this._number = number;
 
         this.state.blend = true;
         this.state.blendMode = this.BLEND_MODE;

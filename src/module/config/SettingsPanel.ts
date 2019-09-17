@@ -1,3 +1,4 @@
+import EffectsSettings from '@/module/config/EffectsSettings.vue';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
 import GeneralSettings from '@/module/config/GeneralSettings.vue';
 import ConfigModule from '@/module/config/index';
@@ -12,13 +13,12 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     @Ref('content') readonly content!: HTMLDivElement;
     @Ref('toolbar') readonly handle!: HTMLDivElement;
 
-    readonly tabs = ['General'];
-    readonly pages = [GeneralSettings];
+    readonly pages = [GeneralSettings, EffectsSettings];
 
-    selectedTab = 0;
+    selectedPage = 0;
 
     get currentPage() {
-        return this.pages[this.selectedTab];
+        return this.pages[this.selectedPage];
     }
 
     get cachedConfigModule() {

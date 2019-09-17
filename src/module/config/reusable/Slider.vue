@@ -27,9 +27,10 @@ import { Component, Model, Prop, Ref } from 'vue-property-decorator';
 @Component
 export default class Slider extends Vue {
     @Model('change', { default: 0 }) readonly value!: number;
-    @Prop({ default: 1 }) readonly max!: number;
-    @Prop({ default: 0 }) readonly min!: number;
-    @Prop({ default: 0 }) readonly step!: number;
+
+    @Prop({ default: 1, type: Number }) readonly max!: number;
+    @Prop({ default: 0, type: Number }) readonly min!: number;
+    @Prop({ default: 0, type: Number }) readonly step!: number;
     @Prop({ default: false, type: Boolean }) readonly progress!: boolean;
     @Prop({ default: false, type: Boolean }) readonly overlay!: boolean;
 

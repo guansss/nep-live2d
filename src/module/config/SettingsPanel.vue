@@ -4,12 +4,12 @@
             <div class="toolbar" ref="toolbar">
                 <div class="tabs">
                     <div
-                        v-for="(tab, i) in tabs"
-                        :key="tab"
-                        :class="['tab selectable', { selected: i === selectedTab }]"
-                        @click="selectedTab = i"
+                        v-for="(page, i) in pages"
+                        :key="page.title"
+                        :class="['tab selectable', { selected: i === selectedPage }]"
+                        @click="selectedPage = i"
                     >
-                        {{ tab }}
+                        {{ page.title }}
                     </div>
                 </div>
                 <div class="selectable right" @click="refresh">
@@ -92,6 +92,19 @@
 .tab
     z-index 1
     padding 8px 16px
+
+// page content
+
+.settings >>> .section
+
+    &:before
+        content attr(data-title)
+        display block
+        padding 2px 16px
+        background lighten($themeColor, 40%)
+        color white
+
+// icons
 
 .close
     position relative
