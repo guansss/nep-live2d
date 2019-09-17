@@ -1,9 +1,9 @@
 /**
- * Original source: https://codepen.io/bsehovac/pen/GPwXxq
+ * Based on https://codepen.io/bsehovac/pen/GPwXxq
  */
 
-import { DRAW_MODES } from '@pixi/constants';
-import { Buffer, Geometry, Renderer, Shader, State, Texture } from '@pixi/core';
+import { BLEND_MODES, DRAW_MODES } from '@pixi/constants';
+import { Buffer, Geometry, Shader, State, Texture } from '@pixi/core';
 import { Mesh } from '@pixi/mesh';
 import frag from 'raw-loader!./snow.frag';
 import vert from 'raw-loader!./snow.vert';
@@ -19,12 +19,7 @@ export class Wind {
 
 const TAG = 'Snow';
 
-// custom blend mode
-const SNOW_BLEND_MODE = [WebGLRenderingContext.SRC_ALPHA, WebGLRenderingContext.ONE];
-
 export default class Snow extends Mesh {
-    readonly BLEND_MODE = 999;
-
     wind = new Wind();
 
     private _number: number;
@@ -70,7 +65,7 @@ export default class Snow extends Mesh {
         this._number = number;
 
         this.state.blend = true;
-        this.state.blendMode = this.BLEND_MODE;
+        this.state.blendMode = BLEND_MODES.NORMAL_NPM;
         this.state.depthTest = false;
         this.state.culling = true;
 
@@ -170,14 +165,5 @@ export default class Snow extends Mesh {
 
         this.shader.uniforms.time = now / 5000;
         this.shader.uniforms.wind = this.wind.current;
-    }
-
-    render(renderer: Renderer) {
-        if (!(renderer.state as any).blendModes[this.BLEND_MODE]) {
-            // save the custom blend mode into renderer so we can reference it by setting `this.state.blendMode` as BLEND_MODE
-            (renderer.state as any).blendModes[this.BLEND_MODE] = SNOW_BLEND_MODE;
-        }
-
-        super.render(renderer);
     }
 }

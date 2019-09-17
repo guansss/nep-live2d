@@ -20,7 +20,7 @@ declare module '*.vue' {
  * @see https://github.com/pixijs/pixi.js/issues/5397
  */
 declare module '@pixi/constants' {
-    export { DRAW_MODES } from 'pixi.js';
+    export { BLEND_MODES, DRAW_MODES } from 'pixi.js';
 }
 
 declare module '@pixi/core' {
