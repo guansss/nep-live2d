@@ -9,7 +9,7 @@
                 <div ref="thumb" :class="['thumb', { display: overlay }]" :style="{ left: position }">
                     <div ref="overlay" :class="['overlay', { visible: overlay }]">
                         <slot name="display">
-                            {{ Math.round(value * 100) / 100 }}
+                            {{ displayValue }}
                         </slot>
                     </div>
                 </div>
@@ -47,6 +47,11 @@ export default class Slider extends Vue {
         const fraction = (this.value - this.min) / (this.max - this.min);
 
         return this.domReady ? fraction * (this.track.offsetWidth - this.thumb.offsetWidth) + 'px' : '0px';
+    }
+
+    get displayValue() {
+        // keep at most 2 decimals
+        return Math.round(this.value * 100) / 100;
     }
 
     private mounted() {
@@ -144,7 +149,6 @@ export default class Slider extends Vue {
     width 20px
     height 20px
     background-color var(--accentColor)
-    box-shadow 0 0 5px 0 rgba(0, 0, 0, 0.3)
 
 .overlay
     position relative
@@ -159,6 +163,7 @@ export default class Slider extends Vue {
     white-space nowrap
     text-align center
     background-color var(--accentColor) !important
+    box-shadow 0 0 5px 0 rgba(0, 0, 0, 0.3)
     transform scale(.5)
     transition transform .1s, color .1s
 
