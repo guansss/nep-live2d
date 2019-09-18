@@ -33,6 +33,7 @@ export default class Mka {
             view: canvas,
             width: canvas.offsetWidth,
             height: canvas.offsetHeight,
+            transparent: true,
         });
 
         this.rafId = requestAnimationFrame(this.tick);

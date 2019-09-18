@@ -1,7 +1,8 @@
-import EffectsSettings from '@/module/config/EffectsSettings.vue';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
-import GeneralSettings from '@/module/config/GeneralSettings.vue';
 import ConfigModule from '@/module/config/index';
+import BackgroundSettings from '@/module/config/settings/BackgroundSettings.vue';
+import EffectsSettings from '@/module/config/settings/EffectsSettings.vue';
+import GeneralSettings from '@/module/config/settings/GeneralSettings.vue';
 import { Component, Mixins, Prop, Ref } from 'vue-property-decorator';
 
 @Component
@@ -13,7 +14,7 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     @Ref('content') readonly content!: HTMLDivElement;
     @Ref('toolbar') readonly handle!: HTMLDivElement;
 
-    readonly pages = [GeneralSettings, EffectsSettings];
+    readonly pages = [GeneralSettings, BackgroundSettings, EffectsSettings];
 
     selectedPage = 0;
 

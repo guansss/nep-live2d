@@ -36,7 +36,7 @@ export default class ConfigModule implements Module {
 
     readonly config: Config = {};
 
-    constructor(private app: App) {
+    constructor(readonly app: App) {
         this.read();
 
         app.on('config', this.setConfig, this);
