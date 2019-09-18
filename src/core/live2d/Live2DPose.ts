@@ -1,4 +1,4 @@
-import { clamp } from 'lodash';
+import clamp from 'lodash/clamp';
 
 interface PartsDefinition {
     group: {

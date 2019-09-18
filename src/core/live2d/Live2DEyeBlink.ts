@@ -1,4 +1,5 @@
-import { clamp, random } from 'lodash';
+import clamp from 'lodash/clamp';
+import random from 'lodash/random';
 
 enum EyeState {
     Idle,

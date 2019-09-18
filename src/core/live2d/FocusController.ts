@@ -1,4 +1,4 @@
-import { clamp } from 'lodash';
+import clamp from 'lodash/clamp';
 
 /** Minimum distance to respond */
 const EPSILON = 0.01;

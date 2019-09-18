@@ -1,5 +1,6 @@
 import { cloneWithCamelCase } from '@/core/utils/misc';
-import { get, set } from 'lodash';
+import get from 'lodash/get';
+import set from 'lodash/set';
 import { resolve as urlResolve } from 'url';
 
 export interface MotionDefinition {

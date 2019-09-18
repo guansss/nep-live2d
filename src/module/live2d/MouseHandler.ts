@@ -1,5 +1,7 @@
 import autobind from 'autobind-decorator';
-import { Cancelable, debounce, throttle } from 'lodash';
+import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
+import Cancelable = _.Cancelable;
 
 export default class MouseHandler {
     readonly element: HTMLElement;

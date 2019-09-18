@@ -2,7 +2,7 @@ import Live2DExpression from '@/core/live2d/Live2DExpression';
 import { ExpressionDefinition } from '@/core/live2d/ModelSettings';
 import { error, log } from '@/core/utils/log';
 import { getJSON } from '@/core/utils/net';
-import { sample } from 'lodash';
+import sample from 'lodash/sample';
 
 export default class ExpressionManager extends MotionQueueManager {
     tag: string;

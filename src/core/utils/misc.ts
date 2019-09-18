@@ -1,4 +1,4 @@
-import { camelCase } from 'lodash';
+import camelCase from 'lodash/camelCase';
 
 /**
  * Deep clones a JSON object, converting all the property names to camel case.
