@@ -48,7 +48,6 @@ body
 
 #app
     height: 100vh
-    background-color: #333
     color: #333
     font-family: 'Avenir', Helvetica, Arial, sans-serif
     -webkit-font-smoothing: antialiased

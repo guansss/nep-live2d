@@ -1,5 +1,4 @@
 import { App, Module } from '@/App';
-import Background from '@/module/background/Background.vue';
 import { Config } from '@/module/config';
 import get from 'lodash/get';
 
@@ -18,17 +17,10 @@ export default class BackgroundModule implements Module {
 
     config: Config = {};
 
-    // this will later be reactive because it will be passed as props into Vue component
-    vueProps = {
-        image: '',
-    };
-
     constructor(readonly app: App) {
         app.on('configInit', this.init, this)
             .on('bgSelect', this.selectImage, this)
             .on('bgSave', this.saveImage, this);
-
-        app.addComponent(Background, this.vueProps).then();
     }
 
     init(config: Config) {
@@ -37,13 +29,20 @@ export default class BackgroundModule implements Module {
         const savedImages = get(this.config, 'bg.images', []) as BackgroundImage[];
         const selectedIndex = get(this.config, 'bg.selected', 0);
 
-        this.vueProps.image = savedImages[selectedIndex]
+        const image = savedImages[selectedIndex]
             ? BackgroundModule.IMAGE_PATH + '/' + savedImages[selectedIndex].name
             : '';
+
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.transition = 'background .2s';
+        document.body.style.backgroundColor = 'black';
+        document.body.style.backgroundImage = `url(${image})`;
     }
 
     selectImage(name?: string) {
-        this.vueProps.image = name ? BackgroundModule.IMAGE_PATH + '/' + name : '';
+        const image = name ? BackgroundModule.IMAGE_PATH + '/' + name : '';
+
+        document.body.style.backgroundImage = `url(${image})`;
 
         const selectedIndex = (get(this.config, 'bg.images', []) as BackgroundImage[]).findIndex(
             bgImage => bgImage.name === name,
