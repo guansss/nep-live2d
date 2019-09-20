@@ -42,6 +42,7 @@
     "stylus-loader": "^3.0.2",
     "typescript": "^3.5.3",
     "vue-property-decorator": "^8.2.1",
+    "vue-svg-loader": "^0.12.0",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {

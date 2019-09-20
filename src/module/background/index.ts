@@ -20,7 +20,8 @@ export default class BackgroundModule implements Module {
     constructor(readonly app: App) {
         app.on('configInit', this.init, this)
             .on('bgSelect', this.selectImage, this)
-            .on('bgSave', this.saveImage, this);
+            .on('bgSave', this.saveImage, this)
+            .on('bgDelete', this.deleteImage, this);
     }
 
     init(config: Config) {
@@ -59,6 +60,17 @@ export default class BackgroundModule implements Module {
             savedImages.push({
                 name,
             });
+
+            this.app.emit('config', 'bg.images', savedImages);
+        }
+    }
+
+    deleteImage(name: string) {
+        const savedImages = get(this.config, 'bg.images', []) as BackgroundImage[];
+        const index = savedImages.findIndex(saved => saved.name === name);
+
+        if (index >= 0) {
+            savedImages.splice(index, 1);
 
             this.app.emit('config', 'bg.images', savedImages);
         }

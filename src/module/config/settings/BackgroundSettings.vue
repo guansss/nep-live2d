@@ -2,10 +2,10 @@
     <div class="page">
         <FileInput @change="imageInputChange" />
 
-        <div class="bg-list">
+        <TransitionGroup name="list" tag="div" class="bg-list">
             <div
                 v-for="(image, i) in images"
-                :key="i"
+                :key="image.name"
                 :class="['bg-item card', { selected: i === selected }]"
                 @click="selectImage(image, i)"
             >
@@ -17,15 +17,29 @@
                     @load="imageLoaded(image)"
                     @error="imageError(image)"
                 />
-                <svg class="check" viewBox="0 0 24 24">
-                    <path fill="#FFF" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
-                </svg>
+                <CheckSVG class="check" />
+
+                <div
+                    v-if="deleting === i && deletingProgress > 0"
+                    class="delete-cover"
+                    :style="{ transform: `translateY(${(1 - deletingProgress) * 100}%)` }"
+                ></div>
+                <CloseSVG
+                    v-if="selected !== i"
+                    class="delete"
+                    @click.stop=""
+                    @mousedown.stop="deleteStart(i)"
+                    @mouseup.stop="deleteCancel"
+                    @mouseleave="deleteCancel"
+                />
             </div>
-        </div>
+        </TransitionGroup>
     </div>
 </template>
 
 <script lang="ts">
+import CheckSVG from '@/assets/img/check.svg';
+import CloseSVG from '@/assets/img/close.svg';
 import BackgroundModule, { BackgroundImage } from '@/module/background';
 import FileInput from '@/module/config/reusable/FileInput.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
@@ -40,7 +54,7 @@ interface ImageEntity {
 }
 
 @Component({
-    components: { FileInput, Slider },
+    components: { FileInput, Slider, CheckSVG, CloseSVG },
 })
 export default class BackgroundSettings extends Vue {
     static title = 'BACKGROUND';
@@ -54,6 +68,11 @@ export default class BackgroundSettings extends Vue {
     images: ImageEntity[] = [];
 
     selected = -1;
+
+    deleting = -1; // the index of image that will be deleted after progress goes to 1
+    deletingTime = 500; // time required to press and hold the button to delete
+    deletingProgress = 0; // 0 ~ 1
+    deletingRafID = -1; // ID returned by requestAnimationFrame()
 
     private created() {
         this.images = (this.configModule.getConfig('bg.images', []) as BackgroundImage[]).map(({ name }) => ({
@@ -75,6 +94,9 @@ export default class BackgroundSettings extends Vue {
                 });
             }
         });
+
+        // reset the input, otherwise its "change" event will never be triggered when user selects same file again
+        (e.target as HTMLInputElement).value = '';
     }
 
     imageLoaded(image: ImageEntity) {
@@ -96,6 +118,49 @@ export default class BackgroundSettings extends Vue {
 
             this.selected = index;
         }
+    }
+
+    deleteStart(index: number) {
+        this.deleting = index;
+
+        // ensure there is no active animation
+        if (this.deletingRafID === -1) {
+            this.deletingProgress = 0;
+
+            const startTime = performance.now();
+
+            // make deleting animation
+            const tick = (now: DOMHighResTimeStamp) => {
+                this.deletingProgress = (now - startTime) / this.deletingTime;
+
+                if (this.deletingProgress > 1) {
+                    this.deletingRafID = -1;
+                    this.delete();
+                } else {
+                    this.deletingRafID = requestAnimationFrame(tick);
+                }
+            };
+
+            tick(startTime);
+        }
+    }
+
+    deleteCancel() {
+        this.deletingProgress = 0;
+        this.deleting = -1;
+
+        if (this.deletingRafID != -1) cancelAnimationFrame(this.deletingRafID);
+        this.deletingRafID = -1;
+    }
+
+    delete() {
+        if (this.images[this.deleting]) {
+            this.configModule.app.emit('bgDelete', this.images[this.deleting].name);
+            this.images.splice(this.deleting, 1);
+        }
+
+        // this method can also be used to clean up
+        this.deleteCancel();
     }
 }
 </script>
@@ -123,9 +188,11 @@ export default class BackgroundSettings extends Vue {
         padding-bottom (9 / 16) * 100%
 
     &:hover
-
         .bg-item-img
             transform scale(1.1)
+
+        .delete
+            opacity 1
 
 .bg-item-img
     position absolute
@@ -134,6 +201,7 @@ export default class BackgroundSettings extends Vue {
     left 0
     width 100%
     height 100%
+    background #AAA
     object-fit cover
     transition transform .15s ease-out
 
@@ -149,8 +217,41 @@ export default class BackgroundSettings extends Vue {
     object-fit cover
     transition opacity .2s
 
+.delete-cover
+    position absolute
+    top 0
+    left 0
+    width 100%
+    height 100%
+    background #C0392BAA
+
+.delete
+    position absolute
+    display block
+    top 0
+    right 0
+    width 24px
+    height 24px
+    background #0000
+    opacity 0
+    transition opacity .15s ease-out, background-color .15s ease-out
+
+    &:hover
+        background #E74C3C
+
 .card
     overflow hidden
     border-radius 4px
     box-shadow 0 3px 1px -2px #0003, 0 2px 2px 0px #0002, 0 1px 5px 0px #0002
+
+/* animation */
+.bg-item
+    display block
+    transition all .2s
+
+.list-enter, .list-leave-to
+    opacity 0
+
+.list-leave-active
+    position absolute
 </style>

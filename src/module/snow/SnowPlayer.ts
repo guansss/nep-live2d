@@ -1,5 +1,5 @@
+import snowflake from '@/assets/img/snowflake.png';
 import Player from '@/core/mka/Player';
-import snowflake from '@/img/snowflake.png';
 import Snow from '@/module/snow/pixi-snow/Snow';
 
 export interface Loader {
