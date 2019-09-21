@@ -1,6 +1,6 @@
 <template>
     <div class="page">
-        <FileInput @change="imageInputChange" />
+        <FileInput class="input" v-model="imageFiles" />
 
         <TransitionGroup name="list" tag="div" class="bg-list">
             <div
@@ -45,7 +45,7 @@ import FileInput from '@/module/config/reusable/FileInput.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import SettingsPanel from '@/module/config/SettingsPanel.js';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Watch } from 'vue-property-decorator';
 
 interface ImageEntity {
     name: string;
@@ -65,6 +65,7 @@ export default class BackgroundSettings extends Vue {
 
     imageDir = BackgroundModule.IMAGE_PATH;
 
+    imageFiles: File[] = [];
     images: ImageEntity[] = [];
 
     selected = -1;
@@ -84,8 +85,9 @@ export default class BackgroundSettings extends Vue {
         this.selected = this.configModule.getConfig('bg.selected', this.selected);
     }
 
-    imageInputChange(e: Event) {
-        [...((e.target as HTMLInputElement).files || [])].forEach(file => {
+    @Watch('imageFiles')
+    imageFilesChanged(value: File[]) {
+        value.forEach(file => {
             if (!this.images.find(image => image.name === file.name)) {
                 this.images.push({
                     name: file.name,
@@ -94,9 +96,6 @@ export default class BackgroundSettings extends Vue {
                 });
             }
         });
-
-        // reset the input, otherwise its "change" event will never be triggered when user selects same file again
-        (e.target as HTMLInputElement).value = '';
     }
 
     imageLoaded(image: ImageEntity) {
@@ -166,6 +165,11 @@ export default class BackgroundSettings extends Vue {
 </script>
 
 <style scoped lang="stylus">
+@require '../reusable/styles'
+
+.input
+    margin 16px 16px 0
+
 .bg-list
     display grid
     padding 16px
@@ -238,11 +242,6 @@ export default class BackgroundSettings extends Vue {
 
     &:hover
         background #E74C3C
-
-.card
-    overflow hidden
-    border-radius 4px
-    box-shadow 0 3px 1px -2px #0003, 0 2px 2px 0px #0002, 0 1px 5px 0px #0002
 
 /* animation */
 .bg-item
