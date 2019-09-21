@@ -23,7 +23,7 @@ const rl = readline.createInterface(process.stdin, process.stdout);
         console.log(chalk.blue('Making files in', env.WALLPAPER_PATH));
 
         await copyFiles(
-            ['./assets/stub.html', path.join(env.WALLPAPER_PATH, 'index.html')],
+            ['./assets/bridge.html', path.join(env.WALLPAPER_PATH, 'index.html')],
             ['./assets/preview.jpg', path.join(env.WALLPAPER_PATH, 'preview.jpg')],
         );
 

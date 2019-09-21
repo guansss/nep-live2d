@@ -1,5 +1,8 @@
 import camelCase from 'lodash/camelCase';
 
+// check if running in Wallpaper Engine
+export const inWallpaperEngine = !!window.wallpaperRequestRandomFileForProperty;
+
 /**
  * Deep clones a JSON object, converting all the property names to camel case.
  * @param value - JSON object.
