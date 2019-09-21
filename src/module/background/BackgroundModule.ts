@@ -1,5 +1,5 @@
 import { App, Module } from '@/App';
-import { Config } from '@/module/config';
+import { Config } from '@/module/config/ConfigModule';
 import get from 'lodash/get';
 
 export interface App {

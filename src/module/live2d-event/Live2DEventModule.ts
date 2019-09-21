@@ -1,6 +1,6 @@
 import { App, Module } from '@/App';
-import Live2DModule from '@/module/live2d';
 import registerHitEvent from '@/module/live2d-event/hit-event';
+import Live2DModule from '@/module/live2d/Live2DModule';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import { DisplayObject } from '@pixi/display';
 

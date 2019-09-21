@@ -40,7 +40,7 @@
 <script lang="ts">
 import CheckSVG from '@/assets/img/check.svg';
 import CloseSVG from '@/assets/img/close.svg';
-import BackgroundModule, { BackgroundImage } from '@/module/background';
+import BackgroundModule, { BackgroundImage } from '@/module/background/BackgroundModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import SettingsPanel from '@/module/config/SettingsPanel.js';

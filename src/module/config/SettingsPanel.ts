@@ -1,5 +1,5 @@
+import ConfigModule from '@/module/config/ConfigModule';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
-import ConfigModule from '@/module/config/index';
 import BackgroundSettings from '@/module/config/settings/BackgroundSettings.vue';
 import EffectsSettings from '@/module/config/settings/EffectsSettings.vue';
 import GeneralSettings from '@/module/config/settings/GeneralSettings.vue';

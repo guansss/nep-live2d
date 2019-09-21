@@ -1,10 +1,10 @@
 import { App, Module } from '@/App';
-import { Config } from '@/module/config';
-import Live2DModule from '@/module/live2d';
+import { Config } from '@/module/config/ConfigModule';
 import SoundManager from '@/module/live2d-motion/SoundManager';
 import SubtitleManager from '@/module/live2d-motion/SubtitleManager';
 import VueLive2DMotionClass from '@/module/live2d-motion/VueLive2DMotion.ts';
 import VueLive2DMotion from '@/module/live2d-motion/VueLive2DMotion.vue';
+import Live2DModule from '@/module/live2d/Live2DModule';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import { DisplayObject } from '@pixi/display';
 import { EventEmitter } from '@pixi/utils';
