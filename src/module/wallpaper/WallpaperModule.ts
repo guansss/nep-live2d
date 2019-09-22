@@ -9,25 +9,23 @@ export interface App {
 
 const PREFIX = 'we:';
 
-const EVENT_MAP_USER = {
-    schemecolor: 'schemeColor',
+const EVENT_MAP = {
+    schemecolor: ['schemeColor', 'string'],
 };
 
 export default class WallpaperModule implements Module {
     name = 'Wallpaper';
 
-    userProps: WEUserProperties = {};
-    generalProps: WEGeneralProperties = {};
+    props: WEProperties = {};
 
     constructor(readonly app: App) {
         // immediately call the listener when it's added
         app.on('newListener', (event: string, listener: EventEntity, context: any) => {
             if (event.startsWith(PREFIX)) {
                 const name = event.slice(PREFIX.length);
-                const prop = this.userProps[name] || this.generalProps[name];
 
-                if (prop) {
-                    listener.fn.call(listener.context, prop.value);
+                if (this.props[name]) {
+                    listener.fn.call(listener.context, this.props[name]!.value);
 
                     if (listener.once) app.off(event, listener.fn, undefined, true);
                 }
@@ -45,7 +43,8 @@ export default class WallpaperModule implements Module {
                     const { userProps, generalProps } = await getJSON('/props');
 
                     if (userProps || generalProps) {
-                        this.setup(userProps, generalProps);
+                        generalProps && this.updateProps(generalProps);
+                        userProps && this.updateProps(userProps);
                     } else {
                         // noinspection ExceptionCaughtLocallyJS
                         throw 'Empty response';
@@ -61,33 +60,28 @@ export default class WallpaperModule implements Module {
         }
     }
 
-    // all properties must be available on setup
-    setup(userProps: WEUserProperties, generalProps: WEGeneralProperties) {
-        this.updateUserProps(userProps);
-    }
+    updateProps(props: WEProperties) {
+        Object.entries(EVENT_MAP).forEach(([name, [event, type]]) => {
+            const prop = props[name];
 
-    // only one of the properties is available on each update
-    updateUserProps(props: WEUserProperties) {
-        Object.assign(this.userProps, props);
+            if (prop) {
+                switch (type) {
+                    case 'number': {
+                        const number = parseInt(this.props[name]!.value as string);
 
-        Object.entries(EVENT_MAP_USER).forEach(([name, event]) => {
-            this.emitString(props, name, event);
-        });
-    }
+                        if (!Number.isNaN(number)) {
+                            this.app.emit(PREFIX + event, number);
+                        }
+                        break;
+                    }
 
-    emitString(props: WEProperties, name: string, event: string) {
-        if (props[name]) {
-            this.app.emit(PREFIX + event, props[name]!.value);
-        }
-    }
-
-    emitNumber(props: WEProperties, name: string, event: string) {
-        if (props[name]) {
-            const number = parseInt(props[name]!.value as string);
-
-            if (!isNaN(number)) {
-                this.app.emit(PREFIX + event, number);
+                    case 'string':
+                    default:
+                        this.app.emit(PREFIX + event, prop.value);
+                }
             }
-        }
+        });
+
+        Object.assign(this.props, props);
     }
 }

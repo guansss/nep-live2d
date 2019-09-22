@@ -7,14 +7,15 @@ declare interface WEProperty {
     value: string | number;
 }
 
-declare interface WEProperties {
-    [name: string]: WEProperty | undefined;
-}
-
-declare interface WEUserProperties extends WEProperties {
+declare interface WEUserProperties {
     // make sure these are included in properties in "/assets/project-json/base.json"
 
     schemecolor?: WEProperty;
 }
 
-declare interface WEGeneralProperties extends WEProperties {}
+declare interface WEGeneralProperties {}
+
+// merged user properties and general properties
+declare interface WEProperties extends WEUserProperties, WEGeneralProperties {
+    [name: string]: WEProperty | undefined;
+}
