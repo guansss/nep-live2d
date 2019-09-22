@@ -1,6 +1,11 @@
 declare interface Window {
     // see http://steamcommunity.com/sharedfiles/filedetails/?id=795674740
     wallpaperRequestRandomFileForProperty?(name: string, response: (...args: any) => void): void;
+
+    wallpaperPropertyListener: {
+        applyUserProperties(props: WEUserProperties): void;
+        applyGeneralProperties(props: WEGeneralProperties): void;
+    };
 }
 
 declare interface WEProperty {
