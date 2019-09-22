@@ -1,4 +1,5 @@
 const path = require('path');
+const merge = require('lodash/merge');
 
 module.exports = {
     productionSourceMap: false,
@@ -14,15 +15,15 @@ module.exports = {
             // I MUST BE CRAZY TO DO THIS
 
             const props = {
-                userProps: undefined,
-                generalProps: undefined,
+                userProps: {},
+                generalProps: {},
             };
 
             // receive properties by POST
             app.post('/props', require('body-parser').json(), (req, res, next) => {
                 // save props to local variables
-                props.userProps = req.body.userProps;
-                props.generalProps = req.body.generalProps;
+                merge(props.userProps, req.body.userProps);
+                merge(props.generalProps, req.body.generalProps);
 
                 res.json(props);
             });

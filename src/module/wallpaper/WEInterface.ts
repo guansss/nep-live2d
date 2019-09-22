@@ -2,6 +2,8 @@ import EventEmitter, { EventEntity } from '@/core/utils/EventEmitter';
 
 export interface App {
     on(event: 'we:{prop}', fn: (value: string | number) => void, context?: any): this;
+
+    on(event: 'we:*', fn: (name: string, value: string | number) => void, context?: any): this;
 }
 
 export namespace WEInterface {
@@ -23,7 +25,7 @@ export namespace WEInterface {
 
         // immediately call the new listener when it's added
         emitter.on('newListener', (event: string, listener: EventEntity, context: any) => {
-            if (event.startsWith(PREFIX)) {
+            if (event.startsWith(PREFIX) && event !== PREFIX + '*') {
                 const value = getPropValue(event.slice(PREFIX.length));
 
                 if (value) {
@@ -66,6 +68,7 @@ export namespace WEInterface {
 
             if (value) {
                 eventEmitter.emit(PREFIX + name, value);
+                eventEmitter.emit(PREFIX + '*', name, value);
             }
         }
     }
