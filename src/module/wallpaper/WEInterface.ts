@@ -7,8 +7,8 @@ export interface App {
 export namespace WEInterface {
     export const PREFIX = 'we:';
 
-    const PROPERTY_MAP: { [name: string]: [string, string] } = {
-        schemecolor: ['schemeColor', 'string'],
+    const TYPE_MAP: { [name: string]: string } = {
+        schemecolor: 'string',
     };
 
     export const props: WEProperties = {};
@@ -19,7 +19,7 @@ export namespace WEInterface {
         eventEmitter = emitter;
 
         // immediately emit all properties
-        Object.keys(PROPERTY_MAP).forEach(emitProp);
+        Object.keys(props).forEach(emitProp);
 
         // immediately call the new listener when it's added
         emitter.on('newListener', (event: string, listener: EventEntity, context: any) => {
@@ -36,18 +36,13 @@ export namespace WEInterface {
     }
 
     export function updateProps(_props: WEProperties) {
-        Object.keys(PROPERTY_MAP).forEach(name => {
-            if (name in _props) {
-                props[name] = _props[name];
-
-                emitProp(name);
-            }
-        });
+        Object.assign(props, _props);
+        Object.keys(_props).forEach(emitProp);
     }
 
     export function getPropValue(name: string): string | number | undefined {
         const prop = props[name];
-        const type = PROPERTY_MAP[name][1];
+        const type = TYPE_MAP[name];
 
         if (prop) {
             switch (type) {
@@ -70,7 +65,7 @@ export namespace WEInterface {
             const value = getPropValue(name);
 
             if (value) {
-                eventEmitter.emit(PREFIX + PROPERTY_MAP[name][0], value);
+                eventEmitter.emit(PREFIX + name, value);
             }
         }
     }

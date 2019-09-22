@@ -27,7 +27,7 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     }
 
     protected mounted() {
-        this.cachedConfigModule.app.on('we:schemeColor', (color: string) => {
+        this.cachedConfigModule.app.on('we:schemecolor', (color: string) => {
             const rgb = color
                 .split(' ')
                 .map(float => ~~(parseFloat(float) * 255))
