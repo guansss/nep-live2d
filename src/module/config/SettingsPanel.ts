@@ -27,8 +27,13 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     }
 
     protected mounted() {
-        // TODO: use theme color from Wallpaper Engine properties
-        document.documentElement.style.setProperty('--accentColor', '#AB47BC');
+        this.cachedConfigModule.app.on('we:schemeColor', (color: string) => {
+            const rgb = color
+                .split(' ')
+                .map(float => ~~(parseFloat(float) * 255))
+                .join(',');
+            document.documentElement.style.setProperty('--accentColor', `rgb(${rgb})`);
+        });
 
         this.switchTop = this.cachedConfigModule.getConfig('settings.switchTop', this.switchTop);
         this.switchLeft = this.cachedConfigModule.getConfig('settings.switchLeft', this.switchLeft);

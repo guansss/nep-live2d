@@ -39,6 +39,7 @@ export default class VueApp extends Vue {
     margin: 0
 
 body
+    background-color #333
     overflow hidden
 
 #canvas
