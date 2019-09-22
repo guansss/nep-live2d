@@ -14,6 +14,8 @@ if (!env) {
     process.exit(1);
 }
 
+const OVERWRITE_MESSAGE = 'File already exists, overwrite it?';
+
 const rl = readline.createInterface(process.stdin, process.stdout);
 
 (async function setup() {
@@ -39,7 +41,7 @@ async function copyFiles(...filePairs) {
     async function copyFile(from, to) {
         if (fs.existsSync(to)) {
             console.log(chalk.red(to));
-            await confirm('File already exists, overwrite it?');
+            await confirm(OVERWRITE_MESSAGE);
         }
 
         fs.copyFileSync(from, to);
@@ -52,21 +54,24 @@ async function copyFiles(...filePairs) {
 }
 
 async function setupProjectJSON() {
-    const projectJSONPath = path.join(env.WALLPAPER_PATH, 'project.json');
+    const projectJSON = generateProjectJSON();
 
-    if (fs.existsSync(projectJSONPath)) {
-        console.log(chalk.red(projectJSONPath));
-        await confirm('File already exists, overwrite it?');
+    for (const jsonPath of [
+        path.join(env.WALLPAPER_PATH, 'project.json'),
+        path.join(__dirname, '../wallpaper/project.json'),
+    ]) {
+        if (fs.existsSync(jsonPath)) {
+            console.log(chalk.red(jsonPath));
+            await confirm(OVERWRITE_MESSAGE);
+        }
+
+        fs.writeFileSync(jsonPath, projectJSON);
+        console.log(chalk.green(jsonPath));
     }
-
-    generateProjectJSON(projectJSONPath);
-    console.log(chalk.green(projectJSONPath));
 }
 
 async function confirm(message) {
-    const result = await new Promise(resolve =>
-        rl.question(message + ' [y]/n: ', resolve),
-    );
+    const result = await new Promise(resolve => rl.question(message + ' y/[n]: ', resolve));
 
     if (result !== 'y') throw 'Action canceled';
 }

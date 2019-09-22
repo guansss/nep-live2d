@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-function generate(outputPath) {
+function generate() {
     const project = require('../assets/project-json/base.json');
 
     fs.readdirSync('assets/project-json/locales').forEach(file => {
@@ -10,7 +10,7 @@ function generate(outputPath) {
         project.general.localization[locale] = content;
     });
 
-    fs.writeFileSync(outputPath, JSON.stringify(project));
+    return JSON.stringify(project);
 }
 
 module.exports = generate;
