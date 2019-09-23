@@ -28,6 +28,7 @@ const LOCAL_HOST = 'http://127.0.0.1:8080';
 const localProps = {
     userProps: undefined,
     generalProps: undefined,
+    files: {},
 };
 
 // listen for properties initialization
@@ -39,13 +40,29 @@ window.wallpaperPropertyListener = {
 
     applyUserProperties(props) {
         localProps.userProps = props;
+
+        // check for properties of directory type
+        Object.entries(props).forEach(([name, prop]) => {
+            if (prop.type === 'directory' && prop.mode === 'fetchall' && !localProps.files[name]) {
+                // put a placeholder if it's not existing
+                localProps.files[name] = null;
+            }
+        });
+
+        launch();
+    },
+
+    userDirectoryFilesAddedOrChanged(propName, files) {
+        localProps.files[propName] = files;
         launch();
     },
 };
 
 function launch() {
+    const allFilesLoaded = Object.values(localProps.files).every(files => files !== null);
+
     // launch when both props are set
-    if (localProps.userProps && localProps.generalProps) {
+    if (localProps.userProps && localProps.generalProps && allFilesLoaded) {
         display('Sending properties...');
 
         // transfer the properties to target location
@@ -63,12 +80,12 @@ function launch() {
                     fail('Server responded with ' + res.status + '\n\n' + text);
                 });
             }
-        }).catch(fail);
+        }).catch(e => fail(e + '\n\nHave you run `yarn serve` ?'));
     }
 }
 
 function fail(e) {
-    display('Failed to send props to Webpack DevServer: \n\n' + e.toString());
+    display('Failed to send props to Webpack DevServer: \n\n' + e);
 }
 
 function display(message) {

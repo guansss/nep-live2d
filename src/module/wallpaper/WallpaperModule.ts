@@ -19,7 +19,9 @@ export default class WallpaperModule implements Module {
                 await setupRemote();
 
                 // must use a debounce because property can change rapidly, for example when using a color picker
-                this.app.on('we:*', debounce(updateRemote, 200));
+                this.app.on('we:*', debounce(updateRemoteProperty, 100));
+
+                this.app.on('weFilesUpdate:*', updateRemoteFiles).on('weFilesRemove:*', updateRemoteFiles);
             }
         } else {
             await setupDefault();
@@ -46,11 +48,17 @@ async function setupDefault() {
 
 async function setupRemote() {
     try {
-        const { userProps, generalProps } = await getJSON('/props');
+        const props = await getJSON('/props');
 
-        if (userProps || generalProps) {
-            generalProps && window.wallpaperPropertyListener.applyGeneralProperties(generalProps);
-            userProps && window.wallpaperPropertyListener.applyUserProperties(userProps);
+        if (props) {
+            props.generalProps && window.wallpaperPropertyListener.applyGeneralProperties(props.generalProps);
+            props.userProps && window.wallpaperPropertyListener.applyUserProperties(props.userProps);
+
+            if (props.files) {
+                Object.entries(props.files).forEach(([propName, files]) =>
+                    window.wallpaperPropertyListener.userDirectoryFilesAddedOrChanged(propName, files as string[]),
+                );
+            }
         } else {
             // noinspection ExceptionCaughtLocallyJS
             throw 'Empty response';
@@ -61,9 +69,15 @@ async function setupRemote() {
 }
 
 // update remote properties so they can be retrieved after HMR
-function updateRemote(prop: string, value: string) {
+function updateRemoteProperty(propName: string, value: string) {
     postJSON('/props', {
         // no need to care about putting the property in userProps or generalProps, because they will finally be merged
-        userProps: { [prop]: { value } },
+        userProps: { [propName]: { value } },
+    }).catch();
+}
+
+function updateRemoteFiles(propName: string, files: string[], allFiles: string[]) {
+    postJSON('/props', {
+        files: { [propName]: allFiles },
     }).catch();
 }

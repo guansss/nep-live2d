@@ -5,6 +5,9 @@ declare interface Window {
     wallpaperPropertyListener: {
         applyUserProperties(props: WEUserProperties): void;
         applyGeneralProperties(props: WEGeneralProperties): void;
+
+        userDirectoryFilesAddedOrChanged(propName: string, files: string[]): void;
+        userDirectoryFilesRemoved(propName: string, files: string[]): void;
     };
 }
 

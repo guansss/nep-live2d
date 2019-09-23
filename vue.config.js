@@ -17,6 +17,7 @@ module.exports = {
             const props = {
                 userProps: {},
                 generalProps: {},
+                files: {},
             };
 
             // receive properties by POST
@@ -24,6 +25,9 @@ module.exports = {
                 // save props to local variables
                 merge(props.userProps, req.body.userProps);
                 merge(props.generalProps, req.body.generalProps);
+
+                // DON'T use merge on files because merging will keep the removed files!
+                Object.assign(props.files, req.body.files);
 
                 res.json(props);
             });
