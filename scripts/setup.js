@@ -39,13 +39,10 @@ const rl = readline.createInterface(process.stdin, process.stdout);
 
 async function copyFiles(...filePairs) {
     async function copyFile(from, to) {
-        if (fs.existsSync(to)) {
-            console.log(chalk.red(to));
-            await confirm(OVERWRITE_MESSAGE);
+        if (await checkConflict(to, from)) {
+            fs.copyFileSync(from, to);
+            console.log(chalk.black.bgGreen(' WRITE '), chalk.green(to));
         }
-
-        fs.copyFileSync(from, to);
-        console.log(chalk.green(to));
     }
 
     for (const [from, to] of filePairs) {
@@ -60,14 +57,35 @@ async function setupProjectJSON() {
         path.join(env.WALLPAPER_PATH, 'project.json'),
         path.join(__dirname, '../wallpaper/project.json'),
     ]) {
-        if (fs.existsSync(jsonPath)) {
-            console.log(chalk.red(jsonPath));
-            await confirm(OVERWRITE_MESSAGE);
+        if (await checkConflictByContent(jsonPath, projectJSON)) {
+            fs.writeFileSync(jsonPath, projectJSON);
+            console.log(chalk.black.bgGreen(' WRITE '), chalk.green(jsonPath));
         }
-
-        fs.writeFileSync(jsonPath, projectJSON);
-        console.log(chalk.green(jsonPath));
     }
+}
+
+/**
+ * @return {Promise<boolean>} True if dst should be overwritten.
+ */
+async function checkConflict(dst, src) {
+    if (fs.existsSync(dst) && !fs.readFileSync(dst).equals(fs.readFileSync(src))) {
+        console.log(chalk.black.bgRed(' CONFLICT '), chalk.red(dst));
+        await confirm(OVERWRITE_MESSAGE);
+        return true;
+    }
+    console.log(chalk.black.bgGreen(' SKIP '), chalk.green(dst));
+}
+
+/**
+ * @return {Promise<boolean>} True if dst should be overwritten.
+ */
+async function checkConflictByContent(dst, content) {
+    if (fs.existsSync(dst) && fs.readFileSync(dst, 'utf-8') !== content) {
+        console.log(chalk.black.bgRed(' CONFLICT '), chalk.red(dst));
+        await confirm(OVERWRITE_MESSAGE);
+        return true;
+    }
+    console.log(chalk.black.bgGreen(' SKIP '), chalk.green(dst));
 }
 
 async function confirm(message) {
