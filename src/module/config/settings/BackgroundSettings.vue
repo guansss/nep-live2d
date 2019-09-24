@@ -1,37 +1,14 @@
 <template>
     <div class="page">
-        <FileInput class="input" v-model="imageFiles" />
-
-        <TransitionGroup name="list" tag="div" class="bg-list">
+        <TransitionGroup appear name="list" tag="div" class="bg-list">
             <div
-                v-for="(image, i) in images"
-                :key="image.name"
-                :class="['bg-item card', { selected: i === selected }]"
-                @click="selectImage(image, i)"
+                v-for="image in images"
+                :key="image"
+                :class="['bg-item card', { selected: image === selected }]"
+                @click="selectImage(image)"
             >
-                <img
-                    v-if="image.valid"
-                    class="bg-item-img"
-                    :title="image.name"
-                    :src="imageDir + '/' + image.name"
-                    @load="imageLoaded(image)"
-                    @error="imageError(image)"
-                />
+                <img class="bg-item-img" :title="image" :src="image" />
                 <CheckSVG class="check" />
-
-                <div
-                    v-if="deleting === i && deletingProgress > 0"
-                    class="delete-cover"
-                    :style="{ transform: `translateY(${(1 - deletingProgress) * 100}%)` }"
-                ></div>
-                <CloseSVG
-                    v-if="selected !== i"
-                    class="delete"
-                    @click.stop=""
-                    @mousedown.stop="deleteStart(i)"
-                    @mouseup.stop="deleteCancel"
-                    @mouseleave="deleteCancel"
-                />
             </div>
         </TransitionGroup>
     </div>
@@ -39,22 +16,15 @@
 
 <script lang="ts">
 import CheckSVG from '@/assets/img/check.svg';
-import CloseSVG from '@/assets/img/close.svg';
-import BackgroundModule, { BackgroundImage } from '@/module/background/BackgroundModule';
+import { inWallpaperEngine } from '@/core/utils/misc';
 import FileInput from '@/module/config/reusable/FileInput.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import SettingsPanel from '@/module/config/SettingsPanel.js';
 import Vue from 'vue';
-import { Component, Watch } from 'vue-property-decorator';
-
-interface ImageEntity {
-    name: string;
-    valid: boolean;
-    saved: boolean;
-}
+import { Component } from 'vue-property-decorator';
 
 @Component({
-    components: { FileInput, Slider, CheckSVG, CloseSVG },
+    components: { FileInput, Slider, CheckSVG },
 })
 export default class BackgroundSettings extends Vue {
     static title = 'BACKGROUND';
@@ -63,103 +33,39 @@ export default class BackgroundSettings extends Vue {
         return (this.$parent as SettingsPanel).configModule();
     }
 
-    imageDir = BackgroundModule.IMAGE_PATH;
+    images: string[] = [];
 
-    imageFiles: File[] = [];
-    images: ImageEntity[] = [];
-
-    selected = -1;
-
-    deleting = -1; // the index of image that will be deleted after progress goes to 1
-    deletingTime = 500; // time required to press and hold the button to delete
-    deletingProgress = 0; // 0 ~ 1
-    deletingRafID = -1; // ID returned by requestAnimationFrame()
+    selected = '';
 
     private created() {
-        this.images = (this.configModule.getConfig('bg.images', []) as BackgroundImage[]).map(({ name }) => ({
-            name,
-            valid: true,
-            saved: true,
-        }));
+        this.configModule.app
+            .on('weFilesUpdate:bgDirectory', this.imageChange, this)
+            .on('weFilesRemove:bgDirectory', this.imageChange, this);
 
         this.selected = this.configModule.getConfig('bg.selected', this.selected);
-    }
 
-    @Watch('imageFiles')
-    imageFilesChanged(value: File[]) {
-        value.forEach(file => {
-            if (!this.images.find(image => image.name === file.name)) {
-                this.images.push({
-                    name: file.name,
-                    valid: true,
-                    saved: false,
-                });
-            }
-        });
-    }
-
-    imageLoaded(image: ImageEntity) {
-        if (!image.saved) {
-            this.configModule.app.emit('bgSave', image.name);
-
-            // let's assume that it's been saved...
-            image.saved = true;
+        if (!inWallpaperEngine) {
+            // get some random images!
+            this.images = [
+                'https://w.wallhaven.cc/full/r2/wallhaven-r2qqlj.jpg',
+                'https://w.wallhaven.cc/full/kw/wallhaven-kw1ky1.jpg',
+                'https://w.wallhaven.cc/full/vm/wallhaven-vmx153.jpg',
+                'https://w.wallhaven.cc/full/48/wallhaven-482r8j.jpg',
+                'https://w.wallhaven.cc/full/qd/wallhaven-qddrv7.jpg',
+                'https://w.wallhaven.cc/full/d5/wallhaven-d5x9rm.jpg',
+                'https://w.wallhaven.cc/full/k9/wallhaven-k993g7.jpg',
+            ];
         }
     }
 
-    imageError(image: ImageEntity) {
-        image.valid = false;
+    imageChange(files: string[], allFiles: string[]) {
+        this.images = [...allFiles];
     }
 
-    selectImage(image: ImageEntity, index: number) {
-        if (image.saved && image.valid) {
-            this.configModule.app.emit('bgSelect', image.name);
+    selectImage(image: string) {
+        this.configModule.app.emit('bgSelect', image);
 
-            this.selected = index;
-        }
-    }
-
-    deleteStart(index: number) {
-        this.deleting = index;
-
-        // ensure there is no active animation
-        if (this.deletingRafID === -1) {
-            this.deletingProgress = 0;
-
-            const startTime = performance.now();
-
-            // make deleting animation
-            const tick = (now: DOMHighResTimeStamp) => {
-                this.deletingProgress = (now - startTime) / this.deletingTime;
-
-                if (this.deletingProgress > 1) {
-                    this.deletingRafID = -1;
-                    this.delete();
-                } else {
-                    this.deletingRafID = requestAnimationFrame(tick);
-                }
-            };
-
-            tick(startTime);
-        }
-    }
-
-    deleteCancel() {
-        this.deletingProgress = 0;
-        this.deleting = -1;
-
-        if (this.deletingRafID != -1) cancelAnimationFrame(this.deletingRafID);
-        this.deletingRafID = -1;
-    }
-
-    delete() {
-        if (this.images[this.deleting]) {
-            this.configModule.app.emit('bgDelete', this.images[this.deleting].name);
-            this.images.splice(this.deleting, 1);
-        }
-
-        // this method can also be used to clean up
-        this.deleteCancel();
+        this.selected = image;
     }
 }
 </script>
@@ -195,9 +101,6 @@ export default class BackgroundSettings extends Vue {
         .bg-item-img
             transform scale(1.1)
 
-        .delete
-            opacity 1
-
 .bg-item-img
     position absolute
     display block
@@ -207,6 +110,7 @@ export default class BackgroundSettings extends Vue {
     height 100%
     background #AAA
     object-fit cover
+    will-change transform
     transition transform .15s ease-out
 
 .check
@@ -220,28 +124,6 @@ export default class BackgroundSettings extends Vue {
     opacity 0
     object-fit cover
     transition opacity .2s
-
-.delete-cover
-    position absolute
-    top 0
-    left 0
-    width 100%
-    height 100%
-    background #C0392BAA
-
-.delete
-    position absolute
-    display block
-    top 0
-    right 0
-    width 24px
-    height 24px
-    background #0000
-    opacity 0
-    transition opacity .15s ease-out, background-color .15s ease-out
-
-    &:hover
-        background #E74C3C
 
 /* animation */
 .bg-item
