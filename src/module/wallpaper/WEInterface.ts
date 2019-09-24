@@ -136,10 +136,10 @@ export namespace WEInterface {
 
         userDirectoryFilesAddedOrChanged(propName, files) {
             // add prefixes to raw file paths
-            updateFiles(propName, files.map(file => 'file://' + file));
+            updateFiles(propName, files.map(file => 'file://' + unescape(file)));
         },
         userDirectoryFilesRemoved(propName, files) {
-            removeFiles(propName, files.map(file => 'file://' + file));
+            removeFiles(propName, files.map(file => 'file://' + unescape(file)));
         },
     };
 }
