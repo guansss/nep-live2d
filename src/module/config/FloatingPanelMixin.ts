@@ -18,6 +18,7 @@ export default class FloatingPanelMixin extends Vue {
     expanded = false;
 
     stateClass = 'switch';
+    snapped = false;
 
     switchTop = 0;
     switchLeft = 0;
@@ -115,58 +116,58 @@ export default class FloatingPanelMixin extends Vue {
 
     snapSwitch(animate: boolean) {
         const parent = this.panel.parentElement;
+        if (!parent) return;
 
-        if (parent) {
-            const centerX = this.switchLeft + this.switchWidth / 2;
-            const centerY = this.switchTop + this.switchHeight / 2;
+        const centerX = this.switchLeft + this.switchWidth / 2;
+        const centerY = this.switchTop + this.switchHeight / 2;
 
-            const snapDistanceX = Math.min(SNAP_DISTANCE_X, parent.offsetWidth / 2);
-            const snapDistanceY = Math.min(SNAP_DISTANCE_Y, parent.offsetHeight / 2);
+        const snapDistanceX = Math.min(SNAP_DISTANCE_X, parent.offsetWidth / 2);
+        const snapDistanceY = Math.min(SNAP_DISTANCE_Y, parent.offsetHeight / 2);
 
-            // top and bottom, left and right, both should never be true at the same time
-            const snapTop = centerY < snapDistanceY;
-            const snapBottom = centerY > parent.offsetHeight - snapDistanceY;
-            const snapLeft = centerX < snapDistanceX;
-            const snapRight = centerX > parent.offsetWidth - snapDistanceX;
+        // top and bottom, left and right, both should never be true at the same time
+        const snapTop = centerY < snapDistanceY;
+        const snapBottom = centerY > parent.offsetHeight - snapDistanceY;
+        const snapLeft = centerX < snapDistanceX;
+        const snapRight = centerX > parent.offsetWidth - snapDistanceX;
 
-            this.switchTransform = '';
+        this.snapped = snapTop || snapBottom || snapLeft || snapRight;
+        this.switchTransform = '';
 
-            if (snapTop) {
-                this.switchTop = 0;
-                this.switchTransform += ' translateY(-50%)';
-            }
-            if (snapBottom) {
-                // should have used `bottom: 0`, because otherwise resizing parent will break the snap, but, whatever
-                this.switchTop = parent.offsetHeight - this.switchHeight;
-                this.switchTransform += ' translateY(50%)';
-            }
-            if (snapLeft) {
-                this.switchLeft = 0;
-                this.switchTransform += ' translateX(-50%)';
-            }
-            if (snapRight) {
-                // ditto
-                this.switchLeft = parent.offsetWidth - this.switchWidth;
-                this.switchTransform += ' translateX(50%)';
-            }
+        if (snapTop) {
+            this.switchTop = 0;
+            this.switchTransform += ' translateY(-50%)';
+        }
+        if (snapBottom) {
+            // should have used `bottom: 0`, because otherwise resizing parent will break the snap, but, whatever
+            this.switchTop = parent.offsetHeight - this.switchHeight;
+            this.switchTransform += ' translateY(50%)';
+        }
+        if (snapLeft) {
+            this.switchLeft = 0;
+            this.switchTransform += ' translateX(-50%)';
+        }
+        if (snapRight) {
+            // ditto
+            this.switchLeft = parent.offsetWidth - this.switchWidth;
+            this.switchTransform += ' translateX(50%)';
+        }
 
-            if (animate) {
-                // FLIP animation
-                const translateX = this.panel.offsetLeft - this.switchLeft;
-                const translateY = this.panel.offsetTop - this.switchTop;
+        if (animate && this.snapped) {
+            // FLIP animation
+            const translateX = this.panel.offsetLeft - this.switchLeft;
+            const translateY = this.panel.offsetTop - this.switchTop;
 
-                if (translateX || translateY) {
-                    this.panel.animate(
-                        [
-                            { transform: `translateX(${translateX}px) translateY(${translateY}px)` },
-                            { transform: this.switchTransform },
-                        ],
-                        {
-                            duration: 300,
-                            easing: 'ease-in-out',
-                        },
-                    );
-                }
+            if (translateX || translateY) {
+                this.panel.animate(
+                    [
+                        { transform: `translateX(${translateX}px) translateY(${translateY}px)` },
+                        { transform: this.switchTransform },
+                    ],
+                    {
+                        duration: 300,
+                        easing: 'ease-in-out',
+                    },
+                );
             }
         }
     }
