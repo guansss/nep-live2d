@@ -1,5 +1,5 @@
 <template>
-    <div class="page">
+    <div>
         <div class="section" data-title="Snow">
             <Slider :min="100" :max="10000" v-model="snowNumber">Amount</Slider>
         </div>
@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts">
+import ConfigModule from '@/module/config/ConfigModule';
 import Slider from '@/module/config/reusable/Slider.vue';
-import SettingsPanel from '@/module/config/SettingsPanel.ts';
 import Vue from 'vue';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
     components: { Slider },
@@ -18,11 +18,9 @@ import { Component, Watch } from 'vue-property-decorator';
 export default class EffectsSettings extends Vue {
     static title = 'EFFECTS';
 
-    snowNumber = this.configModule.getConfig('snow.number', 0);
+    @Prop() readonly configModule!: ConfigModule;
 
-    get configModule() {
-        return (this.$parent as SettingsPanel).configModule();
-    }
+    snowNumber = this.configModule.getConfig('snow.number', 0);
 
     @Watch('snowNumber')
     snowNumberChanged(value: any) {

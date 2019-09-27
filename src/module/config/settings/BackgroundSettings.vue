@@ -1,5 +1,5 @@
 <template>
-    <div class="page">
+    <div>
         <TransitionGroup appear name="list" tag="div" class="bg-list">
             <div
                 v-for="image in images"
@@ -17,21 +17,20 @@
 <script lang="ts">
 import CheckSVG from '@/assets/img/check.svg';
 import { inWallpaperEngine } from '@/core/utils/misc';
+import ConfigModule from '@/module/config/ConfigModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
+import Scrollable from '@/module/config/reusable/Scrollable.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
-import SettingsPanel from '@/module/config/SettingsPanel.js';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 @Component({
-    components: { FileInput, Slider, CheckSVG },
+    components: { Scrollable, FileInput, Slider, CheckSVG },
 })
 export default class BackgroundSettings extends Vue {
     static title = 'BACKGROUND';
 
-    get configModule() {
-        return (this.$parent as SettingsPanel).configModule();
-    }
+    @Prop() readonly configModule!: ConfigModule;
 
     images: string[] = [];
 

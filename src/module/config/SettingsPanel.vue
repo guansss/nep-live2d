@@ -20,9 +20,11 @@
                 </div>
             </div>
 
-            <keep-alive>
-                <component :is="currentPage" />
-            </keep-alive>
+            <Scrollable class="page">
+                <keep-alive>
+                    <component :is="currentPage" v-bind="{ configModule: cachedConfigModule }" />
+                </keep-alive>
+            </Scrollable>
         </div>
     </div>
 </template>
@@ -36,7 +38,7 @@
     position absolute
     max-width 100%
     max-height 100%
-    overflow auto
+    overflow hidden
     user-select none
     color $themeColor
     font-size 16px
@@ -52,6 +54,8 @@
 
 .content
     position relative
+    display flex
+    flex-direction column
     width 100%
     height 100%
 
@@ -70,6 +74,8 @@
 .toolbar
     position relative
     display flex
+    height 36px
+    overflow hidden
     background-color rgba($themeColor, 0.1)
     cursor move
 
@@ -91,9 +97,14 @@
 
 .tab
     z-index 1
-    padding 8px 16px
+    padding 0 16px
+    line-height 36px
 
 // page content
+
+.page
+    flex 1 0 0
+    width 100%
 
 .settings >>> .section
 

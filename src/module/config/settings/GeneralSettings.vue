@@ -1,14 +1,14 @@
 <template>
-    <div class="page">
+    <div>
         <Slider progress v-model="volume">Volume</Slider>
     </div>
 </template>
 
 <script lang="ts">
+import ConfigModule from '@/module/config/ConfigModule';
 import Slider from '@/module/config/reusable/Slider.vue';
-import SettingsPanel from '@/module/config/SettingsPanel.ts';
 import Vue from 'vue';
-import { Component, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
     components: { Slider },
@@ -16,11 +16,9 @@ import { Component, Watch } from 'vue-property-decorator';
 export default class GeneralSettings extends Vue {
     static title = 'GENERAL';
 
-    volume = this.configModule.getConfig('volume', 0);
+    @Prop() readonly configModule!: ConfigModule;
 
-    get configModule() {
-        return (this.$parent as SettingsPanel).configModule();
-    }
+    volume = this.configModule.getConfig('volume', 0);
 
     @Watch('volume')
     volumeChanged(value: any) {

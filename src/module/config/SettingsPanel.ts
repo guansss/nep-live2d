@@ -1,11 +1,14 @@
 import ConfigModule from '@/module/config/ConfigModule';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
+import Scrollable from '@/module/config/reusable/Scrollable.vue';
 import BackgroundSettings from '@/module/config/settings/BackgroundSettings.vue';
 import EffectsSettings from '@/module/config/settings/EffectsSettings.vue';
 import GeneralSettings from '@/module/config/settings/GeneralSettings.vue';
 import { Component, Mixins, Prop, Ref } from 'vue-property-decorator';
 
-@Component
+@Component({
+    components: { Scrollable },
+})
 export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     // use getter function to prevent Vue's observation on ConfigModule instance
     @Prop() readonly configModule!: () => ConfigModule;
