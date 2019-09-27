@@ -42,7 +42,7 @@ export default class Scrollable extends Vue {
     }
 
     private mounted() {
-        this.intervalId = setInterval(() => {
+        this.intervalId = window.setInterval(() => {
             this.overflow = this.container.offsetHeight < this.container.scrollHeight;
 
             if (this.overflow) {
