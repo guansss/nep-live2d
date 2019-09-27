@@ -1,3 +1,4 @@
+import { Vue } from '*.vue';
 import ConfigModule from '@/module/config/ConfigModule';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
 import Scrollable from '@/module/config/reusable/Scrollable.vue';
@@ -16,6 +17,7 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     @Ref('settings') readonly panel!: HTMLDivElement;
     @Ref('content') readonly content!: HTMLDivElement;
     @Ref('toolbar') readonly handle!: HTMLDivElement;
+    @Ref('page') readonly pageComponent!: Vue;
 
     readonly pages = [GeneralSettings, BackgroundSettings, EffectsSettings];
 
@@ -45,6 +47,14 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
         this.panelLeft = this.cachedConfigModule.getConfig('settings.panelLeft', this.panelLeft);
     }
 
+    async selectPage(index: number) {
+        this.selectedPage = index;
+
+        // notify selected child to load stuffs, this is probably not a good design...
+        await this.$nextTick();
+        this.afterOpen();
+    }
+
     protected switchMoveEnded() {
         this.cachedConfigModule.setConfig('settings.switchTop', this.switchTop);
         this.cachedConfigModule.setConfig('settings.switchLeft', this.switchLeft);
@@ -53,6 +63,16 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     protected panelMoveEnded() {
         this.cachedConfigModule.setConfig('settings.panelTop', this.panelTop);
         this.cachedConfigModule.setConfig('settings.panelLeft', this.panelLeft);
+    }
+
+    protected afterOpen() {
+        const component = this.pageComponent as any;
+        component && component.afterOpen && component.afterOpen();
+    }
+
+    protected beforeClose() {
+        const component = this.pageComponent as any;
+        component && component.beforeClose && component.beforeClose();
     }
 
     refresh() {

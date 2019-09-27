@@ -1,6 +1,6 @@
 <template>
     <div>
-        <TransitionGroup appear name="list" tag="div" class="bg-list">
+        <TransitionGroup appear v-if="showImage" name="list" tag="div" class="bg-list">
             <div
                 v-for="image in images"
                 :key="image"
@@ -36,6 +36,8 @@ export default class BackgroundSettings extends Vue {
 
     selected = '';
 
+    showImage = false;
+
     private created() {
         this.configModule.app
             .on('weFilesUpdate:bgDirectory', this.imageChange, this)
@@ -65,6 +67,16 @@ export default class BackgroundSettings extends Vue {
         this.configModule.app.emit('bgSelect', image);
 
         this.selected = image;
+    }
+
+    beforeClose() {
+        // transforming images is a heavy job and will cause stuttering animation, especially when images here are
+        //  super high resolution background images, so we should hide them before transformation
+        this.showImage = false;
+    }
+
+    afterOpen() {
+        this.showImage = true;
     }
 }
 </script>

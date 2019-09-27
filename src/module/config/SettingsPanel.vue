@@ -7,7 +7,7 @@
                         v-for="(page, i) in pages"
                         :key="page.title"
                         :class="['tab selectable', { selected: i === selectedPage }]"
-                        @click="selectedPage = i"
+                        @click="selectPage(i)"
                     >
                         {{ page.title }}
                     </div>
@@ -22,7 +22,7 @@
 
             <Scrollable class="page">
                 <keep-alive>
-                    <component :is="currentPage" v-bind="{ configModule: cachedConfigModule }" />
+                    <component :is="currentPage" ref="page" v-bind="{ configModule: cachedConfigModule }" />
                 </keep-alive>
             </Scrollable>
         </div>

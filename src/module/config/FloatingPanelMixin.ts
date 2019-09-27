@@ -210,7 +210,7 @@ export default class FloatingPanelMixin extends Vue {
                         duration: this.transformAnimDuration,
                         easing: TRANSFORM_EASING,
                     },
-                );
+                ).onfinish = () => this.afterOpen(); // do some lazy loads!
             });
         }
     }
@@ -227,27 +227,35 @@ export default class FloatingPanelMixin extends Vue {
 
             this.panel.style.borderRadius = this.switchBorderRadius;
 
-            this.panel.animate(
-                [
-                    { borderRadius: this.panelBorderRadius, transform: 'none' },
-                    { borderRadius: this.panelBorderRadius, offset: this.stateChangeFraction },
-                    {
-                        borderRadius: this.switchBorderRadius,
-                        transform: `translateX(${distanceX}px) translateY(${distanceY}px) scaleX(${scaleX}) scaleY(${scaleY})`,
-                    },
-                ],
-                {
-                    duration: this.transformAnimDuration,
-                    easing: TRANSFORM_EASING,
-                },
-            ).onfinish = () => {
-                this.expanded = false;
-                this.stateClass = 'switch';
-            };
+            // do some cleanup!
+            this.beforeClose();
 
-            this.content.animate([{ opacity: 1 }, { opacity: 0, offset: this.stateChangeFraction }, { opacity: 0 }], {
-                duration: this.transformAnimDuration,
-                easing: TRANSFORM_EASING,
+            this.$nextTick(() => {
+                this.panel.animate(
+                    [
+                        { borderRadius: this.panelBorderRadius, transform: 'none' },
+                        { borderRadius: this.panelBorderRadius, offset: this.stateChangeFraction },
+                        {
+                            borderRadius: this.switchBorderRadius,
+                            transform: `translateX(${distanceX}px) translateY(${distanceY}px) scaleX(${scaleX}) scaleY(${scaleY})`,
+                        },
+                    ],
+                    {
+                        duration: this.transformAnimDuration,
+                        easing: TRANSFORM_EASING,
+                    },
+                ).onfinish = () => {
+                    this.expanded = false;
+                    this.stateClass = 'switch';
+                };
+
+                this.content.animate(
+                    [{ opacity: 1 }, { opacity: 0, offset: this.stateChangeFraction }, { opacity: 0 }],
+                    {
+                        duration: this.transformAnimDuration,
+                        easing: TRANSFORM_EASING,
+                    },
+                );
             });
         }
     }
@@ -255,6 +263,9 @@ export default class FloatingPanelMixin extends Vue {
     // To be overridden
     protected switchMoveEnded() {}
 
-    // To be overridden
     protected panelMoveEnded() {}
+
+    protected afterOpen() {}
+
+    protected beforeClose() {}
 }
