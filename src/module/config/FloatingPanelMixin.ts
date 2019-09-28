@@ -31,7 +31,7 @@ export default class FloatingPanelMixin extends Vue {
     panelLeft = 0;
     panelWidth = 600;
     panelHeight = 450;
-    panelBorderRadius = '4px';
+    panelBorderRadius = '2px';
 
     transformAnimDuration = 300;
 
