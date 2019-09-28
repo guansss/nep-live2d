@@ -107,6 +107,8 @@ export default class Slider extends Vue {
 <style scoped lang="stylus">
 @require './styles'
 
+$height = 20px
+
 .slider
     display flex
     width 240px
@@ -118,11 +120,12 @@ export default class Slider extends Vue {
 .slider-wrapper
     position relative
     flex-grow 1
-    height 20px
+    height $height
 
 .progress
     position absolute
-    height 100%
+    top ($height / 4)
+    height ($height / 2)
     background-color var(--accentColor)
 
     &:after
@@ -137,29 +140,30 @@ export default class Slider extends Vue {
 
 .track
     position absolute
+    top ($height / 4)
     width 100%
-    height 100%
+    height ($height / 2)
     background-color #0001
     transition background-color .1s
 
 .thumb
     position absolute
     z-index 1
-    top 0
+    top -($height / 4)
     left 0
-    width 20px
-    height 20px
+    width $height
+    height $height
     background-color var(--accentColor)
 
 .overlay
     position relative
     top -10px
     left -10px
-    width 40px
-    height 40px
+    width $height * 2
+    height $height * 2
     color #EEE0
-    font-size 20px
-    line-height 40px
+    font-size $height
+    line-height $height * 2
     overflow hidden
     white-space nowrap
     text-align center
