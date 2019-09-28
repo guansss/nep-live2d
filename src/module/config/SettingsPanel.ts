@@ -18,6 +18,7 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     @Ref('settings') readonly panel!: HTMLDivElement;
     @Ref('content') readonly content!: HTMLDivElement;
     @Ref('toolbar') readonly handle!: HTMLDivElement;
+    @Ref('resizer') readonly resizer!: HTMLDivElement;
     @Ref('page') readonly pageComponent!: Vue;
 
     readonly pages = [GeneralSettings, BackgroundSettings, EffectsSettings, LogSettings];
@@ -46,6 +47,8 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
 
         this.panelTop = this.cachedConfigModule.getConfig('settings.panelTop', this.panelTop);
         this.panelLeft = this.cachedConfigModule.getConfig('settings.panelLeft', this.panelLeft);
+        this.panelWidth = this.cachedConfigModule.getConfig('settings.panelWidth', this.panelWidth);
+        this.panelHeight = this.cachedConfigModule.getConfig('settings.panelHeight', this.panelHeight);
     }
 
     async selectPage(index: number) {
@@ -64,6 +67,11 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     protected panelMoveEnded() {
         this.cachedConfigModule.setConfig('settings.panelTop', this.panelTop);
         this.cachedConfigModule.setConfig('settings.panelLeft', this.panelLeft);
+    }
+
+    protected panelResizeEnded() {
+        this.cachedConfigModule.setConfig('settings.panelWidth', this.panelWidth);
+        this.cachedConfigModule.setConfig('settings.panelHeight', this.panelHeight);
     }
 
     protected afterOpen() {

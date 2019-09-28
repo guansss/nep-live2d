@@ -1,4 +1,5 @@
 import Draggable from '@/core/utils/Draggable';
+import { clamp } from '@/core/utils/math';
 import Vue from 'vue';
 import { Component, Watch } from 'vue-property-decorator';
 
@@ -14,6 +15,7 @@ export default class FloatingPanelMixin extends Vue {
     readonly panel!: HTMLElement;
     readonly content!: HTMLElement;
     readonly handle!: HTMLElement;
+    readonly resizer!: HTMLElement;
 
     expanded = false;
 
@@ -100,17 +102,36 @@ export default class FloatingPanelMixin extends Vue {
     }
 
     private setupContent() {
+        // setup draggable for panel mode
         if (this.content) {
-            // setup draggable for panel mode
-            const draggable = new Draggable(this.handle, undefined, 2);
+            const handleDraggable = new Draggable(this.handle, undefined, 2);
 
-            draggable.onDrag = (e: MouseEvent) => {
+            handleDraggable.onDrag = (e: MouseEvent) => {
                 this.panelTop += e._movementY;
                 this.panelLeft += e._movementX;
                 return true;
             };
 
-            draggable.onEnd = () => this.panelMoveEnded();
+            handleDraggable.onEnd = () => this.panelMoveEnded();
+
+            const resizerDraggable = new Draggable(this.resizer, undefined, 2);
+
+            resizerDraggable.onDrag = (e: MouseEvent) => {
+                const parent = this.panel.parentElement;
+                this.panelWidth = clamp(
+                    this.panelWidth + e._movementX,
+                    50,
+                    parent!.offsetWidth - this.panel.offsetLeft,
+                );
+                this.panelHeight = clamp(
+                    this.panelHeight + e._movementY,
+                    50,
+                    parent!.offsetHeight - this.panel.offsetTop,
+                );
+                return true;
+            };
+
+            resizerDraggable.onEnd = () => this.panelResizeEnded();
         }
     }
 
@@ -265,6 +286,8 @@ export default class FloatingPanelMixin extends Vue {
     protected switchMoveEnded() {}
 
     protected panelMoveEnded() {}
+
+    protected panelResizeEnded() {}
 
     protected afterOpen() {}
 

@@ -25,6 +25,8 @@
                     <component :is="currentPage" ref="page" v-bind="{ configModule: cachedConfigModule }" />
                 </keep-alive>
             </Scrollable>
+
+            <div ref="resizer" class="resizer"></div>
         </div>
     </div>
 </template>
@@ -105,6 +107,22 @@
     z-index 1
     padding 0 16px
     line-height 36px
+
+.resizer
+    $size = 12px
+    position absolute
+    bottom - $size
+    right - $size
+    border-top solid $size transparent
+    border-right solid $size transparent
+    border-bottom solid $size transparent
+    border-left solid $size #FFF
+    cursor se-resize
+    transform rotate(45deg)
+    transition border-left-color .15s ease-out
+
+    &:hover
+        border-left solid $size var(--accentColor)
 
 // page content
 
