@@ -1,6 +1,7 @@
 <template>
     <div class="log">
-        <div class="button" @click="dump">Dump</div>
+        <div class="button" @click="dumpLogs">Dump Logs</div>
+        <div class="button" @click="dumpConfig">Dump Config</div>
         <table class="table">
             <tr v-for="(log, i) in logs" :key="i" :class="['row', { error: log.error }]">
                 <td v-if="log.rowSpan" :rowspan="log.rowSpan" class="tag" :style="{ backgroundColor: log.color }">
@@ -91,8 +92,13 @@ export default class LogSettings extends Vue {
         };
     }
 
-    dump() {
+    dumpLogs() {
         const data = logs.reduce((result, log) => `${result}##[${log.tag}]${log.message}`, '').replace('\n', '##');
+        prompt('Dump result', data);
+    }
+
+    dumpConfig() {
+        const data = JSON.stringify(localStorage.config);
         prompt('Dump result', data);
     }
 
@@ -105,6 +111,9 @@ export default class LogSettings extends Vue {
 <style scoped lang="stylus">
 .log
     padding 16px
+
+.button
+    margin-right 8px
 
 .table
     color #000
