@@ -63,8 +63,8 @@ export default class FloatingPanelMixin extends Vue {
     @Watch('expanded')
     expandedChanged(expanded: boolean) {
         if (expanded) {
-            // Since the content is conditional on `expanded` with `v-if`, its element will be dynamically create and destroy
-            //  every time the dependency changes, we need to do works right after it create or recreates.
+            // Since the content is conditional on `expanded` with `v-if`, its element will be dynamically created and destroyed
+            //  every time the dependency changes, we need to do works right after it's created and recreated.
             this.$nextTick(this.setupContent);
         }
     }

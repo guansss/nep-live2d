@@ -17,8 +17,7 @@ export default class Draggable {
     lastMouseY = 0;
 
     /**
-     *
-     * @param element - Element that should be listen for drag event.
+     * @param element - Element that should be listened for drag event.
      * @param target - Element that should respond to the dragging with movement, if unset, only the listeners will be called.
      * @param deadZone - Maximum dragging distance to keep element static.
      * @param exact - Only trigger dragging if events are dispatched exactly from this element.
