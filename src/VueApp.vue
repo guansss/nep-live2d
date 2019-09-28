@@ -53,4 +53,34 @@ body
     font-family: 'Avenir', Helvetica, Arial, sans-serif
     -webkit-font-smoothing: antialiased
     -moz-osx-font-smoothing: grayscale
+
+.button
+    position relative
+    display inline-block
+    margin-bottom 8px
+    padding 8px 16px
+    background-color var(--accentColor)
+    color white
+    cursor pointer
+    transition box-shadow .15s ease-out
+
+    &:after
+        content ''
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        display block
+        background #0001
+        transition background-color .15s ease-out
+
+    &:hover
+        box-shadow 0 1px 4px #0006
+
+        &:after
+            background transparent
+
+    &:active
+        box-shadow none
 </style>

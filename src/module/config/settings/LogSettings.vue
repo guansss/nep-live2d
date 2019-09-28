@@ -1,5 +1,6 @@
 <template>
     <div class="log">
+        <div class="button" @click="dump">Dump</div>
         <table class="table">
             <tr v-for="(log, i) in logs" :key="i" :class="['row', { error: log.error }]">
                 <td v-if="log.rowSpan" :rowspan="log.rowSpan" class="tag" :style="{ backgroundColor: log.color }">
@@ -88,6 +89,11 @@ export default class LogSettings extends Vue {
 
             return logs.length;
         };
+    }
+
+    dump() {
+        const data = logs.reduce((result, log) => `${result}##[${log.tag}]${log.message}`, '').replace('\n', '##');
+        prompt('Dump result', data);
     }
 
     private beforeDestroy() {
