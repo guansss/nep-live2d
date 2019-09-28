@@ -24,6 +24,9 @@ export default class Snow extends Mesh {
 
     private _number: number;
 
+    private _width = 0;
+    private _height = 0;
+
     get number() {
         return this._number;
     }
@@ -57,11 +60,8 @@ export default class Snow extends Mesh {
             DRAW_MODES.POINTS,
         );
 
-        this._bounds.minX = 0;
-        this._bounds.minY = 0;
-        this._bounds.maxX = width;
-        this._bounds.maxY = height;
-
+        this._width = width;
+        this._height = height;
         this._number = number;
 
         this.state.blend = true;
@@ -73,8 +73,8 @@ export default class Snow extends Mesh {
     }
 
     protected setup() {
-        const boundWidth = this._bounds.maxX - this._bounds.minX;
-        const boundHeight = this._bounds.maxY - this._bounds.minY;
+        const boundWidth = this._width;
+        const boundHeight = this._height;
 
         // z in range from -80 to 80, camera distance is 100
         // max height at z of -80 is 110
@@ -145,13 +145,16 @@ export default class Snow extends Mesh {
     }
 
     resize(width: number, height: number) {
-        this._bounds.maxX = width;
-        this._bounds.maxY = height;
+        this._width = width;
+        this._height = height;
         this.setup();
     }
 
     _calculateBounds() {
-        // override it to prevent default calculation
+        this._bounds.minX = 0;
+        this._bounds.minY = 0;
+        this._bounds.maxX = this._width;
+        this._bounds.maxY = this._height;
     }
 
     update(dt: DOMHighResTimeStamp, now: DOMHighResTimeStamp) {

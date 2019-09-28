@@ -38,8 +38,14 @@ export default class SnowPlayer extends Player {
             this.snow = new Snow(snowflake, width, height, this._number);
         }
 
-        if (this.mka && !this.mka.pixiApp.stage.children.includes(this.snow!)) {
-            this.mka.pixiApp.stage.addChild(this.snow!);
+        if (this.mka) {
+            const pixiApp = this.mka.pixiApp;
+            if (!pixiApp.stage.children.includes(this.snow!)) {
+                if (pixiApp.renderer.width !== this.snow.width || pixiApp.renderer.height !== this.snow.height) {
+                    this.snow.resize(pixiApp.renderer.width, pixiApp.renderer.height);
+                }
+                this.mka.pixiApp.stage.addChild(this.snow!);
+            }
         }
     }
 
