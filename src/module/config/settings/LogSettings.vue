@@ -122,9 +122,8 @@ export default class LogSettings extends Vue {
     box-shadow inset 0 0 4px #666
 
 .tag
-    overflow hidden
     color #FFF
-    resize horizontal
+    border-bottom 1px solid #FFF1
 
 .message
     flex-grow 1
