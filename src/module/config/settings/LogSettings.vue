@@ -80,9 +80,9 @@ export default class LogSettings extends Vue {
                     lastLog.rowSpan = 0;
                 } else {
                     log.rowSpan = 1;
-                    setColor(log);
                 }
 
+                setColor(log);
                 this.logs.unshift(log);
             }
 
