@@ -113,6 +113,7 @@ $height = 20px
     display flex
     width 240px
     padding 16px
+    align-items center
 
 .label
     width 30%

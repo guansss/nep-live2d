@@ -9,19 +9,54 @@ export interface Loader {
 const TAG = 'SnowPlayer';
 
 export default class SnowPlayer extends Player {
-    snow = new Snow(snowflake, undefined, undefined, 1000);
+    private snow?: Snow;
+
+    private _number = 1000;
+
+    get number() {
+        return this.snow ? this.snow.number : this._number;
+    }
+
+    set number(value: number) {
+        this._number = value;
+        this.snow && (this.snow.number = value);
+    }
+
+    private setup() {
+        if (!this.enabled) return;
+
+        if (!this.snow) {
+            let width = 100;
+            let height = 100;
+
+            if (this.mka) {
+                const renderer = this.mka.pixiApp.renderer;
+                width = renderer.width;
+                height = renderer.height;
+            }
+
+            this.snow = new Snow(snowflake, width, height, this._number);
+        }
+
+        if (this.mka && !this.mka.pixiApp.stage.children.includes(this.snow!)) {
+            this.mka.pixiApp.stage.addChild(this.snow!);
+        }
+    }
 
     attach() {
-        const pixiApp = this.mka!.pixiApp;
-        this.snow.resize(pixiApp.renderer.width, pixiApp.renderer.height);
-        pixiApp.stage.addChild(this.snow);
+        this.setup();
     }
 
     detach() {
-        if (this.snow) {
-            this.snow.destroy();
-            this.snow.parent.removeChild(this.snow);
-        }
+        this.destroy();
+    }
+
+    enable() {
+        this.setup();
+    }
+
+    disable() {
+        this.destroy();
     }
 
     update(): boolean {
@@ -35,6 +70,13 @@ export default class SnowPlayer extends Player {
     }
 
     destroy() {
-        this.snow && this.snow.destroy();
+        if (this.snow) {
+            if (this.mka && this.mka.pixiApp.stage.children.includes(this.snow!)) {
+                this.mka.pixiApp.stage.removeChild(this.snow!);
+            }
+
+            this.snow.destroy();
+            this.snow = undefined;
+        }
     }
 }

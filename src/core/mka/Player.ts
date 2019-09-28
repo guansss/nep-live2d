@@ -3,7 +3,7 @@ import Mka from '@/core/mka/Mka';
 export default abstract class Player {
     readonly mka?: Mka;
 
-    readonly enabled: boolean = true;
+    readonly enabled: boolean = false;
     readonly paused: boolean = false;
 
     /**

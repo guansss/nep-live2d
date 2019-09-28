@@ -39,7 +39,7 @@ export default class Mka {
         this.rafId = requestAnimationFrame(this.tick);
     }
 
-    addPlayer(name: string, player: Player) {
+    addPlayer(name: string, player: Player, enabled = true) {
         if (this.players[name]) {
             log(TAG, `Player "${name}" already exists, ignored.`);
             return;
@@ -49,10 +49,32 @@ export default class Mka {
         this.players[name] = player;
         this.players[name].mka = this;
         player.attach();
+
+        if (enabled) {
+            this.enablePlayer(name);
+        }
     }
 
     getPlayer(name: string) {
-        return this.players[name];
+        return this.players[name] as Player;
+    }
+
+    enablePlayer(name: string) {
+        const player = this.players[name];
+
+        if (player && !player.enabled) {
+            player.enabled = true;
+            player.enable();
+        }
+    }
+
+    disablePlayer(name: string) {
+        const player = this.players[name];
+
+        if (player && player.enabled) {
+            player.enabled = false;
+            player.disable();
+        }
     }
 
     @autobind
