@@ -34,6 +34,7 @@ declare module '@pixi/loaders' {
 declare module '@pixi/utils' {
     import { utils } from 'pixi.js';
     export import EventEmitter = utils.EventEmitter;
+    export import sayHello = utils.sayHello;
 }
 
 declare module '@pixi/app' {

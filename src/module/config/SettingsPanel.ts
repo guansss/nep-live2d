@@ -5,6 +5,7 @@ import Scrollable from '@/module/config/reusable/Scrollable.vue';
 import BackgroundSettings from '@/module/config/settings/BackgroundSettings.vue';
 import EffectsSettings from '@/module/config/settings/EffectsSettings.vue';
 import GeneralSettings from '@/module/config/settings/GeneralSettings.vue';
+import LogSettings from '@/module/config/settings/LogSettings.vue';
 import { Component, Mixins, Prop, Ref } from 'vue-property-decorator';
 
 @Component({
@@ -19,7 +20,7 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     @Ref('toolbar') readonly handle!: HTMLDivElement;
     @Ref('page') readonly pageComponent!: Vue;
 
-    readonly pages = [GeneralSettings, BackgroundSettings, EffectsSettings];
+    readonly pages = [GeneralSettings, BackgroundSettings, EffectsSettings, LogSettings];
 
     selectedPage = 0;
 
