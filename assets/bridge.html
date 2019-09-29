@@ -32,7 +32,13 @@ const localProps = {
 };
 
 // listen for properties initialization
+// apparently the call order is: files -> user -> general
 window.wallpaperPropertyListener = {
+    userDirectoryFilesAddedOrChanged(propName, files) {
+        localProps.files[propName] = files;
+        launch();
+    },
+
     applyGeneralProperties(props) {
         localProps.generalProps = props;
         launch();
@@ -40,29 +46,17 @@ window.wallpaperPropertyListener = {
 
     applyUserProperties(props) {
         localProps.userProps = props;
-
-        // check for properties of directory type
-        Object.entries(props).forEach(([name, prop]) => {
-            if (prop.type === 'directory' && prop.mode === 'fetchall' && !localProps.files[name]) {
-                // put a placeholder if it's not existing
-                localProps.files[name] = null;
-            }
-        });
-
-        launch();
-    },
-
-    userDirectoryFilesAddedOrChanged(propName, files) {
-        localProps.files[propName] = files;
         launch();
     },
 };
 
 function launch() {
-    const allFilesLoaded = Object.values(localProps.files).every(files => files !== null);
+    display('Waiting for properties... ' +
+        [['user', localProps.userProps], ['general', localProps.generalProps], ['dirs', Object.keys(localProps.files).length]]
+            .map(([name, ok]) => `<b>${name}</b> ${ok ? '√' : 'X'}`).join('  '));
 
     // launch when both props are set
-    if (localProps.userProps && localProps.generalProps && allFilesLoaded) {
+    if (localProps.userProps && localProps.generalProps) {
         display('Sending properties...');
 
         // transfer the properties to target location
@@ -89,10 +83,10 @@ function fail(e) {
 }
 
 function display(message) {
-    document.getElementById('message').innerHTML = message;
+    document.getElementById('message').innerHTML += '\n' + message;
 }
 
-display('Waiting for properties initialization...');
+launch();
 </script>
 </body>
 </html>
