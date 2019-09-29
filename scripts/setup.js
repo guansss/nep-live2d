@@ -68,24 +68,34 @@ async function setupProjectJSON() {
  * @return {Promise<boolean>} True if dst should be overwritten.
  */
 async function checkConflict(dst, src) {
-    if (fs.existsSync(dst) && !fs.readFileSync(dst).equals(fs.readFileSync(src))) {
-        console.log(chalk.black.bgRed(' CONFLICT '), chalk.red(dst));
-        await confirm(OVERWRITE_MESSAGE);
-        return true;
+    if (fs.existsSync(dst)) {
+        if (!fs.readFileSync(dst).equals(fs.readFileSync(src))) {
+            console.log(chalk.black.bgRed(' CONFLICT '), chalk.red(dst));
+            await confirm(OVERWRITE_MESSAGE);
+            return true;
+        }
+
+        console.log(chalk.black.bgGreen(' SKIP '), chalk.green(dst));
+        return false;
     }
-    console.log(chalk.black.bgGreen(' SKIP '), chalk.green(dst));
+    return true;
 }
 
 /**
  * @return {Promise<boolean>} True if dst should be overwritten.
  */
 async function checkConflictByContent(dst, content) {
-    if (fs.existsSync(dst) && fs.readFileSync(dst, 'utf-8') !== content) {
-        console.log(chalk.black.bgRed(' CONFLICT '), chalk.red(dst));
-        await confirm(OVERWRITE_MESSAGE);
-        return true;
+    if (fs.existsSync(dst)) {
+        if (fs.readFileSync(dst, 'utf-8') !== content) {
+            console.log(chalk.black.bgRed(' CONFLICT '), chalk.red(dst));
+            await confirm(OVERWRITE_MESSAGE);
+            return true;
+        }
+
+        console.log(chalk.black.bgGreen(' SKIP '), chalk.green(dst));
+        return false;
     }
-    console.log(chalk.black.bgGreen(' SKIP '), chalk.green(dst));
+    return true;
 }
 
 async function confirm(message) {
