@@ -82,6 +82,6 @@ function updateRemoteProperty(propName: string, value: string) {
 
 function updateRemoteFiles(propName: string, files: string[], allFiles: string[]) {
     postJSON('/props', {
-        files: { [propName]: allFiles },
+        files: { [propName]: allFiles.map(file => file.slice('file://'.length)) },
     }).catch();
 }
