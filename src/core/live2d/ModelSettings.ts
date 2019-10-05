@@ -37,6 +37,7 @@ export default class ModelSettings {
 
     // files
     readonly model: string = '';
+    readonly preview?: string;
     readonly pose?: string;
     readonly physics?: string;
     readonly subtitle?: string;
@@ -90,6 +91,7 @@ export default class ModelSettings {
 
         copyProperty(this, json, 'name', 'string');
         copyProperty(this, json, 'pose', 'string');
+        copyProperty(this, json, 'preview', 'string');
         copyProperty(this, json, 'physics', 'string');
         copyProperty(this, json, 'subtitle', 'string');
 
@@ -176,6 +178,7 @@ export default class ModelSettings {
         };
 
         convertProperty(this, 'model');
+        convertProperty(this, 'preview');
         convertProperty(this, 'pose');
         convertProperty(this, 'physics');
         convertProperty(this, 'subtitle');

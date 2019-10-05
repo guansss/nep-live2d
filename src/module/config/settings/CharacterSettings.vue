@@ -69,13 +69,11 @@ class ModelEntity {
     attach(live2dModel: Live2DModel) {
         this.loaded = true;
         this.name = live2dModel.name;
+        this.preview = live2dModel.modelSettings.preview;
         this.width = live2dModel.width;
         this.height = live2dModel.height;
 
         this.config = this.config || new SavedModel(live2dModel.uid, live2dModel.modelSettings.path);
-
-        // TODO: make preview
-        // this.preview = live2dModel.modelSettings.preview;
     }
 }
 
@@ -222,7 +220,7 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
         box-shadow 0 1px 6px #0005
 
     &.selected
-        border 2px solid var(--accentColor)
+        border-color var(--accentColor)
         cursor default
 
 .details
