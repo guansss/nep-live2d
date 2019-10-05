@@ -43,6 +43,7 @@ $height = 20px
     width $height * 2
     height $height
     background-color #0001
+    box-shadow inset 0 0 4px #0002
     transition background-color .1s
 
     &:hover
