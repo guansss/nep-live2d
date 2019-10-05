@@ -7,6 +7,10 @@ import MotionManager from '@/core/live2d/MotionManager';
 import { log } from '@/core/utils/log';
 import { randomID } from '@/core/utils/string';
 
+function generateUID() {
+    return Date.now();
+}
+
 export default class Live2DModel {
     tag = 'Live2DModel(uninitialized)';
 
@@ -31,16 +35,20 @@ export default class Live2DModel {
     focusX = 0;
     focusY = 0;
 
-    static async create(file: string) {
+    static async create(file: string, uid = generateUID()) {
         const modelSettings = await loadModelSettings(file);
         if (!modelSettings) throw `Failed to load model settings from "${file}"`;
 
         const internalModel = await loadModel(modelSettings.model);
 
-        return new Live2DModel(internalModel!, modelSettings);
+        return new Live2DModel(internalModel!, modelSettings, uid);
     }
 
-    private constructor(readonly internalModel: Live2DModelWebGL, public modelSettings: ModelSettings) {
+    private constructor(
+        readonly internalModel: Live2DModelWebGL,
+        public modelSettings: ModelSettings,
+        readonly uid: number,
+    ) {
         this.name = modelSettings.name || randomID();
         this.tag = `Live2DModel(${this.name})`;
 

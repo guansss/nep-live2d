@@ -1,29 +1,32 @@
 <template>
-    <div class="file-input card">
-        <input :multiple="multiple" type="file" accept="image/*" @change="change" />
-        <ImagePlusSVG class="svg" />
+    <div class="file-input">
+        <input :multiple="multiple" type="file" :accept="accept" @change="change" />
+        <PlusSVG class="svg" />
     </div>
 </template>
 
 <script lang="ts">
-import ImagePlusSVG from '@/assets/img/image-plus.svg';
+import PlusSVG from '@/assets/img/plus.svg';
 import Vue from 'vue';
 import { Component, Model, Prop } from 'vue-property-decorator';
 
 @Component({
-    components: { ImagePlusSVG },
+    components: { PlusSVG },
 })
 export default class FileInput extends Vue {
-    @Model('change', { default: [] }) readonly files!: File[];
+    @Model('change', { default: undefined }) readonly files!: File[] | File | null;
 
     @Prop({ default: false, type: Boolean }) readonly multiple!: boolean;
+    @Prop({ default: '', type: String }) readonly accept!: string;
 
     change(e: Event) {
-        const fileList = (e.target as HTMLInputElement).files;
-        this.$emit('change', fileList ? [...fileList] : []);
+        const input = e.target as HTMLInputElement;
+        const files = input.files || [];
+
+        this.$emit('change', this.multiple ? [...files] : files[0] || null);
 
         // reset the input, otherwise its "change" event will never be triggered when user selects same file(s) again
-        (e.target as HTMLInputElement).value = '';
+        input.value = '';
     }
 }
 </script>
@@ -35,12 +38,7 @@ export default class FileInput extends Vue {
     position relative
     width 96px
     height 32px
-    padding 4px
-    background #EEE
-    transition background-color .15s ease-out
-
-    &:hover
-        background #CCC
+    padding 16%
 
     input
         position absolute

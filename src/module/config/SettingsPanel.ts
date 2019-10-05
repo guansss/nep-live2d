@@ -3,6 +3,7 @@ import ConfigModule from '@/module/config/ConfigModule';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
 import Scrollable from '@/module/config/reusable/Scrollable.vue';
 import BackgroundSettings from '@/module/config/settings/BackgroundSettings.vue';
+import CharacterSettings from '@/module/config/settings/CharacterSettings.vue';
 import EffectsSettings from '@/module/config/settings/EffectsSettings.vue';
 import GeneralSettings from '@/module/config/settings/GeneralSettings.vue';
 import LogSettings from '@/module/config/settings/LogSettings.vue';
@@ -21,7 +22,7 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     @Ref('resizer') readonly resizer!: HTMLDivElement;
     @Ref('page') readonly pageComponent!: Vue;
 
-    readonly pages = [GeneralSettings, BackgroundSettings, EffectsSettings, LogSettings];
+    readonly pages = [GeneralSettings, CharacterSettings, BackgroundSettings, EffectsSettings, LogSettings];
 
     selectedPage = 0;
 

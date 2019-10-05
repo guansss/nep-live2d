@@ -54,9 +54,10 @@ export default class ModelSettings {
 
     /**
      * @param json - The model settings JSON
+     * @param path - Path of model settings file.
      * @param basePath - Base path of the model.
      */
-    constructor(json: any, basePath: string) {
+    constructor(json: any, readonly path: string, readonly basePath: string) {
         if (!(json && typeof json === 'object')) {
             throw new TypeError('Invalid JSON.');
         }

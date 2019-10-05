@@ -51,8 +51,8 @@ export default class Live2DSprite extends DisplayObject {
         this._height = value;
     }
 
-    static async create(modelSettingsFile: string) {
-        const model = await Live2DModel.create(modelSettingsFile);
+    static async create(modelSettingsFile: string, uid?: number) {
+        const model = await Live2DModel.create(modelSettingsFile, uid);
         return new Live2DSprite(model);
     }
 
