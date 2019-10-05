@@ -30,25 +30,20 @@ export default class Live2DSprite extends DisplayObject {
     drawingScaleX = 1;
     drawingScaleY = 1;
 
-    private _width: number;
-    private _height: number;
-
     get width() {
-        return this._width;
+        return this.model.width * this.scale.x;
     }
 
     set width(value) {
-        this.scale.x = value > 0 ? value / this._width : 1;
-        this._width = value;
+        this.scale.x = value > 0 ? value / this.model.width : 1;
     }
 
     get height() {
-        return this._height;
+        return this.model.height * this.scale.y;
     }
 
     set height(value) {
-        this.scale.y = value > 0 ? value / this._height : 1;
-        this._height = value;
+        this.scale.y = value > 0 ? value / this.model.height : 1;
     }
 
     static async create(modelSettingsFile: string, uid?: number) {
@@ -58,9 +53,6 @@ export default class Live2DSprite extends DisplayObject {
 
     private constructor(public model: Live2DModel) {
         super();
-
-        this._width = model.width;
-        this._height = model.height;
 
         this.textures = model.modelSettings.textures.map(file => {
             const texture = Texture.from(file);
