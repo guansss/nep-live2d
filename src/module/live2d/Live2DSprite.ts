@@ -1,6 +1,6 @@
 import Live2DModel from '@/core/live2d/Live2DModel';
 import { Renderer, Texture } from '@pixi/core';
-import { DisplayObject } from '@pixi/display';
+import { Container } from '@pixi/display';
 
 interface ExposedTextureSystem extends PIXI.systems.TextureSystem {
     initTexture(texture: PIXI.BaseTexture): PIXI.GLTexture;
@@ -14,7 +14,7 @@ interface ExposedRenderer extends Renderer {
     CONTEXT_UID: number;
 }
 
-export default class Live2DSprite extends DisplayObject {
+export default class Live2DSprite extends Container {
     textures: Texture[];
 
     // temporary 4x4 matrix
@@ -29,22 +29,6 @@ export default class Live2DSprite extends DisplayObject {
     /** The scale from WebGL's context size to model's logical size. */
     drawingScaleX = 1;
     drawingScaleY = 1;
-
-    get width() {
-        return this.model.width * this.scale.x;
-    }
-
-    set width(value) {
-        this.scale.x = value > 0 ? value / this.model.width : 1;
-    }
-
-    get height() {
-        return this.model.height * this.scale.y;
-    }
-
-    set height(value) {
-        this.scale.y = value > 0 ? value / this.model.height : 1;
-    }
 
     static async create(modelSettingsFile: string, uid?: number) {
         const model = await Live2DModel.create(modelSettingsFile, uid);
@@ -91,8 +75,11 @@ export default class Live2DSprite extends DisplayObject {
             .forEach(hitAreaName => this.emit('hit', hitAreaName));
     }
 
-    /** @override */
-    render(renderer: Renderer) {
+    _calculateBounds() {
+        this._bounds.addFrame(this.transform, 0, 0, this.model.width, this.model.height);
+    }
+
+    _render(renderer: Renderer) {
         // must flush the batch system before resetting renderer, otherwise there will be weird issues when using
         //  two or more instances of this sprite with any other batch-able DisplayObjects such as Graphics
         renderer.batch.flush();

@@ -34,7 +34,7 @@
 <script lang="ts" src="./SettingsPanel.ts"></script>
 
 <style scoped lang="stylus">
-@require './reusable/styles'
+@require './reusable/vars'
 
 .settings
     position absolute

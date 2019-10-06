@@ -24,7 +24,7 @@ export default class ToggleSwitch extends Vue {
 </script>
 
 <style scoped lang="stylus">
-@require './styles'
+@require './vars'
 
 $height = 20px
 

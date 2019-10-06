@@ -8,9 +8,13 @@ import get from 'lodash/get';
 import { resolve as urlResolve } from 'url';
 
 export interface App {
+    emit(event: 'live2dDraggable', draggable: boolean): this;
+
     emit(event: 'live2dAdd', path: string, callback?: (error?: Error, model?: Live2DModel) => void): this;
 
     emit(event: 'live2dLoaded', model: Live2DModel): this;
+
+    on(event: 'live2dDraggable', fn: (draggable: boolean) => void, context?: any): this;
 
     on(
         event: 'live2dAdd',
@@ -24,6 +28,8 @@ export interface App {
 export class SavedModel {
     enabled = true;
     scale = 1;
+    x = 0;
+    y = 0;
 
     constructor(readonly uid: number, readonly path: string) {}
 }
@@ -39,6 +45,8 @@ export default class Live2DModule implements Module {
 
     constructor(readonly app: App) {
         this.player = new Live2DPlayer(app.mka!);
+        this.player.dragEnded = sprite => this.savePosition(sprite);
+
         app.mka!.addPlayer('live2d', this.player);
 
         // this.loadModels();
@@ -48,7 +56,8 @@ export default class Live2DModule implements Module {
                 this.loadModels();
             })
             .on('config:model.models', this.modelsUpdated, this)
-            .on('live2dAdd', this.addModel, this);
+            .on('live2dAdd', this.addModel, this)
+            .on('live2dDraggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable));
     }
 
     _loadModels() {
@@ -113,8 +122,26 @@ export default class Live2DModule implements Module {
     }
 
     private configureSprite(sprite: Live2DSprite, saved: SavedModel) {
-        if (sprite.scale.x !== saved.scale) {
-            sprite.scale.x = sprite.scale.y = saved.scale;
+        sprite.scale.x = sprite.scale.y = saved.scale;
+        sprite.x = saved.x;
+        sprite.y = saved.y;
+    }
+
+    private savePosition(sprite: Live2DSprite) {
+        this.saveModel(sprite.model.uid, saved => {
+            saved.x = sprite.x;
+            saved.y = sprite.y;
+        });
+    }
+
+    private saveModel(uid: number, action: (saved: SavedModel) => void) {
+        const savedModels = get(this.config, 'model.models', []) as SavedModel[];
+        const savedModel = savedModels.find(saved => saved.uid === uid);
+
+        if (savedModel) {
+            action(savedModel);
+
+            this.app.emit('config', 'model.models', savedModels);
         }
     }
 }

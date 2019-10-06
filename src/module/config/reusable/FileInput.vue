@@ -32,13 +32,10 @@ export default class FileInput extends Vue {
 </script>
 
 <style scoped lang="stylus">
-@require './styles'
+@require './vars'
 
 .file-input
     position relative
-    width 96px
-    height 32px
-    padding 16%
 
     input
         position absolute

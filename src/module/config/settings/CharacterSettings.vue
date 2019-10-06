@@ -1,6 +1,13 @@
 <template>
     <div class="model">
         <div class="list">
+            <div class="actions">
+                <div :class="['action general', { selected: !selectedModel }]" @click="selectModel(null)">
+                    <TuneSVG class="icon" />
+                </div>
+                <FileInput class="action" accept=".json" v-model="modelFile" />
+            </div>
+
             <div
                 v-for="(model, i) in models"
                 :key="i"
@@ -10,12 +17,12 @@
                 <img v-if="model.preview" :src="model.preview" class="preview" />
                 <div v-else class="preview-alt">{{ model.name }}</div>
             </div>
-            <div class="item">
-                <FileInput accept=".json" v-model="modelFile" />
-            </div>
         </div>
 
-        <div v-if="selectedModel" class="config">
+        <div v-if="!selectedModel">
+            <ToggleSwitch key="dont reuse!" v-model="draggable">Draggable</ToggleSwitch>
+        </div>
+        <div v-else>
             <details class="details">
                 <summary>Details</summary>
                 <div>{{ details }}</div>
@@ -27,9 +34,8 @@
             </div>
 
             <template v-else>
-                <ToggleSwitch v-model="selectedModel.config.enabled" @change="enableChanged">Enabled</ToggleSwitch>
-                <Slider v-model="selectedModel.config.scale" overlay :min="0.01" :max="1.5"
-                    @change="scaleChanged">Scale
+                <ToggleSwitch v-model="selectedModel.config.enabled" @change="saveModels">Enabled</ToggleSwitch>
+                <Slider v-model="selectedModel.config.scale" overlay :min="0.01" :max="1.5" @change="saveModels">Scale
                 </Slider>
             </template>
         </div>
@@ -37,6 +43,7 @@
 </template>
 
 <script lang="ts">
+import TuneSVG from '@/assets/img/tune.svg';
 import Live2DModel from '@/core/live2d/Live2DModel';
 import ConfigModule, { Config } from '@/module/config/ConfigModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
@@ -84,7 +91,7 @@ function makePath(fileName: string) {
 }
 
 @Component({
-    components: { ToggleSwitch, FileInput, Slider },
+    components: { TuneSVG, ToggleSwitch, FileInput, Slider },
 })
 export default class CharacterSettings extends Vue {
     static title = 'CHARACTER';
@@ -96,6 +103,8 @@ export default class CharacterSettings extends Vue {
     modelFile: File | null = null;
 
     selectedModel: ModelEntity | null = null;
+
+    draggable = false;
 
     get details() {
         return `File: ${this.selectedModel!.path}
@@ -112,11 +121,15 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
         }
     }
 
+    @Watch('draggable')
+    draggableChanged(value: boolean) {
+        // temporary option, don't save it to config
+        this.configModule.app.emit('live2dDraggable', value);
+    }
+
     @Watch('models')
     modelsChanged(models: ModelEntity[]) {
         if (models.length === 0) this.selectModel(null);
-        // select first model if it is the only one in list
-        else if (models.length === 1 || !this.selectedModel) this.selectModel(this.models[0]);
     }
 
     created() {
@@ -145,7 +158,7 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
                     : err.toString();
             } else if (live2dModel) {
                 model.attach(live2dModel);
-                this.save();
+                this.saveModels();
             }
         });
     }
@@ -158,7 +171,7 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
             model.attach(live2dModel);
 
             this.models.push(model);
-            this.save();
+            this.saveModels();
         } else {
             model.attach(live2dModel);
         }
@@ -168,15 +181,7 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
         this.selectedModel = model;
     }
 
-    enableChanged() {
-        this.save();
-    }
-
-    scaleChanged() {
-        this.save();
-    }
-
-    save() {
+    saveModels() {
         this.configModule.app.emit(
             'config',
             'model.models',
@@ -187,6 +192,44 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
 </script>
 
 <style scoped lang="stylus">
+@require '../reusable/vars'
+
+$itemSize = 144px
+
+$selectableCard
+    @extend $card
+    background #EEE
+    cursor pointer
+    transition background-color .15s ease-out, box-shadow .15s ease-out
+
+    &:hover
+        background-color #FFF
+
+    &.selected
+        @extend $selectableCard:hover
+        border-color var(--accentColor) !important
+        cursor default
+
+.actions
+    display flex
+    margin 8px 0 0 8px
+    width $itemSize
+    height $itemSize
+    flex-flow column
+
+.action
+    @extend $selectableCard
+    flex 1 0 0
+    padding 8px
+
+    &.general
+        margin-bottom 8px
+        border 2px solid transparent
+
+    .icon
+        width 100%
+        height 100%
+
 .list
     display flex
     padding 8px 16px 16px 8px
@@ -194,34 +237,20 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
     background #0002
 
 .item
-    position relative
+    @extend $selectableCard
     margin 8px 0 0 8px
-    width 144px
-    height 144px
-    background #EEE
-    cursor pointer
+    width $itemSize
+    height $itemSize
     border 2px solid transparent
-    box-shadow 0 1px 1px #0001
-    transition background-color .15s ease-out, box-shadow .15s ease-out
 
     .preview
     .preview-alt
-    .file-input
         width 100%
         height 100%
 
     .preview-alt
         display flex
         align-items center
-
-    &:hover
-    &.selected
-        background-color #FFF
-        box-shadow 0 1px 6px #0005
-
-    &.selected
-        border-color var(--accentColor)
-        cursor default
 
 .details
     background #0001

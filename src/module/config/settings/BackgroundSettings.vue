@@ -4,7 +4,7 @@
             <div
                 v-for="image in images"
                 :key="image"
-                :class="['bg-item card', { selected: image === selected }]"
+                :class="['bg-item', { selected: image === selected }]"
                 @click="selectImage(image)"
             >
                 <img class="bg-item-img" :title="image" :src="image" />
@@ -82,7 +82,7 @@ export default class BackgroundSettings extends Vue {
 </script>
 
 <style scoped lang="stylus">
-@require '../reusable/styles'
+@require '../reusable/vars'
 
 .input
     margin 16px 16px 0
@@ -96,6 +96,7 @@ export default class BackgroundSettings extends Vue {
     grid-gap 8px
 
 .bg-item
+    @extend $card
     position relative
     cursor pointer
 

@@ -1,7 +1,8 @@
 import autobind from 'autobind-decorator';
 import debounce from 'lodash/debounce';
-import throttle from 'lodash/throttle';
 import Cancelable = _.Cancelable;
+
+const DEAD_ZONE = 2;
 
 export default class MouseHandler {
     readonly element: HTMLElement;
@@ -14,6 +15,12 @@ export default class MouseHandler {
 
     private pressed = false;
     private dragging = false;
+
+    focusing = !this.focusOnPress;
+
+    draggable = false;
+    lastX = 0;
+    lastY = 0;
 
     constructor(element: HTMLElement) {
         this.element = element;
@@ -28,21 +35,15 @@ export default class MouseHandler {
     }
 
     addGeneralListeners() {
-        this.element.addEventListener('mousedown', this.mouseDown, { passive: true });
-        this.element.addEventListener('mouseup', this.mouseUp, { passive: true });
-        this.element.addEventListener('mouseout', this.mouseOut, { passive: true });
-
-        // maybe adding these will make it support mobile browsers?
-        // (will also require handling 'touchmove' and ignoring `button` property for touch events)
-        //
-        // element.addEventListener('touchstart', e => this.mouseDown(e), { passive: true });
-        // element.addEventListener('touchend', e => this.mouseUp(e), { passive: true });
+        this.element.addEventListener('mousedown', this.mouseDown);
+        this.element.addEventListener('mouseup', this.mouseUp);
+        this.element.addEventListener('mouseleave', this.mouseLeave);
     }
 
     removeGeneralListeners() {
         this.element.removeEventListener('mousedown', this.mouseDown);
         this.element.removeEventListener('mouseup', this.mouseUp);
-        this.element.removeEventListener('mouseout', this.mouseOut);
+        this.element.removeEventListener('mouseleave', this.mouseLeave);
     }
 
     addMouseMoveListener() {
@@ -58,26 +59,53 @@ export default class MouseHandler {
         // only handle left mouse button
         if (e.button !== 0) return;
 
+        this.pressed = true;
+        this.focusing = true;
+        this.lastX = e.clientX;
+        this.lastY = e.clientY;
+
         this.focus(e.clientX, e.clientY);
 
-        this.pressed = true;
-        this.dragging = false;
+        this.addMouseMoveListener();
 
-        if (this.focusOnPress) {
-            this.addMouseMoveListener();
-        } else {
+        if (!this.focusOnPress) {
             this.cancelLoseFocus();
         }
     }
 
-    mouseMove = throttle((e: MouseEvent) => {
-        this.dragging = true;
+    @autobind
+    mouseMove(e: MouseEvent) {
+        const movedX = e.clientX - this.lastX;
+        const movedY = e.clientY - this.lastY;
+
+        this.focusing = true;
         this.focus(e.clientX, e.clientY);
 
-        if (!this.pressed && !this.focusOnPress) {
+        if (this.pressed) {
+            if (
+                this.dragging ||
+                movedX > DEAD_ZONE ||
+                movedX < -DEAD_ZONE ||
+                movedY > DEAD_ZONE ||
+                movedY < -DEAD_ZONE
+            ) {
+                if (this.draggable) {
+                    if (!this.dragging) {
+                        this.dragStart(this.lastX, this.lastY);
+                    } else {
+                        this.dragMove(e.clientX, e.clientY, movedX, movedY);
+                    }
+
+                    this.lastX = e.clientX;
+                    this.lastY = e.clientY;
+                }
+
+                this.dragging = true;
+            }
+        } else if (!this.focusOnPress) {
             this.loseFocus();
         }
-    }, 10);
+    }
 
     @autobind
     mouseUp(e: MouseEvent) {
@@ -92,9 +120,11 @@ export default class MouseHandler {
                 this.clearFocus();
             }
 
-            // detect single click
-            if (!this.dragging) {
-                this.press(e.clientX, e.clientY);
+            if (this.dragging) {
+                this.dragging = false;
+                this.dragEnd();
+            } else {
+                this.click(e.clientX, e.clientY);
             }
         }
     }
@@ -103,21 +133,17 @@ export default class MouseHandler {
      * Will be triggered when cursor leaves the element
      */
     @autobind
-    mouseOut(e: MouseEvent) {
+    mouseLeave(e: MouseEvent) {
         if (!this.focusOnPress) {
             this.clearFocus();
+            this.mouseUp(e);
+        } else if (this.dragging) {
             this.mouseUp(e);
         }
     }
 
-    // to be overridden
-    focus(x: number, y: number) {}
-
-    // to be overridden
-    press(x: number, y: number) {}
-
     clearFocus() {
-        this.focus(0, 0);
+        this.focusing = false;
     }
 
     // must be initialized by calling `updateLoseFocus()` in constructor
@@ -143,6 +169,7 @@ export default class MouseHandler {
                 this.cancelLoseFocus();
                 this.clearFocus();
             } else {
+                this.focusing = true;
                 this.addMouseMoveListener();
             }
         }
@@ -162,4 +189,15 @@ export default class MouseHandler {
         this.removeGeneralListeners();
         this.removeMouseMoveListener();
     }
+
+    // to be overridden
+    focus(x: number, y: number) {}
+
+    click(x: number, y: number) {}
+
+    dragStart(x: number, y: number) {}
+
+    dragMove(x: number, y: number, dx: number, dy: number) {}
+
+    dragEnd() {}
 }
