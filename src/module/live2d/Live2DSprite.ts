@@ -93,6 +93,10 @@ export default class Live2DSprite extends DisplayObject {
 
     /** @override */
     render(renderer: Renderer) {
+        // must flush the batch system before resetting renderer, otherwise there will be weird issues when using
+        //  two or more instances of this sprite with any other batch-able DisplayObjects such as Graphics
+        renderer.batch.flush();
+
         // IMPORTANT: resetting the renderer is the only way to make Live2D core's drawing methods
         //  compatible with Pixi's drawing system
         renderer.reset();
