@@ -53,7 +53,7 @@ export default class Live2DModule implements Module {
 
         app.on('configInit', (config: Config) => {
                 this.config = config;
-                this.loadModels();
+                this.loadSavedModels();
             })
             .on('config:model.models', this.modelsUpdated, this)
             .on('live2dAdd', this.addModel, this)
@@ -69,15 +69,17 @@ export default class Live2DModule implements Module {
         }
     }
 
-    private loadModels() {
+    private loadSavedModels() {
         const savedModels = get(this.config, 'model.models', []) as SavedModel[];
 
         savedModels.forEach(async saved => {
-            try {
-                const sprite = await this.loadModel(saved.path, saved.uid);
-                this.configureSprite(sprite, saved);
-            } catch (e) {
-                error(TAG, e);
+            if (saved.enabled) {
+                try {
+                    const sprite = await this.loadModel(saved.path, saved.uid);
+                    this.configureSprite(sprite, saved);
+                } catch (e) {
+                    error(TAG, e);
+                }
             }
         });
     }
@@ -115,9 +117,25 @@ export default class Live2DModule implements Module {
     }
 
     private modelsUpdated(savedModels: SavedModel[]) {
-        savedModels.forEach(saved => {
-            const sprite = this.player.sprites.find(sprite => sprite.model.uid === saved.uid);
-            if (sprite) this.configureSprite(sprite, saved);
+        savedModels.forEach(async saved => {
+            let sprite = this.player.sprites.find(sprite => sprite.model.uid === saved.uid);
+
+            if (saved.enabled) {
+                if (!sprite) {
+                    sprite = await this.loadModel(saved.path, saved.uid);
+                }
+                this.configureSprite(sprite, saved);
+            } else if (sprite) {
+                // remove sprites whose model is disabled
+                this.player.removeSprite(sprite);
+            }
+        });
+
+        // remove sprites whose model no longer exists in savedModels
+        this.player.sprites.forEach(sprite => {
+            if (!savedModels.find(saved => saved.uid === sprite.model.uid)) {
+                this.player.removeSprite(sprite);
+            }
         });
     }
 

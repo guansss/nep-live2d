@@ -99,13 +99,10 @@ export default class Live2DPlayer extends Player {
         return sprite;
     }
 
-    removeSprite(index: number) {
-        if (this.sprites[index]) {
-            const sprite = this.sprites[index];
-            this.container.removeChild(sprite);
-            this.sprites.splice(index, 1);
-            sprite.destroy();
-        }
+    removeSprite(sprite: Live2DSprite) {
+        this.container.removeChild(sprite);
+        this.sprites.splice(this.sprites.indexOf(sprite), 1);
+        sprite.destroy();
     }
 
     /** @override */

@@ -29,12 +29,12 @@
             </details>
 
             <div v-if="selectedModel.error" class="error">{{ selectedModel.error }}</div>
-            <div v-else-if="!selectedModel.loaded">
+            <div v-else-if="selectedModel.loading">
                 Loading...<br /><br />If loading never finishes, you can check the logs for details.
             </div>
 
             <template v-else>
-                <ToggleSwitch v-model="selectedModel.config.enabled" @change="saveModels">Enabled</ToggleSwitch>
+                <ToggleSwitch v-model="selectedModel.config.enabled" @change="enableChanged">Enabled</ToggleSwitch>
                 <Slider v-model="selectedModel.config.scale" overlay :min="0.01" :max="1.5" @change="saveModels">Scale
                 </Slider>
             </template>
@@ -64,6 +64,10 @@ class ModelEntity {
 
     loaded = false;
     error?: string;
+
+    get loading() {
+        return (this.config ? this.config.enabled : true) && !this.loaded && !this.error;
+    }
 
     config?: SavedModel;
 
@@ -179,6 +183,13 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
 
     selectModel(model: ModelEntity | null) {
         this.selectedModel = model;
+    }
+
+    enableChanged(value: boolean) {
+        if (!value) {
+            this.selectedModel!.loaded = false;
+        }
+        this.saveModels();
     }
 
     saveModels() {
