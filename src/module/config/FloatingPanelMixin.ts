@@ -104,7 +104,7 @@ export default class FloatingPanelMixin extends Vue {
     private setupContent() {
         // setup draggable for panel mode
         if (this.content) {
-            const handleDraggable = new Draggable(this.handle, undefined, 2);
+            const handleDraggable = new Draggable(this.handle, undefined, 2, false);
 
             handleDraggable.onDrag = (e: MouseEvent) => {
                 this.panelTop += e._movementY;

@@ -1,8 +1,8 @@
 <template>
     <div ref="settings" :class="['settings', stateClass, { snapped }]" :style="panelStyle">
         <div v-if="expanded" ref="content" class="content">
-            <div class="toolbar" ref="toolbar">
-                <div class="tabs">
+            <div class="toolbar">
+                <div class="tabs" ref="tabs">
                     <div
                         v-for="(page, i) in pages"
                         :key="page.title"
@@ -102,6 +102,7 @@
 
 .tabs
     display flex
+    flex-grow 1
 
 .tab
     z-index 1

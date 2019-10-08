@@ -18,7 +18,7 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
 
     @Ref('settings') readonly panel!: HTMLDivElement;
     @Ref('content') readonly content!: HTMLDivElement;
-    @Ref('toolbar') readonly handle!: HTMLDivElement;
+    @Ref('tabs') readonly handle!: HTMLDivElement;
     @Ref('resizer') readonly resizer!: HTMLDivElement;
     @Ref('page') readonly pageComponent!: Vue;
 
