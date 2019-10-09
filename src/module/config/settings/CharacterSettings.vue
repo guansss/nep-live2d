@@ -110,7 +110,7 @@ export default class CharacterSettings extends Vue {
 
     selectedModel: ModelEntity | null = null;
 
-    draggable = this.configModule.getConfig('model.draggable', false);
+    draggable = this.configModule.getConfig('live2d.draggable', false);
 
     get details() {
         return `File: ${this.selectedModel!.path}
@@ -129,7 +129,7 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
 
     @Watch('draggable')
     draggableChanged(value: boolean) {
-        this.configModule.app.emit('config', 'model.draggable', value, true);
+        this.configModule.app.emit('config', 'live2d.draggable', value, true);
     }
 
     @Watch('models')
@@ -140,7 +140,7 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
     created() {
         this.configModule.app
             .on('configReady', (config: Config) => {
-                const savedModels = get(config, 'model.models', []) as SavedModel[];
+                const savedModels = get(config, 'live2d.models', []) as SavedModel[];
                 this.models = savedModels.map(saved => new ModelEntity(saved.path, saved));
             })
             .on('live2dLoaded', this.modelLoaded, this);
@@ -196,7 +196,7 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
     saveModels() {
         this.configModule.app.emit(
             'config',
-            'model.models',
+            'live2d.models',
             this.models.map(model => model.config).filter(config => !!config),
         );
     }

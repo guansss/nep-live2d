@@ -55,9 +55,9 @@ export default class Live2DModule implements Module {
                 this.config = config;
                 this.loadSavedModels();
             })
-            .on('config:model.models', this.modelsUpdated, this)
-            .on('live2dAdd', this.addModel, this)
-            .on('config:model.draggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable));
+            .on('config:live2d.models', this.modelsUpdated, this)
+            .on('config:live2d.draggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable))
+            .on('live2dAdd', this.addModel, this);
     }
 
     _loadModels() {
@@ -70,7 +70,7 @@ export default class Live2DModule implements Module {
     }
 
     private loadSavedModels() {
-        const savedModels = get(this.config, 'model.models', []) as SavedModel[];
+        const savedModels = get(this.config, 'live2d.models', []) as SavedModel[];
 
         savedModels.forEach(async saved => {
             if (saved.enabled) {
@@ -100,11 +100,11 @@ export default class Live2DModule implements Module {
             await this.loadModel(path, undefined, (model: Live2DModel) => {
                 if (this.config) {
                     // save the model if not been saved
-                    const savedModels = get(this.config, 'model.models', []) as SavedModel[];
+                    const savedModels = get(this.config, 'live2d.models', []) as SavedModel[];
 
                     if (!savedModels.find(saved => saved.uid === model.uid)) {
                         savedModels.push(new SavedModel(model.uid, path));
-                        this.app.emit('config:model.models', savedModels);
+                        this.app.emit('config:live2d.models', savedModels);
                     }
                 }
 
@@ -153,13 +153,13 @@ export default class Live2DModule implements Module {
     }
 
     private saveModel(uid: number, action: (saved: SavedModel) => void) {
-        const savedModels = get(this.config, 'model.models', []) as SavedModel[];
+        const savedModels = get(this.config, 'live2d.models', []) as SavedModel[];
         const savedModel = savedModels.find(saved => saved.uid === uid);
 
         if (savedModel) {
             action(savedModel);
 
-            this.app.emit('config', 'model.models', savedModels);
+            this.app.emit('config', 'live2d.models', savedModels);
         }
     }
 }
