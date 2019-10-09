@@ -6,6 +6,8 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 
 export interface Config {
+    runtime: { [key: string]: any };
+
     [key: string]: any;
 }
 
@@ -19,7 +21,7 @@ export interface App {
 
     on(event: 'config:{path}', fn: (value: any, oldValue: any, config: Config) => void, context?: any): this;
 
-    on(event: 'config', fn: (path: string, value: any) => void, context?: any): this;
+    on(event: 'config', fn: (path: string, value: any, runtime?: boolean) => void, context?: any): this;
 
     emit(event: 'init'): this;
 
@@ -29,7 +31,7 @@ export interface App {
 
     emit(event: 'config:{path}', value: any, oldValue: any, config: Config): this;
 
-    emit(event: 'config', path: string, value: any): this;
+    emit(event: 'config', path: string, value: any, runtime?: boolean): this;
 }
 
 const TAG = 'ConfigModule';
@@ -39,7 +41,10 @@ export default class ConfigModule implements Module {
 
     storageKey = 'config';
 
-    readonly config: Config = {};
+    readonly config: Config = {
+        // runtime object won't be saved into localStorage
+        runtime: {},
+    };
 
     constructor(readonly app: App) {
         this.read();
@@ -65,23 +70,26 @@ export default class ConfigModule implements Module {
         }
     }
 
-    setConfig(path: string, value: any) {
-        const oldValue = get(this.config, path, undefined);
+    setConfig(path: string, value: any, runtime = false) {
+        const target = runtime ? this.config.runtime : this.config;
 
-        set(this.config, path, value);
-        this.save();
+        const oldValue = get(target, path, undefined);
+
+        set(target, path, value);
+
+        if (!runtime) this.save();
 
         this.app.emit('config:' + path, value, oldValue, this.config);
         this.app.emit('config:*', path, value, oldValue, this.config);
     }
 
     getConfig(path: string, defaultValue: any) {
-        return get(this.config, path, defaultValue);
+        return get(this.config, path, defaultValue) || get(this.config.runtime, path, defaultValue);
     }
 
     read() {
         try {
-            const json = localStorage.getItem(this.storageKey) || '{}';
+            const json = localStorage.getItem(this.storageKey);
 
             if (json) {
                 Object.assign(this.config, JSON.parse(json));
@@ -93,7 +101,9 @@ export default class ConfigModule implements Module {
 
     save(): boolean {
         try {
-            localStorage.setItem(this.storageKey, JSON.stringify(this.config));
+            const saving = Object.assign({}, this.config);
+            delete saving.runtime;
+            localStorage.setItem(this.storageKey, JSON.stringify(saving));
             return true;
         } catch (e) {
             error(TAG, e);
