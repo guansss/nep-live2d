@@ -6,17 +6,18 @@
                     <div
                         v-for="(page, i) in pages"
                         :key="page.title"
-                        :class="['tab selectable', { selected: i === selectedPage }]"
+                        :class="['tab icon selectable', { selected: i === selectedPage }]"
                         @click="selectPage(i)"
                     >
-                        {{ page.title }}
+                        <component :is="page.ICON" class="svg" />
+                        <div class="title">{{ page.TITLE }}</div>
                     </div>
                 </div>
-                <div class="selectable right" @click="refresh">
-                    <div class="refresh"></div>
+                <div class="selectable icon" @click.stop="refresh">
+                    <RefreshSVG />
                 </div>
-                <div class="selectable" @click="close">
-                    <div class="close"></div>
+                <div class="selectable icon" @click.stop="close">
+                    <CloseSVG />
                 </div>
             </div>
 
@@ -35,6 +36,8 @@
 
 <style scoped lang="stylus">
 @require './reusable/vars'
+
+$toolbarHeight = 32px
 
 .settings
     position absolute
@@ -69,10 +72,10 @@
 
 .selectable
     cursor pointer
-    transition background-color .1s, color .1s
+    transition background-color .15s, color .15s
 
     &.selected
-        color #EEE
+        color #FFF
         background-color $themeColor !important
         cursor default
 
@@ -82,7 +85,6 @@
 .toolbar
     position relative
     display flex
-    height 36px
     overflow hidden
     background-color rgba($themeColor, 0.1)
     cursor move
@@ -100,14 +102,45 @@
     .right
         margin-left auto
 
+.icon
+    width $toolbarHeight
+    height $toolbarHeight
+    padding 4px
+
+    svg
+        width $toolbarHeight - 2 * 4px
+        height $toolbarHeight - 2 * 4px
+
+    path
+        fill currentColor
+
 .tabs
     display flex
     flex-grow 1
+    width 0
 
 .tab
     z-index 1
-    padding 0 16px
-    line-height 36px
+    display flex
+    width auto
+    align-items center
+    overflow hidden
+    white-space nowrap
+
+    &:first-child
+        padding-left 14px
+
+    &.selected
+        .title
+            max-width 8 * 12px
+            opacity 1
+
+    .title
+        margin-left 2px
+        max-width 0
+        opacity 0
+        font-size 12px
+        transition max-width .1s linear, opacity .1s ease-out
 
 .resizer
     $size = 12px
@@ -139,71 +172,4 @@
         padding 2px 16px
         background lighten($themeColor, 40%)
         color white
-
-// icons
-
-.close
-    position relative
-    align-self end
-    margin 6px 16px 0
-    width 21px
-    height 21px
-
-    &:before
-        content: '';
-        position: absolute;
-        top: 10px;
-        width: 21px;
-        height: 2px;
-        background-color: currentColor;
-        transform: rotate(-45deg);
-
-    &:after
-        content: '';
-        position: absolute;
-        top: 10px;
-        width: 21px;
-        height: 2px;
-        background-color: currentColor;
-        transform: rotate(45deg);
-
-.refresh
-    position relative
-    margin 8px 16px 0
-    width 18px
-    height 18px
-    border-radius 50%
-    border-top solid 2px currentColor
-    border-right solid 2px transparent
-    border-bottom solid 2px currentColor
-    border-left solid 2px currentColor
-    transform rotate(22.5deg)
-
-    &:before
-        content ''
-        position absolute
-        top -2px
-        left -2px
-        width 14px
-        height 14px
-        border-radius 50%
-        border-top solid 2px transparent
-        border-right solid 2px transparent
-        border-bottom solid 2px currentColor
-        border-left solid 2px transparent
-        transform-origin 50% 50%
-        transform rotate(-60deg)
-
-    &:after
-        content ''
-        position absolute
-        left 10px
-        top -2px
-        width 0
-        height 0
-        border-top solid 4px transparent
-        border-right solid 4px transparent
-        border-bottom solid 4px transparent
-        border-left solid 4px currentColor
-        transform rotate(30deg)
 </style>

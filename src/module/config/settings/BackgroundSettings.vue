@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import CheckSVG from '@/assets/img/check.svg';
+import ImageSVG from '@/assets/img/image.svg';
 import { inWallpaperEngine } from '@/core/utils/misc';
 import ConfigModule from '@/module/config/ConfigModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
@@ -28,7 +29,8 @@ import { Component, Prop } from 'vue-property-decorator';
     components: { Scrollable, FileInput, Slider, CheckSVG },
 })
 export default class BackgroundSettings extends Vue {
-    static title = 'BACKGROUND';
+    static readonly ICON = ImageSVG;
+    static readonly TITLE = 'BACKGROUND';
 
     @Prop() readonly configModule!: ConfigModule;
 

@@ -43,6 +43,7 @@
 </template>
 
 <script lang="ts">
+import FaceSVG from '@/assets/img/face-woman.svg';
 import TuneSVG from '@/assets/img/tune.svg';
 import Live2DModel from '@/core/live2d/Live2DModel';
 import ConfigModule, { Config } from '@/module/config/ConfigModule';
@@ -98,7 +99,8 @@ function makePath(fileName: string) {
     components: { TuneSVG, ToggleSwitch, FileInput, Slider },
 })
 export default class CharacterSettings extends Vue {
-    static title = 'CHARACTER';
+    static readonly ICON = FaceSVG;
+    static readonly TITLE = 'CHARACTER';
 
     @Prop() readonly configModule!: ConfigModule;
 

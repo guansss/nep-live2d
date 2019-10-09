@@ -14,6 +14,7 @@
 </template>
 
 <script lang="ts">
+import ConsoleSVG from '@/assets/img/console.svg';
 import { LogRecord, logs as _logs } from '@/core/utils/log';
 import { randomHSLColor } from '@/core/utils/string';
 import Scrollable from '@/module/config/reusable/Scrollable.vue';
@@ -41,7 +42,8 @@ const cachedColors: { [key: string]: string } = {};
     components: { Scrollable },
 })
 export default class LogSettings extends Vue {
-    static title = 'LOG';
+    static readonly ICON = ConsoleSVG;
+    static readonly TITLE = 'LOG';
 
     logs: ExtendedLogRecord[] = [];
 
