@@ -140,7 +140,7 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
 
     created() {
         this.configModule.app
-            .on('configInit', (config: Config) => {
+            .on('configReady', (config: Config) => {
                 const savedModels = get(config, 'model.models', []) as SavedModel[];
                 this.models = savedModels.map(saved => new ModelEntity(saved.path, saved));
             })

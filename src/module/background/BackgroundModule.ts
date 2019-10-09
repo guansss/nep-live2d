@@ -14,7 +14,7 @@ export default class BackgroundModule implements Module {
     name = 'Background';
 
     constructor(readonly app: App) {
-        app.on('configInit', this.init, this)
+        app.on('configReady', this.init, this)
             .on('bgSelect', this.selectImage, this);
     }
 

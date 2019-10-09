@@ -51,7 +51,7 @@ export default class Live2DModule implements Module {
 
         // this.loadModels();
 
-        app.on('configInit', (config: Config) => {
+        app.on('configReady', (config: Config) => {
                 this.config = config;
                 this.loadSavedModels();
             })

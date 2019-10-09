@@ -1,21 +1,25 @@
 import { App, Module } from '@/App';
+import defaults from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
+import Snow from '@/module/snow/pixi-snow/Snow';
 import SnowPlayer from '@/module/snow/SnowPlayer';
 import debounce from 'lodash/debounce';
 
 export default class SnowModule implements Module {
     name = 'Snow';
 
-    constructor(app: App) {
-        const player = new SnowPlayer();
-        app.mka.addPlayer('snow', player, false);
+    player?: SnowPlayer;
 
-        app.on('configInit', (config: Config) => {
-                if (config.snow) {
-                    player.number = config.snow.number;
+    number = defaults.SNOW_NUMBER;
 
-                    if (config.snow.enabled) app.mka.enablePlayer('snow');
-                }
+    constructor(readonly app: App) {
+        app.on('configReady', (config: Config) => {
+                const snowConfig = config.snow || {};
+                const enabled = snowConfig.enabled === undefined ? defaults.SNOW_ENABLED : snowConfig.enabled;
+
+                this.number = snowConfig.number || this.number;
+
+                if (enabled) this.setup();
             })
             .on('config:snow.enabled', (enabled: boolean) => {
                 if (enabled) app.mka.enablePlayer('snow');
@@ -24,8 +28,19 @@ export default class SnowModule implements Module {
             .on(
                 'config:snow.number',
                 debounce((value: number) => {
-                    player.number = value;
+                    this.number = value;
+
+                    this.player && (this.player.number = value);
                 }, 200),
             );
+    }
+
+    private setup() {
+        if (!this.player) {
+            this.player = new SnowPlayer();
+            this.player.number = this.number;
+
+            this.app.mka.addPlayer('snow', this.player, true);
+        }
     }
 }

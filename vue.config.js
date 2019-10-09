@@ -1,5 +1,6 @@
 const path = require('path');
 const merge = require('lodash/merge');
+const webpack = require('webpack');
 
 module.exports = {
     productionSourceMap: false,
@@ -39,6 +40,14 @@ module.exports = {
         },
     },
     chainWebpack(config) {
+        // embed the version number in package.json
+        // see https://github.com/webpack/webpack/issues/237
+        // and https://stackoverflow.com/questions/53076540/vue-js-webpack-problem-cant-add-plugin-to-vue-config-js-with-configurewebpack
+        config.plugin('define').tap(args => {
+            args[0]['process.env'].VERSION = JSON.stringify(process.env.npm_package_version);
+            return args;
+        });
+
         const svgRule = config.module.rule('svg');
 
         svgRule.uses.clear();

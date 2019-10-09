@@ -10,12 +10,20 @@ export interface Config {
 }
 
 export interface App {
-    on(event: 'configInit', fn: (config: Config) => void, context?: any): this;
+    on(event: 'init', fn: () => void, context?: any): this;
+
+    on(event: 'configReady', fn: (config: Config) => void, context?: any): this;
 
     // Will be emitted on each update of config
     on(event: 'config:*', fn: (path: string, value: any, oldValue: any, config: Config) => void, context?: any): this;
 
     on(event: 'config:{path}', fn: (value: any, oldValue: any, config: Config) => void, context?: any): this;
+
+    on(event: 'config', fn: (path: string, value: any) => void, context?: any): this;
+
+    emit(event: 'init'): this;
+
+    emit(event: 'configReady', config: Config): this;
 
     emit(event: 'config:*', path: string, value: any, oldValue: any, config: Config): this;
 
@@ -26,9 +34,6 @@ export interface App {
 
 const TAG = 'ConfigModule';
 
-/**
- * Handles configurations, must be installed before other modules that listen for `configInit` events.
- */
 export default class ConfigModule implements Module {
     name = 'Config';
 
@@ -41,18 +46,23 @@ export default class ConfigModule implements Module {
 
         app.on('config', this.setConfig, this);
 
-        // immediately call listener of `configInit` when it's added
+        // immediately call listener of "configReady" when it's added
         app.on('newListener', (event: string, listener: EventEntity, context: any) => {
-            if (event === 'configInit') {
+            if (event === 'configReady') {
                 listener.fn.call(listener.context, this.config);
 
                 if (listener.once) app.off(event, listener.fn, undefined, true);
             }
         });
 
-        app.emit('configInit', this.config);
+        app.emit('configReady', this.config);
 
         app.addComponent(SettingsPanel, { configModule: () => this }).then();
+
+        if (!localStorage.v) {
+            app.emit('init');
+            localStorage.v = process.env.VERSION;
+        }
     }
 
     setConfig(path: string, value: any) {

@@ -11,7 +11,7 @@ const TAG = 'SnowPlayer';
 export default class SnowPlayer extends Player {
     private snow?: Snow;
 
-    private _number = 1000;
+    private _number = 0;
 
     get number() {
         return this.snow ? this.snow.number : this._number;
