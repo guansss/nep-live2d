@@ -9,6 +9,9 @@ const TRANSFORM_EASING = 'cubic-bezier(0.4, 0.0, 0.2, 1)';
 const SNAP_DISTANCE_X = 150;
 const SNAP_DISTANCE_Y = 150;
 
+const PANEL_WIDTH = Math.min(600, innerWidth);
+const PANEL_HEIGHT = Math.min(450, innerHeight);
+
 @Component
 export default class FloatingPanelMixin extends Vue {
     // Refs
@@ -23,16 +26,16 @@ export default class FloatingPanelMixin extends Vue {
     snapped = false;
 
     switchTop = 0;
-    switchLeft = 0;
+    switchLeft = innerWidth; // snap to right please!
     switchWidth = 64;
     switchHeight = 64;
     switchBorderRadius = '50%';
     switchTransform = '';
 
-    panelTop = 0;
-    panelLeft = 0;
-    panelWidth = 600;
-    panelHeight = 450;
+    panelTop = (innerHeight - PANEL_HEIGHT) / 2; // center in screen
+    panelLeft = (innerWidth - PANEL_WIDTH) / 2;
+    panelWidth = PANEL_WIDTH;
+    panelHeight = PANEL_HEIGHT;
     panelBorderRadius = '2px';
 
     transformAnimDuration = 300;

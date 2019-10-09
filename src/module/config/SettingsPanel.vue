@@ -20,7 +20,7 @@
 
             <Scrollable class="page">
                 <keep-alive>
-                    <component :is="currentPage" ref="page" v-bind="{ configModule: cachedConfigModule }" />
+                    <component :is="currentPage" ref="page" v-bind="{ configModule: _configModule }" />
                 </keep-alive>
             </Scrollable>
 

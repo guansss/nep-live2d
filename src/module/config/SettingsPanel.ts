@@ -31,26 +31,29 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
         return this.pages[this.selectedPage];
     }
 
-    get cachedConfigModule() {
+    get _configModule() {
+        // cache ConfigModule so we don't need to call the getter function every time
         return this.configModule();
     }
 
-    protected mounted() {
-        this.cachedConfigModule.app.on('we:schemecolor', (color: string) => {
+    created() {
+        this.switchTop = this._configModule.getConfig('settings.switchTop', this.switchTop);
+        this.switchLeft = this._configModule.getConfig('settings.switchLeft', this.switchLeft);
+
+        this.panelTop = this._configModule.getConfig('settings.panelTop', this.panelTop);
+        this.panelLeft = this._configModule.getConfig('settings.panelLeft', this.panelLeft);
+        this.panelWidth = this._configModule.getConfig('settings.panelWidth', this.panelWidth);
+        this.panelHeight = this._configModule.getConfig('settings.panelHeight', this.panelHeight);
+    }
+
+    mounted() {
+        this._configModule.app.on('we:schemecolor', (color: string) => {
             const rgb = color
                 .split(' ')
                 .map(float => ~~(parseFloat(float) * 255))
                 .join(',');
             document.documentElement.style.setProperty('--accentColor', `rgb(${rgb})`);
         });
-
-        this.switchTop = this.cachedConfigModule.getConfig('settings.switchTop', this.switchTop);
-        this.switchLeft = this.cachedConfigModule.getConfig('settings.switchLeft', this.switchLeft);
-
-        this.panelTop = this.cachedConfigModule.getConfig('settings.panelTop', this.panelTop);
-        this.panelLeft = this.cachedConfigModule.getConfig('settings.panelLeft', this.panelLeft);
-        this.panelWidth = this.cachedConfigModule.getConfig('settings.panelWidth', this.panelWidth);
-        this.panelHeight = this.cachedConfigModule.getConfig('settings.panelHeight', this.panelHeight);
     }
 
     async selectPage(index: number) {
@@ -61,27 +64,27 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
         this.afterOpen();
     }
 
-    protected switchMoveEnded() {
-        this.cachedConfigModule.setConfig('settings.switchTop', this.switchTop);
-        this.cachedConfigModule.setConfig('settings.switchLeft', this.switchLeft);
+    switchMoveEnded() {
+        this._configModule.setConfig('settings.switchTop', this.switchTop);
+        this._configModule.setConfig('settings.switchLeft', this.switchLeft);
     }
 
-    protected panelMoveEnded() {
-        this.cachedConfigModule.setConfig('settings.panelTop', this.panelTop);
-        this.cachedConfigModule.setConfig('settings.panelLeft', this.panelLeft);
+    panelMoveEnded() {
+        this._configModule.setConfig('settings.panelTop', this.panelTop);
+        this._configModule.setConfig('settings.panelLeft', this.panelLeft);
     }
 
-    protected panelResizeEnded() {
-        this.cachedConfigModule.setConfig('settings.panelWidth', this.panelWidth);
-        this.cachedConfigModule.setConfig('settings.panelHeight', this.panelHeight);
+    panelResizeEnded() {
+        this._configModule.setConfig('settings.panelWidth', this.panelWidth);
+        this._configModule.setConfig('settings.panelHeight', this.panelHeight);
     }
 
-    protected afterOpen() {
+    afterOpen() {
         const component = this.pageComponent as any;
         component && component.afterOpen && component.afterOpen();
     }
 
-    protected beforeClose() {
+    beforeClose() {
         const component = this.pageComponent as any;
         component && component.beforeClose && component.beforeClose();
     }
