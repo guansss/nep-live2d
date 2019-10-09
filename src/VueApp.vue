@@ -61,7 +61,9 @@ body
     padding 8px 16px
     background-color var(--accentColor)
     color white
+    font-size 14px
     cursor pointer
+    box-shadow 0 1px 2px #0004
     transition box-shadow .15s ease-out
 
     &:after
@@ -76,7 +78,7 @@ body
         transition background-color .15s ease-out
 
     &:hover
-        box-shadow 0 1px 4px #0006
+        box-shadow 0 2px 4px #0006
 
         &:after
             background transparent

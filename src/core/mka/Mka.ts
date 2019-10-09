@@ -145,5 +145,7 @@ export default class Mka {
                 error(TAG, e.message, e.stack);
             }
         });
+
+        this.pixiApp.destroy();
     }
 }

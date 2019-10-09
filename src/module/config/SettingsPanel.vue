@@ -13,9 +13,6 @@
                         <div class="title">{{ page.TITLE }}</div>
                     </div>
                 </div>
-                <div class="selectable icon" @click.stop="refresh">
-                    <RefreshSVG />
-                </div>
                 <div class="selectable icon" @click.stop="close">
                     <CloseSVG />
                 </div>

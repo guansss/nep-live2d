@@ -1,18 +1,17 @@
 import { Vue } from '*.vue';
 import CloseSVG from '@/assets/img/close.svg';
-import RefreshSVG from '@/assets/img/refresh.svg';
 import ConfigModule from '@/module/config/ConfigModule';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
 import Scrollable from '@/module/config/reusable/Scrollable.vue';
 import BackgroundSettings from '@/module/config/settings/BackgroundSettings.vue';
 import CharacterSettings from '@/module/config/settings/CharacterSettings.vue';
+import ConsoleSettings from '@/module/config/settings/ConsoleSettings.vue';
 import EffectsSettings from '@/module/config/settings/EffectsSettings.vue';
 import GeneralSettings from '@/module/config/settings/GeneralSettings.vue';
-import LogSettings from '@/module/config/settings/LogSettings.vue';
 import { Component, Mixins, Prop, Ref } from 'vue-property-decorator';
 
 @Component({
-    components: { RefreshSVG, CloseSVG, Scrollable },
+    components: { CloseSVG, Scrollable },
 })
 export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     // use getter function to prevent Vue's observation on ConfigModule instance
@@ -24,7 +23,7 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     @Ref('resizer') readonly resizer!: HTMLDivElement;
     @Ref('page') readonly pageComponent!: Vue;
 
-    readonly pages = [GeneralSettings, CharacterSettings, BackgroundSettings, EffectsSettings, LogSettings];
+    readonly pages = [GeneralSettings, CharacterSettings, BackgroundSettings, EffectsSettings, ConsoleSettings];
 
     selectedPage = 0;
 
@@ -85,9 +84,5 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     protected beforeClose() {
         const component = this.pageComponent as any;
         component && component.beforeClose && component.beforeClose();
-    }
-
-    refresh() {
-        location.reload();
     }
 }
