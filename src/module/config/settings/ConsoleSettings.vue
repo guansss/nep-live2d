@@ -2,7 +2,7 @@
     <div class="log">
         <div class="buttons">
             <div class="button" @click="dumpLogs">Dump Logs</div>
-            <div class="button" @click="dumpConfig">Dump Config</div>
+            <div class="button" @click="dumpStorage">Dump Storage</div>
             <div
                 class="button reset"
                 @mousedown.stop="resetStart"
@@ -122,9 +122,8 @@ export default class ConsoleSettings extends Vue {
         prompt('Dump result', data);
     }
 
-    dumpConfig() {
-        const data = JSON.stringify(localStorage.config);
-        prompt('Dump result', data);
+    dumpStorage() {
+        prompt('Dump result', JSON.stringify(localStorage));
     }
 
     resetStart() {
