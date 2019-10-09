@@ -57,7 +57,7 @@ export default class Live2DModule implements Module {
             })
             .on('config:model.models', this.modelsUpdated, this)
             .on('live2dAdd', this.addModel, this)
-            .on('live2dDraggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable));
+            .on('config:model.draggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable));
     }
 
     _loadModels() {

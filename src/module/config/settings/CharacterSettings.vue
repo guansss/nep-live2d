@@ -110,7 +110,7 @@ export default class CharacterSettings extends Vue {
 
     selectedModel: ModelEntity | null = null;
 
-    draggable = false;
+    draggable = this.configModule.getConfig('model.draggable', false);
 
     get details() {
         return `File: ${this.selectedModel!.path}
@@ -129,8 +129,7 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
 
     @Watch('draggable')
     draggableChanged(value: boolean) {
-        // temporary option, don't save it to config
-        this.configModule.app.emit('live2dDraggable', value);
+        this.configModule.app.emit('config', 'model.draggable', value, true);
     }
 
     @Watch('models')
