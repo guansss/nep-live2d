@@ -1,4 +1,4 @@
 export default {
-    SNOW_ENABLED: false,
+    SNOW_ENABLED: true,
     SNOW_NUMBER: 1000,
 };

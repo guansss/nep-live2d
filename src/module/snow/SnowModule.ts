@@ -13,15 +13,9 @@ export default class SnowModule implements Module {
     number = defaults.SNOW_NUMBER;
 
     constructor(readonly app: App) {
-        app.on('configReady', (config: Config) => {
-                const snowConfig = config.snow || {};
-                const enabled = snowConfig.enabled === undefined ? defaults.SNOW_ENABLED : snowConfig.enabled;
+        app.on('config:snow.enabled', (enabled: boolean) => {
+                this.setup();
 
-                this.number = snowConfig.number || this.number;
-
-                if (enabled) this.setup();
-            })
-            .on('config:snow.enabled', (enabled: boolean) => {
                 if (enabled) app.mka.enablePlayer('snow');
                 else app.mka.disablePlayer('snow');
             })
@@ -32,7 +26,20 @@ export default class SnowModule implements Module {
 
                     this.player && (this.player.number = value);
                 }, 200),
-            );
+            )
+            .on('configReady', (config: Config) => {
+                const snowConfig = config.snow || {};
+
+                if (snowConfig.number === undefined) {
+                    app.emit('config', 'snow.number', defaults.SNOW_NUMBER, true);
+                }
+
+                if (snowConfig.enabled === undefined) {
+                    app.emit('config', 'snow.enabled', defaults.SNOW_ENABLED, true);
+                } else if (snowConfig.enabled) {
+                    this.setup();
+                }
+            });
     }
 
     private setup() {
@@ -40,7 +47,7 @@ export default class SnowModule implements Module {
             this.player = new SnowPlayer();
             this.player.number = this.number;
 
-            this.app.mka.addPlayer('snow', this.player, true);
+            this.app.mka.addPlayer('snow', this.player);
         }
     }
 }

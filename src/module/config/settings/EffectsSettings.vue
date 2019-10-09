@@ -9,7 +9,6 @@
 
 <script lang="ts">
 import FlowerSVG from '@/assets/img/flower.svg';
-import defaults from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
@@ -25,8 +24,8 @@ export default class EffectsSettings extends Vue {
 
     @Prop() readonly configModule!: ConfigModule;
 
-    snowEnabled = this.configModule.getConfig('snow.enabled', defaults.SNOW_ENABLED);
-    snowNumber = this.configModule.getConfig('snow.number', defaults.SNOW_NUMBER);
+    snowEnabled = this.configModule.getConfig('snow.enabled', false);
+    snowNumber = this.configModule.getConfig('snow.number', 0);
 
     @Watch('snowEnabled')
     snowEnabledChanged(value: boolean) {
