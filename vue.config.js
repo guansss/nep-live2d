@@ -38,6 +38,13 @@ module.exports = {
                 res.json(props);
             });
         },
+
+        after(app) {
+            // override default 404 behaviour so it won't send us an HTML 404 page
+            app.use((req, res, next) => {
+                res.status(404).end();
+            });
+        },
     },
     chainWebpack(config) {
         // embed the version number in package.json
