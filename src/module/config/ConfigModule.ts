@@ -51,21 +51,12 @@ export default class ConfigModule implements Module {
 
         app.on('config', this.setConfig, this);
 
-        // immediately call listener of "configReady" when it's added
-        app.on('newListener', (event: string, listener: EventEntity, context: any) => {
-            if (event === 'configReady') {
-                listener.fn.call(listener.context, this.config);
-
-                if (listener.once) app.off(event, listener.fn, undefined, true);
-            }
-        });
-
-        app.emit('configReady', this.config);
+        app.sticky('configReady', this.config);
 
         app.addComponent(SettingsPanel, { configModule: () => this }).then();
 
         if (!localStorage.v) {
-            app.emit('init');
+            app.sticky('init');
             localStorage.v = process.env.VERSION;
         }
     }
