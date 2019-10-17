@@ -1,14 +1,23 @@
 import { App, Module } from '@/App';
-import { EventEntity } from '@/core/utils/EventEmitter';
 import { error } from '@/core/utils/log';
 import SettingsPanel from '@/module/config/SettingsPanel.vue';
 import get from 'lodash/get';
+import merge from 'lodash/merge';
 import set from 'lodash/set';
 
-export interface Config {
-    runtime: { [key: string]: any };
-
+export class Config {
     [key: string]: any;
+
+    // runtime object won't be saved into localStorage
+    runtime: { [key: string]: any } = {};
+
+    get(path: string, defaultValue: any) {
+        const savedValue = get(this, path, defaultValue);
+        const runtimeValue = get(this.runtime, path, defaultValue);
+
+        // saved value has a higher priority than runtime value
+        return typeof savedValue === 'object' ? merge(runtimeValue, savedValue) : savedValue || runtimeValue;
+    }
 }
 
 export interface App {
@@ -41,10 +50,7 @@ export default class ConfigModule implements Module {
 
     storageKey = 'config';
 
-    readonly config: Config = {
-        // runtime object won't be saved into localStorage
-        runtime: {},
-    };
+    readonly config = new Config();
 
     constructor(readonly app: App) {
         this.read();
@@ -75,7 +81,7 @@ export default class ConfigModule implements Module {
     }
 
     getConfig(path: string, defaultValue: any) {
-        return get(this.config, path, defaultValue) || get(this.config.runtime, path, defaultValue);
+        return this.config.get(path, defaultValue);
     }
 
     read() {
