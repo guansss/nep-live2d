@@ -16,6 +16,20 @@
             >
                 <img v-if="model.preview" :src="model.preview" class="preview" />
                 <div v-else class="preview-alt">{{ model.name }}</div>
+
+                <div
+                    v-if="deletingIndex === i && deletingProgress > 0"
+                    class="delete-cover"
+                    :style="{ transform: `translateY(${(1 - deletingProgress) * 100}%)` }"
+                ></div>
+                <CloseSVG
+                    v-if="!(model.config && model.config.builtIn)"
+                    class="delete"
+                    @click.stop=""
+                    @mousedown.stop="deleteStart(i)"
+                    @mouseup.stop="deleteCancel"
+                    @mouseleave="deleteCancel"
+                />
             </div>
         </div>
 
@@ -48,6 +62,7 @@
 </template>
 
 <script lang="ts">
+import CloseSVG from '@/assets/img/close.svg';
 import FaceSVG from '@/assets/img/face-woman.svg';
 import TuneSVG from '@/assets/img/tune.svg';
 import Live2DModel from '@/core/live2d/Live2DModel';
@@ -103,7 +118,7 @@ const BASE_MODEL_CONFIG = {
 };
 
 @Component({
-    components: { TuneSVG, ToggleSwitch, FileInput, Slider },
+    components: { CloseSVG, TuneSVG, ToggleSwitch, FileInput, Slider },
 })
 export default class CharacterSettings extends Vue {
     static readonly ICON = FaceSVG;
@@ -116,6 +131,11 @@ export default class CharacterSettings extends Vue {
     modelFile: File | null = null;
 
     selectedModel: ModelEntity | null = null;
+
+    deletingIndex = -1; // the index of model that will be deleted when progress goes to 1
+    deletingHoldTime = 800; // time required to press and hold the delete button
+    deletingProgress = 0; // 0 ~ 1
+    deletingRafID = -1;
 
     detailsExpanded = false;
 
@@ -197,6 +217,54 @@ export default class CharacterSettings extends Vue {
         this.selectedModel = model;
     }
 
+    deleteStart(index: number) {
+        this.deletingIndex = index;
+
+        // ensure there is no active animation
+        if (this.deletingRafID === -1) {
+            this.deletingProgress = 0;
+
+            const startTime = performance.now();
+
+            // make deleting animation
+            const tick = (now: DOMHighResTimeStamp) => {
+                this.deletingProgress = (now - startTime) / this.deletingHoldTime;
+
+                if (this.deletingProgress > 1) {
+                    this.deletingRafID = -1;
+                    this.delete();
+                } else {
+                    this.deletingRafID = requestAnimationFrame(tick);
+                }
+            };
+
+            tick(startTime);
+        }
+    }
+
+    deleteCancel() {
+        this.deletingProgress = 0;
+        this.deletingIndex = -1;
+
+        if (this.deletingRafID != -1) cancelAnimationFrame(this.deletingRafID);
+        this.deletingRafID = -1;
+    }
+
+    delete() {
+        const model = this.models[this.deletingIndex];
+
+        if (model) {
+            // TODO: cancel the task when model is loading?
+            this.configModule.app.emit('live2dRemove', model.config && model.config.uid);
+            this.models.splice(this.deletingIndex, 1);
+
+            if (model === this.selectedModel) this.selectedModel = null;
+        }
+
+        // this method can also be used to clean up
+        this.deleteCancel();
+    }
+
     enableChanged(value: boolean) {
         if (!value) {
             this.selectedModel!.loaded = false;
@@ -257,22 +325,53 @@ $selectableCard
 
 .item
     @extend $selectableCard
+    position relative
     margin 8px 0 0 8px
     width $itemSize
     height $itemSize
     border 2px solid transparent
 
-    .preview
-    .preview-alt
-        width 100%
-        height 100%
+    &:hover .delete
+        opacity 1
 
-    .preview-alt
-        display flex
-        align-items center
-        padding: 8px;
-        font-size: 120%;
-        font-weight: bold;
+.preview
+.preview-alt
+    width 100%
+    height 100%
+
+.preview-alt
+    display flex
+    align-items center
+    padding: 8px;
+    font-size: 120%;
+    font-weight: bold;
+
+.delete-cover
+    position absolute
+    top 0
+    left 0
+    width 100%
+    height 100%
+    background #C0392BAA
+
+.delete
+    position absolute
+    display block
+    top 0
+    right 0
+    width 24px
+    height 24px
+    background #0002
+    color #333
+    opacity 0
+    transition opacity .15s ease-out, background-color .15s ease-out, color .15s ease-out
+
+    &:hover
+        background #E74C3C
+        color #FFF
+
+        path
+            fill currentColor
 
 .details
     @extend $card

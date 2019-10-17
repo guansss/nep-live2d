@@ -204,7 +204,14 @@ export default class Live2DModule implements Module {
         }
     }
 
-    private removeModel(uid: number) {
+    private removeModel(uid?: number) {
+        const configs = this.savedModelConfigs;
+        const excluded = configs.filter(config => config.uid !== uid);
+
+        if (configs.length !== excluded.length) {
+            this.app.emit('config', 'live2d.models', excluded);
+        }
+
         this.player.sprites.forEach(sprite => {
             if (sprite.model.uid === uid) {
                 this.player.removeSprite(sprite);
