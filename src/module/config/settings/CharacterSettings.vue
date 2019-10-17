@@ -20,12 +20,16 @@
         </div>
 
         <div v-if="!selectedModel">
-            <ToggleSwitch key="dont reuse!" v-model="draggable">Draggable</ToggleSwitch>
+            <ToggleSwitch key="dont reuse me!" v-model="draggable">Draggable</ToggleSwitch>
         </div>
         <div v-else>
-            <details class="details">
+            <details class="details" :open="detailsExpanded" @click.prevent="detailsExpanded=!detailsExpanded">
                 <summary>Details</summary>
-                <div>{{ details }}</div>
+                <template v-if="detailsExpanded">
+                    <div>File: {{ selectedModel.path }}</div>
+                    <div>Name: {{ selectedModel.name }}</div>
+                    <div>Size: {{ selectedModel.width }} x {{ selectedModel.height }}</div>
+                </template>
             </details>
 
             <div v-if="selectedModel.error" class="error">{{ selectedModel.error }}</div>
@@ -35,7 +39,8 @@
 
             <template v-else>
                 <ToggleSwitch v-model="selectedModel.config.enabled" @change="enableChanged">Enabled</ToggleSwitch>
-                <Slider v-model="selectedModel.config.scale" overlay :min="0.01" :max="1.5" @change="saveModels">Scale
+                <Slider v-model="selectedModel.config.scale" overlay :min="0.01" :max="1.5" @change="scaleChanged"
+                >Scale
                 </Slider>
             </template>
         </div>
@@ -50,8 +55,12 @@ import ConfigModule, { Config } from '@/module/config/ConfigModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
-import Live2DModule, { SavedModel } from '@/module/live2d/Live2DModule';
-import get from 'lodash/get';
+import Live2DModule, {
+    makeModelPath,
+    ModelConfig,
+    toRuntimeFormat,
+    toStorageFormat,
+} from '@/module/live2d/Live2DModule';
 import { basename } from 'path';
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
@@ -66,13 +75,15 @@ class ModelEntity {
     loaded = false;
     error?: string;
 
+    config?: ModelConfig;
+
     get loading() {
-        return (this.config ? this.config.enabled : true) && !this.loaded && !this.error;
+        // missing config means the model is newly added and thus supposed to be enabled
+        const enabled = this.config ? this.config.enabled : true;
+        return enabled && !this.loaded && !this.error;
     }
 
-    config?: SavedModel;
-
-    constructor(path: string, config?: SavedModel) {
+    constructor(path: string, config?: ModelConfig) {
         this.name = basename(path);
         this.path = path;
         this.config = config;
@@ -84,16 +95,12 @@ class ModelEntity {
         this.preview = live2dModel.modelSettings.preview;
         this.width = live2dModel.width;
         this.height = live2dModel.height;
-
-        this.config = this.config || new SavedModel(live2dModel.uid, live2dModel.modelSettings.path);
     }
 }
 
-function makePath(fileName: string) {
-    const separatorIndex = fileName.indexOf('.');
-    const dir = fileName.slice(0, separatorIndex > 0 ? separatorIndex : undefined);
-    return `live2d/${dir}/${fileName}`;
-}
+const BASE_MODEL_CONFIG = {
+    scale: 1,
+};
 
 @Component({
     components: { TuneSVG, ToggleSwitch, FileInput, Slider },
@@ -110,17 +117,13 @@ export default class CharacterSettings extends Vue {
 
     selectedModel: ModelEntity | null = null;
 
-    draggable = this.configModule.getConfig('live2d.draggable', false);
+    detailsExpanded = false;
 
-    get details() {
-        return `File: ${this.selectedModel!.path}
-Name: ${this.selectedModel!.name}
-Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
-    }
+    draggable = this.configModule.getConfig('live2d.draggable', false);
 
     @Watch('modelFile')
     modelFileChanged(value: File | null) {
-        const path = value && makePath(value.name);
+        const path = value && makeModelPath(value.name);
 
         if (path && !this.models.find(model => model.path === path)) {
             this.addModel(path);
@@ -140,8 +143,18 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
     created() {
         this.configModule.app
             .on('configReady', (config: Config) => {
-                const savedModels = get(config, 'live2d.models', []) as SavedModel[];
-                this.models = savedModels.map(saved => new ModelEntity(saved.path, saved));
+                const builtInModelConfigs = config.get('live2d.builtIns', []) as ModelConfig[];
+                const modelConfigs = config.get('live2d.models', []) as ModelConfig[];
+
+                this.models = modelConfigs.map(config => {
+                    const builtInConfig = config.builtIn
+                        ? builtInModelConfigs.find(builtInConfig => builtInConfig.path === config.path)
+                        : undefined;
+
+                    const mergedConfig = toRuntimeFormat(Object.assign({}, builtInConfig, config)) as ModelConfig;
+
+                    return new ModelEntity(config.path, Object.assign({}, BASE_MODEL_CONFIG, mergedConfig));
+                });
             })
             .on('live2dLoaded', this.modelLoaded, this);
 
@@ -156,28 +169,26 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
         const model = new ModelEntity(path);
         this.models.push(model);
 
-        this.configModule.app.emit('live2dAdd', path, (err?: Error, live2dModel?: Live2DModel) => {
-            if (err) {
-                model.error = err.message.includes('Failed to fetch')
-                    ? 'Failed to load model file. Have you put files in "live2d" folder of this wallpaper?'
-                    : err.toString();
-            } else if (live2dModel) {
-                model.attach(live2dModel);
-                this.saveModels();
-            }
-        });
+        this.configModule.app.emit(
+            'live2dAdd',
+            path,
+            (err?: Error, live2dModel?: Live2DModel, config?: ModelConfig) => {
+                if (err) {
+                    model.error = err.message.includes('Failed to fetch')
+                        ? 'Failed to load model file. Have you put files in "live2d" folder of this wallpaper?'
+                        : err.toString();
+                } else if (live2dModel) {
+                    model.attach(live2dModel);
+                    model.config = Object.assign({}, BASE_MODEL_CONFIG, toRuntimeFormat(config!) as ModelConfig);
+                }
+            },
+        );
     }
 
     modelLoaded(live2dModel: Live2DModel) {
         let model = this.models.find(model => (model.config && model.config.uid) === live2dModel.uid);
 
-        if (!model) {
-            model = new ModelEntity(live2dModel.modelSettings.path);
-            model.attach(live2dModel);
-
-            this.models.push(model);
-            this.saveModels();
-        } else {
+        if (model) {
             model.attach(live2dModel);
         }
     }
@@ -190,15 +201,11 @@ Size: ${this.selectedModel!.width} x ${this.selectedModel!.height}`;
         if (!value) {
             this.selectedModel!.loaded = false;
         }
-        this.saveModels();
+        this.configModule.app.emit('live2dConfig', this.selectedModel!.config!.uid, { enabled: value });
     }
 
-    saveModels() {
-        this.configModule.app.emit(
-            'config',
-            'live2d.models',
-            this.models.map(model => model.config).filter(config => !!config),
-        );
+    scaleChanged(value: number) {
+        this.configModule.app.emit('live2dConfig', this.selectedModel!.config!.uid, toStorageFormat({ scale: value }));
     }
 }
 </script>
@@ -263,21 +270,30 @@ $selectableCard
     .preview-alt
         display flex
         align-items center
+        padding: 8px;
+        font-size: 120%;
+        font-weight: bold;
 
 .details
-    background #0001
-    white-space pre-wrap
+    @extend $card
+    display inline-block
+    margin 8px 16px
+    padding 8px
+    background #666
+    color #EEE
     font .8em / 1.2em Consolas, monospace
+    white-space pre-wrap
+    cursor pointer
+
+    &[open]
+        display block
+
+        >>> summary
+            margin-bottom 4px
+
+    &:hover
+        background #444
 
     >>> summary
-        padding 8px 16px
         outline none
-        cursor pointer
-        transition background-color .15s ease-out
-
-        &:hover
-            background #0002
-
-    >>> div
-        padding 0 16px 16px 16px
 </style>
