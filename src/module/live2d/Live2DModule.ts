@@ -140,8 +140,7 @@ export default class Live2DModule implements Module {
     private removeModel(id: number) {
         const configs = this.modelConfigs;
 
-        // configs for internal models should not be removed
-        const excluded = configs.filter(config => config.internal || config.id !== id);
+        const excluded = configs.filter(config => config.id !== id);
 
         if (configs.length !== excluded.length) {
             this.app.emit('config', 'live2d.models', excluded);
