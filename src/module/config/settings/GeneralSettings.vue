@@ -23,7 +23,7 @@ export default class GeneralSettings extends Vue {
     volume = this.configModule.getConfig('volume', 0);
 
     @Watch('volume')
-    volumeChanged(value: any) {
+    volumeChanged(value: number) {
         this.configModule.setConfig('volume', value);
     }
 }
