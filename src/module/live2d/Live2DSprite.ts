@@ -11,6 +11,8 @@ interface CustomBaseTexture extends PIXI.BaseTexture {
 }
 
 export default class Live2DSprite extends Container {
+    id!: number;
+
     textures: Texture[];
 
     // temporary 4x4 matrix
@@ -26,8 +28,8 @@ export default class Live2DSprite extends Container {
     drawingScaleX = 1;
     drawingScaleY = 1;
 
-    static async create(modelSettingsFile: string, uid?: number) {
-        const model = await Live2DModel.create(modelSettingsFile, uid);
+    static async create(modelSettingsFile: string) {
+        const model = await Live2DModel.create(modelSettingsFile);
         return new Live2DSprite(model);
     }
 
