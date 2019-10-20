@@ -1,5 +1,5 @@
 <template>
-    <div ref="settings" :class="['settings', stateClass, { snapped }]" :style="panelStyle">
+    <div ref="settings" :class="['settings', stateClass, { snapped }]" :style="panelStyle" @mousedown.stop="">
         <div v-if="expanded" ref="content" class="content">
             <div class="toolbar">
                 <div class="tabs" ref="tabs">
