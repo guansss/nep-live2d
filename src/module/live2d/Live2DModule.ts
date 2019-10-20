@@ -1,83 +1,30 @@
 import { App, Module } from '@/App';
 import Live2DModel from '@/core/live2d/Live2DModel';
 import { error } from '@/core/utils/log';
-import defaults from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import Live2DPlayer from '@/module/live2d/Live2DPlayer';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
+import { configureSprite, DEFAULT_MODEL_CONFIG, ModelConfig, toStorageValues } from '@/module/live2d/ModelConfig';
 
 export interface App {
-    emit(event: 'live2dDraggable', draggable: boolean): this;
+    emit(event: 'live2dAdd', path: string, config?: ModelConfig): this;
 
-    emit(event: 'live2dAdd', path: string, callback?: (error?: Error, model?: Live2DModel) => void): this;
-
-    emit(event: 'live2dRemove', uid: number): this;
+    emit(event: 'live2dRemove', id: number): this;
 
     emit(event: 'live2dLoaded', model: Live2DModel): this;
 
-    emit(event: 'live2dConfig', uid: number, config: Partial<ModelConfig>): this;
+    emit(event: 'live2dConfig', id: number, config: Partial<ModelConfig>): this;
 }
 
-export interface ModelConfig {
-    readonly uid: number;
-    readonly path: string;
-    readonly builtIn?: boolean;
-    enabled?: boolean;
-    scale?: number;
-    x?: number;
-    y?: number;
+let _id = 1;
+
+// update reserve ID to prevent duplication
+function dedupeID(id: number) {
+    _id = Math.max(_id, id + 1);
 }
 
-export function toStorageFormat(config: Partial<ModelConfig>) {
-    const _config = Object.assign({}, config);
-
-    if (_config.scale !== undefined) _config.scale /= innerHeight;
-    if (_config.x !== undefined) _config.x /= innerWidth;
-    if (_config.y !== undefined) _config.y /= innerHeight;
-
-    return _config;
-}
-
-export function toRuntimeFormat(config: Partial<ModelConfig>) {
-    const _config = Object.assign({}, config);
-
-    if (_config.scale !== undefined) _config.scale *= innerHeight;
-    if (_config.x !== undefined) _config.x *= innerWidth;
-    if (_config.y !== undefined) _config.y *= innerHeight;
-
-    return _config;
-}
-
-function configureSprite(sprite: Live2DSprite, config: ModelConfig) {
-    const _config = toRuntimeFormat(config);
-
-    if (!isNaN(_config.scale!)) {
-        const oldWidth = sprite.width;
-        const oldHeight = sprite.height;
-
-        sprite.scale.x = sprite.scale.y = _config.scale!;
-
-        sprite.x -= (sprite.width - oldWidth) / 2;
-        sprite.y -= (sprite.height - oldHeight) / 2;
-    }
-
-    // TODO: use safe area rather than size of entire client
-    if (!isNaN(_config.x!)) sprite.x = _config.x! - sprite.width / 2;
-    if (!isNaN(_config.y!)) sprite.y = _config.y! - sprite.height / 2;
-}
-
-/**
- * Makes a Live2D model path using the name of its model settings file.
- *
- * @example
- * // while LIVE2D_DIRECTORY = 'live2d'
- * makeModelPath('neptune.model.json')
- * => 'live2d/neptune/neptune.model.json'
- */
-export function makeModelPath(fileName: string) {
-    const separatorIndex = fileName.indexOf('.');
-    const dir = fileName.slice(0, separatorIndex > 0 ? separatorIndex : undefined);
-    return `${defaults.LIVE2D_DIRECTORY}/${dir}/${fileName}`;
+function generateID() {
+    return _id++;
 }
 
 const TAG = 'Live2DModule';
@@ -89,12 +36,14 @@ export default class Live2DModule implements Module {
 
     config?: Config;
 
-    get builtInModelConfigs() {
-        return (this.config ? this.config.get('live2d.builtIns', []) : []) as ModelConfig[];
+    pendingRemoveIDs: number[] = []; // a list for models which are pending to be removed
+
+    get internalModelConfigs() {
+        return this.config ? this.config.get<ModelConfig[]>('live2d.internalModels', []) : [];
     }
 
-    get savedModelConfigs() {
-        return (this.config ? this.config.get('live2d.models', []) : []) as ModelConfig[];
+    get modelConfigs() {
+        return this.config ? this.config.get<ModelConfig[]>('live2d.models', []) : [];
     }
 
     constructor(readonly app: App) {
@@ -105,7 +54,6 @@ export default class Live2DModule implements Module {
 
         app.on('configReady', (config: Config) => {
                 this.config = config;
-                this.loadBuiltInModels();
                 this.loadSavedModels();
             })
             .on('config:live2d.draggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable))
@@ -114,161 +62,178 @@ export default class Live2DModule implements Module {
             .on('live2dRemove', this.removeModel, this);
     }
 
-    private loadBuiltInModels() {
-        const builtInModelConfigs: ModelConfig[] = [];
-
-        defaults.LIVE2D_MODELS.forEach(async (file, index) => {
-            try {
-                const config = {
-                    uid: -index, // use negative index as UID, this is special for built-in models
-                    path: makeModelPath(file),
-                    builtIn: true,
-                    enabled: true,
-
-                    // TODO: don't make these hardcoded
-                    scale: 0.0004,
-                    x: 0.5,
-                    y: 0.7,
-                };
-
-                // save it to runtime config
-                builtInModelConfigs.push(config);
-                this.app.sticky('config', 'live2d.builtIns', builtInModelConfigs, true);
-
-                // find saved user config by the built-in flag and path, instead of UID
-                let savedConfig = this.savedModelConfigs.find(it => it.builtIn && it.path === config.path);
-
-                if (savedConfig) {
-                    // update saved UID so we can find it by UID in this launch
-                    (savedConfig as any).uid = config.uid;
-                } else {
-                    // create an empty ModelConfig for built-in models
-                    savedConfig = { uid: config.uid, path: config.path, builtIn: true };
-
-                    const savedModelConfigs = this.savedModelConfigs;
-                    savedModelConfigs.push(savedConfig);
-                    this.app.sticky('config', 'live2d.models', savedModelConfigs);
-                }
-
-                if (!(savedConfig && savedConfig.enabled === false)) {
-                    await this.loadModel(config.path, config.uid, sprite => {
-                        configureSprite(sprite, Object.assign({}, config, savedConfig));
-                    });
-                }
-            } catch (e) {
-                error(TAG, e);
-            }
-        });
-    }
-
     private loadSavedModels() {
-        this.savedModelConfigs.forEach(async modelConfig => {
-            if (!modelConfig.builtIn && modelConfig.enabled) {
-                this.loadModel(modelConfig.path, modelConfig.uid, sprite => configureSprite(sprite, modelConfig)).catch(
-                    e => error(TAG, e),
+        this.modelConfigs.forEach(config => {
+            if (config.id !== undefined) dedupeID(config.id);
+
+            if (!config.internal && config.enabled) {
+                this.loadModel(config.path, config.id, sprite => configureSprite(sprite, config)).catch(e =>
+                    error(TAG, e),
                 );
             }
         });
     }
 
-    private async loadModel(path: string, uid?: number, callback?: (sprite: Live2DSprite) => void) {
-        const sprite = await this.player.addSprite(path, uid);
+    private async loadModel(path: string, id: number, loaded?: (sprite: Live2DSprite) => void) {
+        const sprite = await this.player.addSprite(path);
 
-        // can do some work before emitting the event
-        callback && callback(sprite);
+        if (this.pendingRemoveIDs.includes(id)) {
+            this.pendingRemoveIDs.splice(this.pendingRemoveIDs.indexOf(id), 1);
+            this.player.removeSprite(sprite);
+            error(TAG, `Loading canceled: [${id}] ${sprite.model.name}`);
+            return;
+        }
 
-        this.app.emit('live2dLoaded', sprite.model);
+        sprite.id = id;
+
+        // prepare before emitting the event
+        loaded && loaded(sprite);
+
+        this.app.emit('live2dLoaded', id, sprite);
     }
 
-    private async addModel(
-        path: string,
-        callback?: (error?: Error, model?: Live2DModel, config?: ModelConfig) => void,
-    ) {
+    /**
+     * Adds an internal model or a custom model.
+     * @param path
+     * @param config - If provided, the model will be considered an internal model, otherwise a custom model
+     */
+    private async addModel(path: string, config?: ModelConfig) {
+        const id = generateID();
+
+        const modelConfigs = this.modelConfigs.slice();
+        let savedConfig: ModelConfig | undefined;
+
+        if (config) {
+            const internalConfigs = this.internalModelConfigs.slice();
+
+            if (!internalConfigs.find(it => it.id === id)) {
+                internalConfigs.push({ id, path, ...DEFAULT_MODEL_CONFIG, ...config });
+                this.app.emit('config', 'live2d.internalModels', internalConfigs, true);
+            }
+
+            savedConfig = modelConfigs.find(it => it.internal && it.path === path);
+
+            if (savedConfig) {
+                // internal model IDs are dynamically generated, so we update saved ID every time we add an internal model
+                (savedConfig as any).id = id;
+            } else {
+                // create a config stub for internal model
+                savedConfig = { id, path, internal: true };
+            }
+
+            this.app.emit('config', 'live2d.models', modelConfigs);
+        } else if (!savedConfig) {
+            // create a full config for custom model
+            savedConfig = { id, path, ...DEFAULT_MODEL_CONFIG };
+            modelConfigs.push(savedConfig);
+            this.app.emit('config', 'live2d.models', modelConfigs);
+        }
+
+        if (savedConfig.enabled === false) return;
+
         try {
-            await this.loadModel(path, undefined, sprite => {
-                // save the model if not been saved
-                const modelConfigs = this.savedModelConfigs;
-                let modelConfig = modelConfigs.find(saved => saved.uid === sprite.model.uid);
-
-                if (!modelConfig) {
-                    modelConfig = { uid: sprite.model.uid, path, enabled: true };
-                    modelConfigs.push(modelConfig);
-                    this.app.emit('config', 'live2d.models', modelConfigs);
-                }
-
-                // call the callback before "live2dLoaded" event is emitted, otherwise there will be issues in CharacterSettings
-                callback && callback(undefined, sprite.model, modelConfig);
+            await this.loadModel(path, id, sprite => {
+                configureSprite(sprite, Object.assign({}, config, this.modelConfigs.find(it => it.id === id)));
             });
         } catch (e) {
-            callback && callback(e);
+            error(TAG, e);
+            this.app.emit('live2dError', id, e);
         }
     }
 
-    private removeModel(uid?: number) {
-        const configs = this.savedModelConfigs;
-        const excluded = configs.filter(config => config.uid !== uid);
+    private removeModel(id: number) {
+        const configs = this.modelConfigs;
+
+        // configs for internal models should not be removed
+        const excluded = configs.filter(config => config.internal || config.id !== id);
 
         if (configs.length !== excluded.length) {
             this.app.emit('config', 'live2d.models', excluded);
         }
 
+        let spriteRemoved = false;
+
         this.player.sprites.forEach(sprite => {
-            if (sprite.model.uid === uid) {
+            if (sprite.id === id) {
                 this.player.removeSprite(sprite);
+                spriteRemoved = true;
             }
         });
+
+        if (!spriteRemoved) {
+            // remove sprite right after it finishes loading
+            this.pendingRemoveIDs.push(id);
+        }
     }
 
-    private configureModel(uid: number, config: ModelConfig) {
-        this.modifyModel(uid, modelConfig => {
-            let sprite = this.player.sprites.find(sprite => sprite.model.uid === uid);
+    private configureModel(id: number, config: Partial<ModelConfig>) {
+        const updatedConfig = this.modifyModel(id, config);
 
-            if (sprite) {
-                if (config.enabled !== false) {
+        if (updatedConfig) {
+            const sprite = this.player.sprites.find(sprite => sprite.id === id);
+
+            if (updatedConfig.enabled !== false) {
+                if (sprite) {
                     configureSprite(sprite, config);
                 } else {
-                    // remove sprites whose model is disabled
-                    this.player.removeSprite(sprite);
+                    // create sprite when not existing but enabled
+                    const finalConfig = Object.assign(
+                        {},
+                        updatedConfig.internal ? this.internalModelConfigs.find(it => it.id === id) : undefined,
+                        updatedConfig,
+                    );
+
+                    this.loadModel(updatedConfig.path, id, sprite => configureSprite(sprite, finalConfig)).catch(e =>
+                        error(TAG, e),
+                    );
                 }
-            } else if (config.enabled) {
-                const finalConfig = Object.assign(
-                    {},
-                    modelConfig.builtIn
-                        ? this.builtInModelConfigs.find(builtInConfig => builtInConfig.path === modelConfig.path)
-                        : undefined,
-                    modelConfig,
-                    config,
-                );
-
-                this.loadModel(modelConfig.path, modelConfig.uid, sprite => configureSprite(sprite, finalConfig)).catch(
-                    e => error(TAG, e),
-                );
+            } else {
+                if (sprite) {
+                    // remove sprite when existing but not enabled
+                    this.player.removeSprite(sprite);
+                } else {
+                    // remove sprite right after it finishes loading
+                    this.pendingRemoveIDs.push(id);
+                }
             }
-
-            Object.assign(modelConfig, config);
-        });
+        }
     }
 
     private savePosition(sprite: Live2DSprite) {
-        this.modifyModel(sprite.model.uid, modelConfig => {
-            Object.assign(
-                modelConfig,
-                toStorageFormat({
-                    x: sprite.x + sprite.width / 2,
-                    y: sprite.y + sprite.height / 2,
-                }),
-            );
-        });
+        this.modifyModel(
+            sprite.id,
+            toStorageValues({
+                x: sprite.x + sprite.width / 2,
+                y: sprite.y + sprite.height / 2,
+            }),
+        );
     }
 
-    private modifyModel(uid: number, action: (modelConfig: ModelConfig) => void) {
-        const modelConfigs = this.savedModelConfigs;
-        const modelConfig = modelConfigs.find(saved => saved.uid === uid);
+    private modifyModel(id: number, config: Partial<ModelConfig>) {
+        const modelConfigs = this.modelConfigs;
+        let modelConfig = modelConfigs.find(config => config.id === id);
 
         if (modelConfig) {
-            action(modelConfig);
+            Object.assign(modelConfig, config);
 
             this.app.emit('config', 'live2d.models', modelConfigs);
+
+            return modelConfig;
+        } else {
+            const internalConfig = this.internalModelConfigs.find(config => config.id === id);
+
+            if (internalConfig) {
+                modelConfig = {
+                    id,
+                    path: internalConfig.path,
+                    internal: true,
+                    ...config,
+                };
+
+                this.app.emit('config', 'live2d.models', [...modelConfigs, modelConfig]);
+
+                return modelConfig;
+            }
         }
     }
 }
