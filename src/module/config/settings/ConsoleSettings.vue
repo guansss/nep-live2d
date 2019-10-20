@@ -1,7 +1,23 @@
 <template>
     <div class="log">
-        <div class="button" @click="dumpLogs">Dump Logs</div>
-        <div class="button" @click="dumpConfig">Dump Config</div>
+        <div class="buttons">
+            <div class="button" @click="dumpLogs">Dump Logs</div>
+            <div class="button" @click="dumpStorage">Dump Storage</div>
+            <div
+                class="button reset"
+                @mousedown.stop="resetStart"
+                @mouseup.stop="resetCancel"
+                @mouseleave="resetCancel"
+            >
+                Reset
+                <div
+                    v-if="resetProgress > 0"
+                    class="cover"
+                    :style="{ transform: `translateX(${(resetProgress - 1) * 100}%)` }"
+                ></div>
+            </div>
+        </div>
+
         <table class="table">
             <tr v-for="(log, i) in logs" :key="i" :class="['row', { error: log.error }]">
                 <td v-if="log.rowSpan" :rowspan="log.rowSpan" class="tag" :style="{ backgroundColor: log.color }">
@@ -14,11 +30,13 @@
 </template>
 
 <script lang="ts">
+import ConsoleSVG from '@/assets/img/console.svg';
 import { LogRecord, logs as _logs } from '@/core/utils/log';
 import { randomHSLColor } from '@/core/utils/string';
+import ConfigModule from '@/module/config/ConfigModule';
 import Scrollable from '@/module/config/reusable/Scrollable.vue';
 import Vue from 'vue';
-import { Component } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 export interface ExtendedLogRecord extends LogRecord {
     rowSpan: number;
@@ -40,12 +58,19 @@ const cachedColors: { [key: string]: string } = {};
 @Component({
     components: { Scrollable },
 })
-export default class LogSettings extends Vue {
-    static title = 'LOG';
+export default class ConsoleSettings extends Vue {
+    static readonly ICON = ConsoleSVG;
+    static readonly TITLE = 'CONSOLE';
+
+    @Prop() readonly configModule!: ConfigModule;
 
     logs: ExtendedLogRecord[] = [];
 
-    private created() {
+    resetTime = 2000; // time required to press and hold the button to reset
+    resetProgress = 0; // 0 ~ 1
+    resetRafID = -1; // ID returned by requestAnimationFrame()
+
+    created() {
         // initialize logs for displaying
         for (let i = 0; i < logs.length; i++) {
             const thisLog = logs[i];
@@ -97,12 +122,48 @@ export default class LogSettings extends Vue {
         prompt('Dump result', data);
     }
 
-    dumpConfig() {
-        const data = JSON.stringify(localStorage.config);
-        prompt('Dump result', data);
+    dumpStorage() {
+        prompt('Dump result', JSON.stringify(localStorage));
     }
 
-    private beforeDestroy() {
+    resetStart() {
+        // ensure there is no active animation
+        if (this.resetRafID === -1) {
+            this.resetProgress = 0;
+
+            const startTime = performance.now();
+
+            // make animation
+            const tick = (now: DOMHighResTimeStamp) => {
+                this.resetProgress = (now - startTime) / this.resetTime;
+
+                if (this.resetProgress > 1) {
+                    this.resetRafID = -1;
+                    this.reset();
+                } else {
+                    this.resetRafID = requestAnimationFrame(tick);
+                }
+            };
+
+            tick(startTime);
+        }
+    }
+
+    private resetCancel() {
+        this.resetProgress = 0;
+
+        if (this.resetRafID != -1) cancelAnimationFrame(this.resetRafID);
+        this.resetRafID = -1;
+    }
+
+    reset() {
+        this.configModule.app.emit('reset');
+
+        // this method can also be used to clean up
+        this.resetCancel();
+    }
+
+    beforeDestroy() {
         logs.push = originalPush;
     }
 }
@@ -112,10 +173,28 @@ export default class LogSettings extends Vue {
 .log
     padding 16px
 
+.buttons
+    display flex
+
 .button
     margin-right 8px
 
+.reset
+    margin-right 0
+    margin-left auto
+    overflow hidden
+    background #e72917
+
+    .cover
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        background #FFF8
+
 .table
+    width 100%
     color #000
     font .8em / 1.2em Consolas, monospace
     border-collapse collapse

@@ -151,10 +151,7 @@ export default class Snow extends Mesh {
     }
 
     _calculateBounds() {
-        this._bounds.minX = 0;
-        this._bounds.minY = 0;
-        this._bounds.maxX = this._width;
-        this._bounds.maxY = this._height;
+        this._bounds.addFrame(this.transform, 0, 0, this._width, this._height);
     }
 
     update(dt: DOMHighResTimeStamp, now: DOMHighResTimeStamp) {

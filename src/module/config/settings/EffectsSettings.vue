@@ -8,6 +8,7 @@
 </template>
 
 <script lang="ts">
+import FlareSVG from '@/assets/img/flare.svg';
 import ConfigModule from '@/module/config/ConfigModule';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
@@ -18,7 +19,8 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
     components: { ToggleSwitch, Slider },
 })
 export default class EffectsSettings extends Vue {
-    static title = 'EFFECTS';
+    static readonly ICON = FlareSVG;
+    static readonly TITLE = 'EFFECTS';
 
     @Prop() readonly configModule!: ConfigModule;
 
@@ -32,7 +34,7 @@ export default class EffectsSettings extends Vue {
 
     @Watch('snowNumber')
     snowNumberChanged(value: number) {
-        this.configModule.setConfig('snow.number', value);
+        this.configModule.setConfig('snow.number', ~~value);
     }
 }
 </script>

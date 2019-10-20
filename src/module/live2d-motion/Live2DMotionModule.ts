@@ -35,12 +35,12 @@ export default class Live2DMotionModule implements Module {
             });
         });
 
-        app.on('configInit', (config: Config) => {
+        app.on('configReady', (config: Config) => {
             if (config.volume) {
                 this.soundManager.volume = config.volume;
             }
         });
-        app.on('config:volume', (path: string, value: number) => {
+        app.on('config:volume', (value: number) => {
             this.soundManager.volume = value;
         });
     }

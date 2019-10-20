@@ -1,4 +1,5 @@
 import { App, Module } from '@/App';
+import { error } from '@/core/utils/log';
 import { inWallpaperEngine, redirectedFromBridge } from '@/core/utils/misc';
 import { getJSON, postJSON } from '@/core/utils/net';
 import { WEInterface } from '@/module/wallpaper/WEInterface';
@@ -42,7 +43,7 @@ async function setupDefault() {
             throw 'Empty response';
         }
     } catch (e) {
-        console.error('Failed to load /wallpaper/project.json, have you run `yarn setup` ?', e);
+        error('WE', 'Failed to load /wallpaper/project.json, have you run `yarn setup` ?', e);
     }
 }
 
@@ -55,16 +56,19 @@ async function setupRemote() {
             props.userProps && window.wallpaperPropertyListener.applyUserProperties(props.userProps);
 
             if (props.files) {
-                Object.entries(props.files).forEach(([propName, files]) =>
-                    window.wallpaperPropertyListener.userDirectoryFilesAddedOrChanged(propName, files as string[]),
-                );
+                Object.entries(props.files).forEach(([propName, files]) => {
+                    // files can be null if the directory is unset
+                    if (files) {
+                        window.wallpaperPropertyListener.userDirectoryFilesAddedOrChanged(propName, files as string[]);
+                    }
+                });
             }
         } else {
             // noinspection ExceptionCaughtLocallyJS
             throw 'Empty response';
         }
     } catch (e) {
-        console.error('Failed to retrieve Wallpaper Engine properties from Webpack DevServer:', e);
+        error('WE', 'Failed to retrieve Wallpaper Engine properties from Webpack DevServer:', e);
     }
 }
 
@@ -78,6 +82,6 @@ function updateRemoteProperty(propName: string, value: string) {
 
 function updateRemoteFiles(propName: string, files: string[], allFiles: string[]) {
     postJSON('/props', {
-        files: { [propName]: allFiles },
+        files: { [propName]: allFiles.map(file => file.slice('file://'.length)) },
     }).catch();
 }

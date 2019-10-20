@@ -48,4 +48,10 @@ export class App extends EventEmitter {
     async addComponent(componentClass: VueConstructor, props?: any) {
         return (this.vueApp as any).addChild(componentClass, props) as Vue;
     }
+
+    destroy() {
+        this.emit('destroy');
+        this.vueApp.$destroy();
+        this.mka.destroy();
+    }
 }

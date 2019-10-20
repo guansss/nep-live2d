@@ -1,28 +1,26 @@
 <template>
-    <div ref="settings" :class="['settings', stateClass, { snapped }]" :style="panelStyle">
+    <div ref="settings" :class="['settings', stateClass, { snapped }]" :style="panelStyle" @mousedown.stop="">
         <div v-if="expanded" ref="content" class="content">
-            <div class="toolbar" ref="toolbar">
-                <div class="tabs">
+            <div class="toolbar">
+                <div class="tabs" ref="tabs">
                     <div
                         v-for="(page, i) in pages"
                         :key="page.title"
-                        :class="['tab selectable', { selected: i === selectedPage }]"
+                        :class="['tab icon selectable', { selected: i === selectedPage }]"
+                        :data-title="page.TITLE"
                         @click="selectPage(i)"
                     >
-                        {{ page.title }}
+                        <component :is="page.ICON" class="svg" />
                     </div>
                 </div>
-                <div class="selectable right" @click="refresh">
-                    <div class="refresh"></div>
-                </div>
-                <div class="selectable" @click="close">
-                    <div class="close"></div>
+                <div class="selectable icon" @click.stop="close">
+                    <CloseSVG />
                 </div>
             </div>
 
             <Scrollable class="page">
                 <keep-alive>
-                    <component :is="currentPage" ref="page" v-bind="{ configModule: cachedConfigModule }" />
+                    <component :is="currentPage" ref="page" v-bind="{ configModule: _configModule }" />
                 </keep-alive>
             </Scrollable>
 
@@ -34,19 +32,20 @@
 <script lang="ts" src="./SettingsPanel.ts"></script>
 
 <style scoped lang="stylus">
-@require './reusable/styles'
+@require './reusable/vars'
+
+$toolbarHeight = 36px
 
 .settings
+    @extend $card
     position absolute
     max-width 100%
     max-height 100%
-    overflow hidden
+    overflow visible
     user-select none
     color $themeColor
     font-size 16px
     background-color $backgroundColor
-    box-shadow 0 0 2px #BBB
-    transition background-color .2s
 
 .switch
     transition transform .2s ease-out, opacity .2s ease-out
@@ -67,12 +66,19 @@
     width 100%
     height 100%
 
+    >>> .switch
+    >>> .slider
+        width 100%
+
+    >>> .label
+        width 160px
+
 .selectable
     cursor pointer
-    transition background-color .1s, color .1s
+    transition background-color .15s, color .15s
 
     &.selected
-        color #EEE
+        color #FFF
         background-color $themeColor !important
         cursor default
 
@@ -82,8 +88,6 @@
 .toolbar
     position relative
     display flex
-    height 36px
-    overflow hidden
     background-color rgba($themeColor, 0.1)
     cursor move
 
@@ -100,13 +104,59 @@
     .right
         margin-left auto
 
+.icon
+    $svgSize = 24px
+    padding 6px 12px
+
+    svg
+        display block
+        width $svgSize
+        height $svgSize
+
+    path
+        fill currentColor
+
 .tabs
     display flex
+    flex-grow 1
+    width 0
 
 .tab
+    position relative
+    flex-shrink 1
+    min-width 0
     z-index 1
-    padding 0 16px
-    line-height 36px
+
+    &:before
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 50%;
+        opacity 0
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #333;
+        transform: translateX(-50%);
+        transition opacity .15s ease-out
+
+    &:after
+        content: attr(data-title);
+        position: absolute;
+        display: block;
+        bottom: calc(100% + 6px);
+        left: 50%;
+        padding: 6px;
+        opacity 0
+        background: #333;
+        color #FFF
+        font-size: 14px;
+        border-radius: 2px;
+        transform: translateX(-50%);
+        transition opacity .15s
+
+    &:hover
+        &:before, &:after
+            opacity 1
 
 .resizer
     $size = 12px
@@ -116,13 +166,13 @@
     border-top solid $size transparent
     border-right solid $size transparent
     border-bottom solid $size transparent
-    border-left solid $size #FFF
+    border-left solid $size #DDD
     cursor se-resize
     transform rotate(45deg)
     transition border-left-color .15s ease-out
 
     &:hover
-        border-left solid $size var(--accentColor)
+        border-left solid $size #999
 
 // page content
 
@@ -138,71 +188,4 @@
         padding 2px 16px
         background lighten($themeColor, 40%)
         color white
-
-// icons
-
-.close
-    position relative
-    align-self end
-    margin 6px 16px 0
-    width 21px
-    height 21px
-
-    &:before
-        content: '';
-        position: absolute;
-        top: 10px;
-        width: 21px;
-        height: 2px;
-        background-color: currentColor;
-        transform: rotate(-45deg);
-
-    &:after
-        content: '';
-        position: absolute;
-        top: 10px;
-        width: 21px;
-        height: 2px;
-        background-color: currentColor;
-        transform: rotate(45deg);
-
-.refresh
-    position relative
-    margin 8px 16px 0
-    width 18px
-    height 18px
-    border-radius 50%
-    border-top solid 2px currentColor
-    border-right solid 2px transparent
-    border-bottom solid 2px currentColor
-    border-left solid 2px currentColor
-    transform rotate(22.5deg)
-
-    &:before
-        content ''
-        position absolute
-        top -2px
-        left -2px
-        width 14px
-        height 14px
-        border-radius 50%
-        border-top solid 2px transparent
-        border-right solid 2px transparent
-        border-bottom solid 2px currentColor
-        border-left solid 2px transparent
-        transform-origin 50% 50%
-        transform rotate(-60deg)
-
-    &:after
-        content ''
-        position absolute
-        left 10px
-        top -2px
-        width 0
-        height 0
-        border-top solid 4px transparent
-        border-right solid 4px transparent
-        border-bottom solid 4px transparent
-        border-left solid 4px currentColor
-        transform rotate(30deg)
 </style>

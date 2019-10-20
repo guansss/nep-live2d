@@ -9,6 +9,9 @@ const TRANSFORM_EASING = 'cubic-bezier(0.4, 0.0, 0.2, 1)';
 const SNAP_DISTANCE_X = 150;
 const SNAP_DISTANCE_Y = 150;
 
+const PANEL_WIDTH = Math.min(600, innerWidth);
+const PANEL_HEIGHT = Math.min(450, innerHeight);
+
 @Component
 export default class FloatingPanelMixin extends Vue {
     // Refs
@@ -23,17 +26,17 @@ export default class FloatingPanelMixin extends Vue {
     snapped = false;
 
     switchTop = 0;
-    switchLeft = 0;
+    switchLeft = innerWidth; // snap to right please!
     switchWidth = 64;
     switchHeight = 64;
     switchBorderRadius = '50%';
     switchTransform = '';
 
-    panelTop = 0;
-    panelLeft = 0;
-    panelWidth = 600;
-    panelHeight = 450;
-    panelBorderRadius = '2px';
+    panelTop = (innerHeight - PANEL_HEIGHT) / 2; // center in screen
+    panelLeft = (innerWidth - PANEL_WIDTH) / 2;
+    panelWidth = PANEL_WIDTH;
+    panelHeight = PANEL_HEIGHT;
+    panelBorderRadius = '0';
 
     transformAnimDuration = 300;
 
@@ -63,8 +66,8 @@ export default class FloatingPanelMixin extends Vue {
     @Watch('expanded')
     expandedChanged(expanded: boolean) {
         if (expanded) {
-            // Since the content is conditional on `expanded` with `v-if`, its element will be dynamically create and destroy
-            //  every time the dependency changes, we need to do works right after it create or recreates.
+            // Since the content is conditional on `expanded` with `v-if`, its element will be dynamically created and destroyed
+            //  every time the dependency changes, we need to do works right after it's created and recreated.
             this.$nextTick(this.setupContent);
         }
     }
@@ -104,7 +107,7 @@ export default class FloatingPanelMixin extends Vue {
     private setupContent() {
         // setup draggable for panel mode
         if (this.content) {
-            const handleDraggable = new Draggable(this.handle, undefined, 2);
+            const handleDraggable = new Draggable(this.handle, undefined, 2, false);
 
             handleDraggable.onDrag = (e: MouseEvent) => {
                 this.panelTop += e._movementY;

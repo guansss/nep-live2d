@@ -24,7 +24,7 @@ export default class ToggleSwitch extends Vue {
 </script>
 
 <style scoped lang="stylus">
-@require './styles'
+@require './vars'
 
 $height = 20px
 
@@ -34,15 +34,12 @@ $height = 20px
     padding 16px
     align-items center
 
-.label
-    width 30%
-
 .track
     position relative
-    margin-left auto
     width $height * 2
     height $height
     background-color #0001
+    box-shadow inset 0 0 4px #0002
     transition background-color .1s
 
     &:hover
@@ -55,6 +52,7 @@ $height = 20px
     width $height
     height $height
     background #999
+    box-shadow 0 0 5px 0 rgba(0, 0, 0, 0.3)
     transition left .15s ease-out, background-color .15s ease-out
 
 .checked

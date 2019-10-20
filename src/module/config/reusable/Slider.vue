@@ -105,7 +105,7 @@ export default class Slider extends Vue {
 </script>
 
 <style scoped lang="stylus">
-@require './styles'
+@require './vars'
 
 $height = 20px
 
@@ -115,12 +115,10 @@ $height = 20px
     padding 16px
     align-items center
 
-.label
-    width 30%
-
 .slider-wrapper
     position relative
     flex-grow 1
+    max-width 240px
     height $height
 
 .progress
@@ -145,6 +143,7 @@ $height = 20px
     width 100%
     height ($height / 2)
     background-color #0001
+    box-shadow inset 0 0 4px #0002
     transition background-color .1s
 
 .thumb

@@ -4,7 +4,7 @@
             <div
                 v-for="image in images"
                 :key="image"
-                :class="['bg-item card', { selected: image === selected }]"
+                :class="['bg-item', { selected: image === selected }]"
                 @click="selectImage(image)"
             >
                 <img class="bg-item-img" :title="image" :src="image" />
@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import CheckSVG from '@/assets/img/check.svg';
+import ImageSVG from '@/assets/img/image.svg';
 import { inWallpaperEngine } from '@/core/utils/misc';
 import ConfigModule from '@/module/config/ConfigModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
@@ -28,7 +29,8 @@ import { Component, Prop } from 'vue-property-decorator';
     components: { Scrollable, FileInput, Slider, CheckSVG },
 })
 export default class BackgroundSettings extends Vue {
-    static title = 'BACKGROUND';
+    static readonly ICON = ImageSVG;
+    static readonly TITLE = 'BACKGROUND';
 
     @Prop() readonly configModule!: ConfigModule;
 
@@ -43,7 +45,7 @@ export default class BackgroundSettings extends Vue {
             .on('weFilesUpdate:bgDirectory', this.imageChange, this)
             .on('weFilesRemove:bgDirectory', this.imageChange, this);
 
-        this.selected = this.configModule.getConfig('bg.selected', this.selected);
+        this.selected = this.configModule.getConfig('bg.img', this.selected);
 
         if (!inWallpaperEngine) {
             // get some random images!
@@ -64,7 +66,7 @@ export default class BackgroundSettings extends Vue {
     }
 
     selectImage(image: string) {
-        this.configModule.app.emit('bgSelect', image);
+        this.configModule.setConfig('bg.img', image);
 
         this.selected = image;
     }
@@ -82,7 +84,7 @@ export default class BackgroundSettings extends Vue {
 </script>
 
 <style scoped lang="stylus">
-@require '../reusable/styles'
+@require '../reusable/vars'
 
 .input
     margin 16px 16px 0
@@ -96,6 +98,8 @@ export default class BackgroundSettings extends Vue {
     grid-gap 8px
 
 .bg-item
+    @extend $card
+    @extend $card-hover
     position relative
     cursor pointer
 

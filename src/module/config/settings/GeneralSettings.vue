@@ -5,6 +5,7 @@
 </template>
 
 <script lang="ts">
+import ShapeSVG from '@/assets/img/shape.svg';
 import ConfigModule from '@/module/config/ConfigModule';
 import Slider from '@/module/config/reusable/Slider.vue';
 import Vue from 'vue';
@@ -14,14 +15,15 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
     components: { Slider },
 })
 export default class GeneralSettings extends Vue {
-    static title = 'GENERAL';
+    static readonly ICON = ShapeSVG;
+    static readonly TITLE = 'GENERAL';
 
     @Prop() readonly configModule!: ConfigModule;
 
     volume = this.configModule.getConfig('volume', 0);
 
     @Watch('volume')
-    volumeChanged(value: any) {
+    volumeChanged(value: number) {
         this.configModule.setConfig('volume', value);
     }
 }

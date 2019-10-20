@@ -8,6 +8,10 @@ import { Container } from '@pixi/display';
 
 const MOUSE_HANDLING_ELEMENT = document.documentElement;
 
+interface DraggableLive2DSprite extends Live2DSprite {
+    dragging?: boolean;
+}
+
 export default class Live2DPlayer extends Player {
     gl: WebGLRenderingContext;
 
@@ -26,13 +30,63 @@ export default class Live2DPlayer extends Player {
 
         this.focusController = new FocusController();
 
-        this.mouseHandler = new MouseHandler(MOUSE_HANDLING_ELEMENT);
-        this.mouseHandler.focus = (x, y) =>
-            this.focusController.focus(
-                (x / MOUSE_HANDLING_ELEMENT.offsetWidth) * 2 - 1,
-                (y / MOUSE_HANDLING_ELEMENT.offsetHeight) * 2 - 1,
-            );
-        this.mouseHandler.press = (x, y) => this.sprites.forEach(sprite => sprite.hit(x, y));
+        const self = this;
+
+        this.mouseHandler = new class extends MouseHandler {
+            focus(x: number, y: number) {
+                self.focusController.focus(
+                    (x / MOUSE_HANDLING_ELEMENT.offsetWidth) * 2 - 1,
+                    (y / MOUSE_HANDLING_ELEMENT.offsetHeight) * 2 - 1,
+                );
+            }
+
+            clearFocus() {
+                super.clearFocus();
+
+                self.sprites.forEach(sprite => {
+                    sprite.model.focusX = sprite.model.focusY = 0;
+                });
+            }
+
+            click(x: number, y: number) {
+                self.sprites.forEach(sprite => sprite.hit(x, y));
+            }
+
+            dragStart(x: number, y: number) {
+                // start hit testing by the z order, from top to bottom
+                for (let i = self.container.children.length - 1; i >= 0; i--) {
+                    // need to ensure the container only contains Live2DSprites
+                    const sprite = self.container.children[i] as DraggableLive2DSprite;
+
+                    if (sprite.getBounds().contains(x, y)) {
+                        sprite.dragging = true;
+
+                        // break it so only one sprite will be dragged
+                        break;
+                    }
+                }
+            }
+
+            dragMove(x: number, y: number, dx: number, dy: number) {
+                for (const sprite of self.container.children as DraggableLive2DSprite[]) {
+                    if (sprite.dragging) {
+                        sprite.x += dx;
+                        sprite.y += dy;
+                        break;
+                    }
+                }
+            }
+
+            dragEnd() {
+                for (const sprite of self.container.children as DraggableLive2DSprite[]) {
+                    if (sprite.dragging) {
+                        sprite.dragging = false;
+                        self.dragEnded(sprite);
+                        break;
+                    }
+                }
+            }
+        }(MOUSE_HANDLING_ELEMENT);
 
         mka.pixiApp.stage.addChild(this.container);
     }
@@ -41,21 +95,22 @@ export default class Live2DPlayer extends Player {
         const sprite = await Live2DSprite.create(modelSettingsFile);
         this.sprites.push(sprite);
         this.container.addChild(sprite);
+
+        return sprite;
     }
 
-    removeSprite(index: number) {
-        if (this.sprites[index]) {
-            const sprite = this.sprites[index];
-            this.container.removeChild(sprite);
-            this.sprites.splice(index, 1);
-            sprite.destroy();
-        }
+    removeSprite(sprite: Live2DSprite) {
+        this.container.removeChild(sprite);
+        this.sprites.splice(this.sprites.indexOf(sprite), 1);
+        sprite.destroy();
     }
 
     /** @override */
     update() {
-        // TODO: calculate dt
-        this.updateFocus(16);
+        if (this.mouseHandler.focusing) {
+            // TODO: calculate dt
+            this.updateFocus(16);
+        }
 
         return true;
     }
@@ -86,4 +141,7 @@ export default class Live2DPlayer extends Player {
         this.mouseHandler.destroy();
         super.destroy();
     }
+
+    // to be overridden
+    dragEnded(sprite: Live2DSprite) {}
 }

@@ -18,7 +18,7 @@ yarn install
 
 #### Source files
 
-Due to copyright restrictions, the sources of Live2D SDK and Live2D models are not provided, you need to supply them by yourself.
+Due to copyright restrictions, the files of backgrounds, Live2D SDK and Live2D models are not provided, you need to supply them by yourself.
 
 1. Download [Live2D WebGL SDK 2.1](http://sites.cybernoids.jp/cubism-sdk2/webgl2-1) and take `live2d.min.js` within.
 
@@ -52,19 +52,6 @@ As a result, the prefixes of certain file paths in model settings file need to b
 }
 ```
 
-#### Environment
-
-Create `.env.local` file at project root, add `VUE_APP_LIVE2D_PATH` and `VUE_APP_LIVE2D_MODELS` variables into it.
-
-Considering this env file is just a temporary design, you can simply use the following template:
-
-```
-VUE_APP_LIVE2D_PATH=/live2d
-VUE_APP_LIVE2D_MODELS=neptune/normal.model.json
-```
-
-For more information about the format of this file, see [dotenv](https://github.com/motdotla/dotenv).
-
 ## Serving
 
 ### Sering for browsers
@@ -79,28 +66,33 @@ yarn serve
 
 By redirecting the running wallpaper to the dev server, we are able to use Webpack's Hot Module Replacement (HMR) which is extremely useful for development.
 
-To achieve that, there is a script made to generate a "bridge" HTML file which only contains the redirection. Just a few steps to use it:
+To achieve that, a script was made to generate a bridge HTML file, there are a few steps to prepare before using this script:
 
-1. Add `WALLPAPER_PATH` variable into the `.env.local` file introduced above. It describes the destination of output files.
+1. Create a whatever wallpaper by Wallpaper Editor, then go to its location (use *Open in Explorer*), copy the path from address bar.
 
-``` sh
-# This example represents that the output files will go to Wallpaper Engine's user project directory.
-# But it's not necessary, you can use whatever position you like.
+2. **Exit Wallpaper Editor and close Wallpaper Engine**, delete everything in the wallpaper folder in step 1.
 
-WALLPAPER_PATH=C:\Program Files (x86)\Steam\steamapps\common\wallpaper_engine\projects\myprojects\nep-live2d
-```
+3. Go back to this project, create `.env.local` file at project root, add `WALLPAPER_PATH` variable into this file. It describes the destination of output files.
 
-2. Run following commands. While running `yarn setup` you may be asked for confirmations to overwrite existing files.
+    ``` sh
+    # For example, the created wallpaper was named "live2d"
+    WALLPAPER_PATH=C:\Program Files (x86)\Steam\steamapps\common\wallpaper_engine\projects\myprojects\live2d
+    ```
 
-``` sh
-yarn setup
-yarn serve
-```
+    For more information about the format of this file, see [dotenv](https://github.com/motdotla/dotenv).
 
-3. Click *Open from File* at bottom left of Wallpaper Engine, navigate to the path you set for `WALLPAPER_PATH`, select the `package.json`.
+4. Run following command. You may be asked for confirmations to overwrite existing files.
 
-And voila! HMR is now available on wallpaper!
+    ``` sh
+    yarn setup
+    ```
+
+5. Open Wallpaper Engine, you should see the wallpaper has been renamed to *[DEV] Neptune Live2D*.
+
+The preparation should be done only once, but any time you think the generated files are supposed be updated, you need to run `yarn setup` again.
+
+Now, just like serving for browsers, run `yarn serve`, and select the wallpaper, then HMR is available for it!
 
 ## Building
 
-Not implemented yet...
+Not yet...

@@ -17,7 +17,7 @@ export async function loadModelSettings(file?: string) {
     const baseDir = dirname(url.pathname || '') + '/';
     const json = await getJSON(file);
 
-    return new ModelSettings(json, baseDir);
+    return new ModelSettings(json, file, baseDir);
 }
 
 export async function loadModel(file?: string) {

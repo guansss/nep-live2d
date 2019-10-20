@@ -1,4 +1,4 @@
-import EventEmitter, { EventEntity } from '@/core/utils/EventEmitter';
+import EventEmitter from '@/core/utils/EventEmitter';
 import union from 'lodash/union';
 
 export interface App {
@@ -32,31 +32,6 @@ export namespace WEInterface {
         // immediately emit all properties and files
         Object.keys(props).forEach(emitProp);
         Object.entries(propFiles).forEach(([propName, files]) => emitFilesUpdate(propName, files));
-
-        // immediately call the new listener when it's added
-        emitter.on('newListener', (event: string, listener: EventEntity, context: any) => {
-            const prefix = event.slice(0, event.indexOf(':') + 1);
-
-            if (prefix === PREFIX) {
-                if (event !== PREFIX + '*') {
-                    const value = getPropValue(event.slice(PREFIX.length));
-
-                    if (value) {
-                        listener.fn.call(listener.context, value);
-
-                        if (listener.once) emitter.off(event, listener.fn, undefined, true);
-                    }
-                }
-            } else if (prefix === PREFIX_FILES_UPDATE) {
-                const files = propFiles[event.slice(PREFIX_FILES_UPDATE.length)];
-
-                if (files) {
-                    listener.fn.call(listener.context, files, files);
-
-                    if (listener.once) emitter.off(event, listener.fn, undefined, true);
-                }
-            }
-        });
     }
 
     export function getPropValue(name: string): string | number | undefined {
@@ -110,16 +85,16 @@ export namespace WEInterface {
             const value = getPropValue(name);
 
             if (value) {
-                eventEmitter.emit(PREFIX + name, value);
-                eventEmitter.emit(PREFIX + '*', name, value);
+                eventEmitter.sticky(PREFIX + name, value);
+                eventEmitter.sticky(PREFIX + '*', name, value);
             }
         }
     }
 
     function emitFilesUpdate(propName: string, files: string[]) {
         if (eventEmitter) {
-            eventEmitter.emit(PREFIX_FILES_UPDATE + propName, files, propFiles[propName]);
-            eventEmitter.emit(PREFIX_FILES_UPDATE + '*', propName, files, propFiles[propName]);
+            eventEmitter.sticky(PREFIX_FILES_UPDATE + propName, files, propFiles[propName]);
+            eventEmitter.sticky(PREFIX_FILES_UPDATE + '*', propName, files, propFiles[propName]);
         }
     }
 
