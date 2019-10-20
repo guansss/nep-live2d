@@ -11,7 +11,7 @@ export class Config {
     // runtime object won't be saved into localStorage
     runtime: { [key: string]: any } = {};
 
-    get(path: string, defaultValue: any) {
+    get<T>(path: string, defaultValue: T): Readonly<T> {
         const savedValue = get(this, path, defaultValue);
         const runtimeValue = get(this.runtime, path, defaultValue);
 
@@ -76,11 +76,11 @@ export default class ConfigModule implements Module {
 
         if (!runtime) this.save();
 
-        this.app.emit('config:' + path, value, oldValue, this.config);
-        this.app.emit('config:*', path, value, oldValue, this.config);
+        this.app.sticky('config:' + path, value, oldValue, this.config);
+        this.app.sticky('config:*', path, value, oldValue, this.config);
     }
 
-    getConfig(path: string, defaultValue: any) {
+    getConfig<T>(path: string, defaultValue: T): Readonly<T> {
         return this.config.get(path, defaultValue);
     }
 
