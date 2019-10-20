@@ -145,6 +145,7 @@ $height = 20px
     width 100%
     height ($height / 2)
     background-color #0001
+    box-shadow inset 0 0 4px #0002
     transition background-color .1s
 
 .thumb
