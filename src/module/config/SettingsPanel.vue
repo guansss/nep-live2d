@@ -66,6 +66,13 @@ $toolbarHeight = 36px
     width 100%
     height 100%
 
+    >>> .switch
+    >>> .slider
+        width 100%
+
+    >>> .label
+        width 160px
+
 .selectable
     cursor pointer
     transition background-color .15s, color .15s

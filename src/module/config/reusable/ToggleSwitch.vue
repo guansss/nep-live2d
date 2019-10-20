@@ -34,12 +34,8 @@ $height = 20px
     padding 16px
     align-items center
 
-.label
-    width 30%
-
 .track
     position relative
-    margin-left auto
     width $height * 2
     height $height
     background-color #0001

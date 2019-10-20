@@ -115,12 +115,10 @@ $height = 20px
     padding 16px
     align-items center
 
-.label
-    width 30%
-
 .slider-wrapper
     position relative
     flex-grow 1
+    max-width 240px
     height $height
 
 .progress
