@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import FlowerSVG from '@/assets/img/flower.svg';
+import FlareSVG from '@/assets/img/flare.svg';
 import ConfigModule from '@/module/config/ConfigModule';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
@@ -19,7 +19,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
     components: { ToggleSwitch, Slider },
 })
 export default class EffectsSettings extends Vue {
-    static readonly ICON = FlowerSVG;
+    static readonly ICON = FlareSVG;
     static readonly TITLE = 'EFFECTS';
 
     @Prop() readonly configModule!: ConfigModule;

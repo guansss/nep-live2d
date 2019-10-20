@@ -63,7 +63,7 @@
 
 <script lang="ts">
 import CloseSVG from '@/assets/img/close.svg';
-import FaceSVG from '@/assets/img/face-woman.svg';
+import TShirtSVG from '@/assets/img/tshirt.svg';
 import TuneSVG from '@/assets/img/tune.svg';
 import Live2DModel from '@/core/live2d/Live2DModel';
 import { clamp } from '@/core/utils/math';
@@ -121,7 +121,7 @@ class ModelEntity {
     components: { CloseSVG, TuneSVG, ToggleSwitch, FileInput, Slider },
 })
 export default class CharacterSettings extends Vue {
-    static readonly ICON = FaceSVG;
+    static readonly ICON = TShirtSVG;
     static readonly TITLE = 'CHARACTER';
 
     @Prop() readonly configModule!: ConfigModule;
