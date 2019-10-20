@@ -7,10 +7,10 @@
                         v-for="(page, i) in pages"
                         :key="page.title"
                         :class="['tab icon selectable', { selected: i === selectedPage }]"
+                        :data-title="page.TITLE"
                         @click="selectPage(i)"
                     >
                         <component :is="page.ICON" class="svg" />
-                        <div class="title">{{ page.TITLE }}</div>
                     </div>
                 </div>
                 <div class="selectable icon" @click.stop="close">
@@ -34,19 +34,18 @@
 <style scoped lang="stylus">
 @require './reusable/vars'
 
-$toolbarHeight = 32px
+$toolbarHeight = 36px
 
 .settings
+    @extend $card
     position absolute
     max-width 100%
     max-height 100%
-    overflow hidden
+    overflow visible
     user-select none
     color $themeColor
     font-size 16px
     background-color $backgroundColor
-    box-shadow 0 0 2px #BBB
-    transition background-color .2s
 
 .switch
     transition transform .2s ease-out, opacity .2s ease-out
@@ -82,7 +81,6 @@ $toolbarHeight = 32px
 .toolbar
     position relative
     display flex
-    overflow hidden
     background-color rgba($themeColor, 0.1)
     cursor move
 
@@ -100,13 +98,13 @@ $toolbarHeight = 32px
         margin-left auto
 
 .icon
-    width $toolbarHeight
-    height $toolbarHeight
-    padding 4px
+    $svgSize = 24px
+    padding 6px 12px
 
     svg
-        width $toolbarHeight - 2 * 4px
-        height $toolbarHeight - 2 * 4px
+        display block
+        width $svgSize
+        height $svgSize
 
     path
         fill currentColor
@@ -117,27 +115,41 @@ $toolbarHeight = 32px
     width 0
 
 .tab
+    position relative
+    flex-shrink 1
+    min-width 0
     z-index 1
-    display flex
-    width auto
-    align-items center
-    overflow hidden
-    white-space nowrap
 
-    &:first-child
-        padding-left 14px
-
-    &.selected
-        .title
-            max-width 8 * 12px
-            opacity 1
-
-    .title
-        margin-left 2px
-        max-width 0
+    &:before
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 50%;
         opacity 0
-        font-size 12px
-        transition max-width .1s linear, opacity .1s ease-out
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #333;
+        transform: translateX(-50%);
+        transition opacity .15s ease-out
+
+    &:after
+        content: attr(data-title);
+        position: absolute;
+        display: block;
+        bottom: calc(100% + 6px);
+        left: 50%;
+        padding: 6px;
+        opacity 0
+        background: #333;
+        color #FFF
+        font-size: 14px;
+        border-radius: 2px;
+        transform: translateX(-50%);
+        transition opacity .15s
+
+    &:hover
+        &:before, &:after
+            opacity 1
 
 .resizer
     $size = 12px
@@ -147,13 +159,13 @@ $toolbarHeight = 32px
     border-top solid $size transparent
     border-right solid $size transparent
     border-bottom solid $size transparent
-    border-left solid $size #FFF
+    border-left solid $size #DDD
     cursor se-resize
     transform rotate(45deg)
     transition border-left-color .15s ease-out
 
     &:hover
-        border-left solid $size var(--accentColor)
+        border-left solid $size #999
 
 // page content
 

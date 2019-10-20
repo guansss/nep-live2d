@@ -299,6 +299,7 @@ $itemSize = 144px
 
 $selectableCard
     @extend $card
+    @extend $card-hover
     background #EEE
     cursor pointer
     transition background-color .15s ease-out, box-shadow .15s ease-out
@@ -390,6 +391,7 @@ $selectableCard
 
 .details
     @extend $card
+    @extend $card-hover
     display inline-block
     margin 8px 16px
     padding 8px

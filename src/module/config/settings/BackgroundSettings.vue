@@ -99,6 +99,7 @@ export default class BackgroundSettings extends Vue {
 
 .bg-item
     @extend $card
+    @extend $card-hover
     position relative
     cursor pointer
 
