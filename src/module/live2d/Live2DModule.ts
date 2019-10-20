@@ -116,12 +116,8 @@ export default class Live2DModule implements Module {
             if (savedConfig) {
                 // internal model IDs are dynamically generated, so we update saved ID every time we add an internal model
                 (savedConfig as any).id = id;
-            } else {
-                // create a config stub for internal model
-                savedConfig = { id, path, internal: true };
+                this.app.emit('config', 'live2d.models', modelConfigs);
             }
-
-            this.app.emit('config', 'live2d.models', modelConfigs);
         } else if (!savedConfig) {
             // create a full config for custom model
             savedConfig = { id, path, ...DEFAULT_MODEL_CONFIG };
@@ -129,7 +125,7 @@ export default class Live2DModule implements Module {
             this.app.emit('config', 'live2d.models', modelConfigs);
         }
 
-        if (savedConfig.enabled === false) return;
+        if (savedConfig && savedConfig.enabled === false) return;
 
         try {
             await this.loadModel(path, id, sprite => {
