@@ -26,8 +26,6 @@ export default class Scrollable extends Vue {
     overflow = false;
     dragging = false;
 
-    scrollTop = 0;
-
     barTop = 0;
     barHeight = 0;
 
@@ -47,6 +45,14 @@ export default class Scrollable extends Vue {
 
             if (this.overflow) {
                 this.barHeight = this.container.offsetHeight ** 2 / this.container.scrollHeight || 0;
+
+                // sync the state because the content can be changed
+                this.barTop =
+                    this.container.scrollTop /
+                    ((this.container.scrollHeight - this.container.offsetHeight) /
+                        (this.container.offsetHeight - this.barHeight));
+            } else {
+                this.barTop = 0;
             }
         }, 500);
 
@@ -63,12 +69,12 @@ export default class Scrollable extends Vue {
         this.draggable.onDrag = (e: MouseEvent) => {
             this.barTop = clamp(this.barTop + e._movementY, 0, this.container.offsetHeight - this.barHeight);
 
-            this.scrollTop =
+            const scrollTop =
                 this.barTop *
                 ((this.container.scrollHeight - this.container.offsetHeight) /
                     (this.container.offsetHeight - this.barHeight));
 
-            this.container.scrollTo({ top: this.scrollTop });
+            this.container.scrollTo({ top: scrollTop });
 
             return true;
         };
