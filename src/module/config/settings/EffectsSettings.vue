@@ -34,7 +34,7 @@ export default class EffectsSettings extends Vue {
 
     @Watch('snowNumber')
     snowNumberChanged(value: number) {
-        this.configModule.setConfig('snow.number', value);
+        this.configModule.setConfig('snow.number', ~~value);
     }
 }
 </script>

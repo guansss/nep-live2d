@@ -1,5 +1,4 @@
 import { App, Module } from '@/App';
-import defaults from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import Snow from '@/module/snow/pixi-snow/Snow';
 import SnowPlayer from '@/module/snow/SnowPlayer';
@@ -10,11 +9,11 @@ export default class SnowModule implements Module {
 
     player?: SnowPlayer;
 
-    number = defaults.SNOW_NUMBER;
+    number = ~~((innerWidth * innerHeight) / 1000);
 
     constructor(readonly app: App) {
         app.on('config:snow.enabled', (enabled: boolean) => {
-                this.setup();
+                if (enabled) this.setup();
 
                 if (enabled) app.mka.enablePlayer('snow');
                 else app.mka.disablePlayer('snow');
@@ -28,17 +27,8 @@ export default class SnowModule implements Module {
                 }, 200),
             )
             .on('configReady', (config: Config) => {
-                const snowConfig = config.snow || {};
-
-                if (snowConfig.number === undefined) {
-                    app.emit('config', 'snow.number', defaults.SNOW_NUMBER, true);
-                }
-
-                if (snowConfig.enabled === undefined) {
-                    app.emit('config', 'snow.enabled', defaults.SNOW_ENABLED, true);
-                } else if (snowConfig.enabled) {
-                    this.setup();
-                }
+                app.emit('config', 'snow.enabled', false, true);
+                app.emit('config', 'snow.number', this.number, true);
             });
     }
 
