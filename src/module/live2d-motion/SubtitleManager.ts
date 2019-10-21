@@ -29,11 +29,6 @@ export default class SubtitleManager {
 
     subtitles: { [file: string]: SubtitleJSON } = {};
 
-    /**
-     * @param displayingSubtitles
-     */
-    constructor(public displayingSubtitles: Subtitle[]) {}
-
     async loadSubtitle(model: Live2DModel) {
         const file = model.modelSettings.subtitle;
 
@@ -60,31 +55,7 @@ export default class SubtitleManager {
         }
     }
 
-    showSubtitle(model: Live2DModel, name: string, timingPromise?: Promise<any>) {
-        const subtitle = this.getSubtitle(model.modelSettings.subtitle || '', name);
-
-        if (subtitle) {
-            this.displayingSubtitles.push(subtitle);
-
-            if (!isNaN(subtitle.duration as number)) {
-                setTimeout(() => this.dismissSubtitle(subtitle), subtitle.duration);
-            } else if (timingPromise) {
-                timingPromise.then(() => this.dismissSubtitle(subtitle));
-            }
-
-            return subtitle;
-        }
-    }
-
-    dismissSubtitle(subtitle: Subtitle) {
-        const index = this.displayingSubtitles.indexOf(subtitle);
-
-        if (index >= 0) {
-            this.displayingSubtitles.splice(index, 1);
-        }
-    }
-
-    getSubtitle(file: string, name: string): Subtitle | undefined {
+    getSubtitle(file: string, name: string) {
         const json = this.subtitles[file];
 
         if (!json) return;
@@ -105,4 +76,27 @@ export default class SubtitleManager {
 
         return getFromLocale(this.locale) || getFromLocale(DEFAULT_LOCALE);
     }
+
+    showSubtitle(model: Live2DModel, name: string, timingPromise?: Promise<any>) {
+        const subtitle = this.getSubtitle(model.modelSettings.subtitle || '', name);
+
+        if (subtitle) {
+            const index = this.show(subtitle);
+
+            if (!isNaN(subtitle.duration!)) {
+                setTimeout(() => this.dismiss(index), subtitle.duration);
+            } else if (timingPromise) {
+                timingPromise.then(() => this.dismiss(index));
+            }
+
+            return subtitle;
+        }
+    }
+
+    // to be overridden
+    show(subtitle: Subtitle) {
+        return -1;
+    }
+
+    dismiss(index: number) {}
 }

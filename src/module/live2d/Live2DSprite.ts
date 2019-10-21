@@ -10,7 +10,13 @@ interface CustomBaseTexture extends PIXI.BaseTexture {
     bound?: boolean;
 }
 
-export default class Live2DSprite extends Container {
+interface Live2DSprite {
+    emit(event: 'hit', hitAreaName: string): boolean;
+
+    emit(event: 'motion', group: string, index: number): boolean;
+}
+
+class Live2DSprite extends Container {
     id!: number;
 
     textures: Texture[];
@@ -127,14 +133,4 @@ export default class Live2DSprite extends Container {
     }
 }
 
-/**
- * @event Live2DSprite#hit
- * @param {string} - The name of hit area.
- */
-
-/**
- * @event Live2DSprite#motion
- * @param {Live2DMotion} motion
- * @param {string} group
- * @param {number} index
- */
+export default Live2DSprite;

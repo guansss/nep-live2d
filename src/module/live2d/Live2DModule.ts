@@ -1,5 +1,4 @@
 import { App, Module } from '@/App';
-import Live2DModel from '@/core/live2d/Live2DModel';
 import { error } from '@/core/utils/log';
 import { Config } from '@/module/config/ConfigModule';
 import Live2DPlayer from '@/module/live2d/Live2DPlayer';
@@ -11,7 +10,7 @@ export interface App {
 
     emit(event: 'live2dRemove', id: number): this;
 
-    emit(event: 'live2dLoaded', model: Live2DModel): this;
+    emit(event: 'live2dLoaded', id: number, sprite: Live2DSprite): this;
 
     emit(event: 'live2dConfig', id: number, config: Partial<ModelConfig>): this;
 }
