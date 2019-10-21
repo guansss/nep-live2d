@@ -35,6 +35,7 @@
 
         <div v-if="!selectedModel">
             <ToggleSwitch key="dont reuse me!" v-model="draggable">Draggable</ToggleSwitch>
+            <ToggleSwitch key="dont reuse me!!" v-model="bottomSubtitle">Bottom Subtitle</ToggleSwitch>
         </div>
         <div v-else>
             <details class="details" :open="detailsExpanded" @click.prevent="detailsExpanded = !detailsExpanded">
@@ -140,6 +141,7 @@ export default class CharacterSettings extends Vue {
     detailsExpanded = false;
 
     draggable = this.configModule.getConfig('live2d.draggable', false);
+    bottomSubtitle = this.configModule.getConfig('sub.bottom', false);
 
     get selectedModel() {
         return this.models[this.selectedIndex];
@@ -159,6 +161,11 @@ export default class CharacterSettings extends Vue {
     @Watch('draggable')
     draggableChanged(value: boolean) {
         this.configModule.app.emit('config', 'live2d.draggable', value, true);
+    }
+
+    @Watch('bottomSubtitle')
+    bottomSubtitleChanged(value: boolean) {
+        this.configModule.app.emit('config', 'sub.bottom', value, true);
     }
 
     created() {

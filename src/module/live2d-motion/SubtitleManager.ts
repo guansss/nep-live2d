@@ -81,12 +81,12 @@ export default class SubtitleManager {
         const subtitle = this.getSubtitle(model.modelSettings.subtitle || '', name);
 
         if (subtitle) {
-            const index = this.show(subtitle);
+            const id = this.show(subtitle);
 
             if (!isNaN(subtitle.duration!)) {
-                setTimeout(() => this.dismiss(index), subtitle.duration);
+                setTimeout(() => this.dismiss(id), subtitle.duration);
             } else if (timingPromise) {
-                timingPromise.then(() => this.dismiss(index));
+                timingPromise.then(() => this.dismiss(id));
             }
 
             return subtitle;
@@ -98,5 +98,5 @@ export default class SubtitleManager {
         return -1;
     }
 
-    dismiss(index: number) {}
+    dismiss(id: number) {}
 }

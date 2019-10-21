@@ -16,7 +16,7 @@ export default class Live2DMotionModule implements Module {
     soundManager = new SoundManager();
     subtitleManager = new SubtitleManager();
 
-    constructor(app: App) {
+    constructor(readonly app: App) {
         const live2dModule = app.modules['Live2D'] as Live2DModule;
 
         if (!live2dModule) return;
