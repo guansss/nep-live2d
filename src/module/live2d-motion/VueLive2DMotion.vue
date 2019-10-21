@@ -1,10 +1,10 @@
 <template>
     <div :class="['container', toBottom ? 'bottom' : 'top']">
-        <template v-for="subtitle in displaySubtitles">
-            <div class="subtitle-wrapper" :key="subtitle.id">
+        <TransitionGroup name="subtitle">
+            <div v-for="subtitle in displaySubtitles" class="subtitle-item" :key="subtitle.id">
                 <div class="subtitle bordered" :style="subtitle.sub.style">{{ subtitle.sub.text }}</div>
             </div>
-        </template>
+        </TransitionGroup>
     </div>
 </template>
 
@@ -60,6 +60,7 @@ export default class VueLive2DMotion extends Vue {
     position absolute
     right 0
     left 0
+    margin 8px
 
 .top
     top 0
@@ -67,16 +68,15 @@ export default class VueLive2DMotion extends Vue {
 .bottom
     bottom 0
 
-.subtitle-wrapper
-    margin 16px 64px
+.subtitle-item
+    position relative
+    padding 8px 48px
+    text-align center
 
 .subtitle
     position relative
-    left 50%
-    margin 0 auto
-    z-index 1000
+    z-index 100
     display inline-block
-    transform translateX(-50%)
 
     &.bordered
         padding 4px 8px
@@ -85,4 +85,27 @@ export default class VueLive2DMotion extends Vue {
         background #AE2839
         color white
         font-size 1.5em
+
+// animation
+
+.subtitle-enter-active
+.subtitle-leave-active
+.subtitle-move
+    transition transform .2s ease-out, opacity .2s ease-out
+
+.subtitle-enter
+.subtitle-leave-to
+    opacity 0
+
+.top .subtitle-enter
+.bottom .subtitle-leave-to
+    transform translateY(10px)
+
+.top .subtitle-leave-to
+.bottom .subtitle-enter
+    transform translateY(-10px)
+
+.subtitle-leave-active
+    position absolute
+    width 100%
 </style>

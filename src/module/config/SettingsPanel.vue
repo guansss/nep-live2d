@@ -39,6 +39,7 @@ $toolbarHeight = 36px
 .settings
     @extend $card
     position absolute
+    z-index 1000
     max-width 100%
     max-height 100%
     overflow visible
