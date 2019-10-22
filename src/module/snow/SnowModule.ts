@@ -1,4 +1,5 @@
 import { App, Module } from '@/App';
+import { SNOW_NUMBER } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import Snow from '@/module/snow/pixi-snow/Snow';
 import SnowPlayer from '@/module/snow/SnowPlayer';
@@ -9,7 +10,7 @@ export default class SnowModule implements Module {
 
     player?: SnowPlayer;
 
-    number = ~~((innerWidth * innerHeight) / 1000);
+    number = SNOW_NUMBER;
 
     constructor(readonly app: App) {
         app.on('config:snow.enabled', (enabled: boolean) => {

@@ -8,6 +8,7 @@ export const THEMES: Theme[] = [
         name: 'Default',
         bg: 'img/bg_forest.jpg',
         snow: false,
+        leaves: true,
         models: [
             {
                 file: 'live2d/neptune/neptune.model.json',
@@ -26,6 +27,7 @@ export const THEMES: Theme[] = [
         name: 'Christmas',
         bg: 'img/bg_lowee.jpg',
         snow: true,
+        leaves: false,
         models: [
             {
                 file: 'live2d/nepsanta/nepsanta.model.json',
@@ -40,3 +42,11 @@ export const THEMES: Theme[] = [
         ],
     },
 ];
+
+export const SNOW_NUMBER = ~~((innerWidth * innerHeight) / 1000);
+export const SNOW_NUMBER_MIN = 10;
+export const SNOW_NUMBER_MAX = 9999;
+
+export const LEAVES_NUMBER = ~~(innerWidth / 10);
+export const LEAVES_NUMBER_MIN = 1;
+export const LEAVES_NUMBER_MAX = 2000;

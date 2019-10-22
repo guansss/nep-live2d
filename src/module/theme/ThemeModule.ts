@@ -9,6 +9,7 @@ export interface Theme {
     name: string;
     bg: string;
     snow: boolean;
+    leaves: boolean;
     models: {
         file: string;
         profiles: {
@@ -56,6 +57,7 @@ export default class ThemeModule implements Module {
 
                 // overwrite user configs if the theme is changed by user
                 this.app.emit('config', 'bg.img', theme.bg, !byUser);
+                this.app.emit('config', 'leaves.enabled', theme.leaves, !byUser);
                 this.app.emit('config', 'snow.enabled', theme.snow, !byUser);
 
                 this.updateModels(theme, byUser);

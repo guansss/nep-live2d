@@ -45,6 +45,18 @@ declare module '@pixi/display' {
     export { DisplayObject, Container } from 'pixi.js';
 }
 
+declare module '@pixi/particles' {
+    export { ParticleContainer, ParticleRenderer } from 'pixi.js';
+}
+
+declare module '@pixi/spritesheet' {
+    export { SpritesheetLoader } from 'pixi.js';
+}
+
+declare module '@pixi/sprite' {
+    export { Sprite } from 'pixi.js';
+}
+
 declare module '@pixi/mesh' {
     export { Mesh } from 'pixi.js';
 }
