@@ -99,7 +99,11 @@ class Live2DSprite extends Container {
             baseTexture = this.textures[i].baseTexture as CustomBaseTexture;
 
             // don't render if any of textures is not ready
-            if (!baseTexture.valid) return;
+            if (!baseTexture.valid) {
+                // remember to reset it!
+                renderer.gl.pixelStorei(WebGLRenderingContext.UNPACK_FLIP_Y_WEBGL, false);
+                return;
+            }
 
             // manually bind the texture so it will be managed and automatically unbound (if necessary) by Pixi's TextureSystem
             renderer.texture.bind(baseTexture, i);
@@ -110,6 +114,9 @@ class Live2DSprite extends Container {
                 this.model.bindTexture(i, baseTexture._glTextures[(renderer as any).CONTEXT_UID].texture);
             }
         }
+
+        // reset Y flipping for other textures in Pixi
+        renderer.gl.pixelStorei(WebGLRenderingContext.UNPACK_FLIP_Y_WEBGL, false);
 
         this.updateTransform();
 
