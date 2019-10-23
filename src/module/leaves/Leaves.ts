@@ -20,6 +20,7 @@ const DEFAULT_OPTIONS = {
     autoFall: true,
 };
 
+const NUMBER_LIMIT = LEAVES_NUMBER_MAX * 1.5; // reserve some space for piece leaves!
 const MAX_ANCHOR_OFFSET = 5;
 const PIECE_RATIO = 0.8;
 const NORMAL_FADING_STEP = 0.02;
@@ -50,7 +51,7 @@ export default class Leaves extends ParticleContainer {
     nextFallTime = performance.now();
 
     constructor(sheetSource: string, options: Partial<typeof DEFAULT_OPTIONS>) {
-        super(LEAVES_NUMBER_MAX, { vertices: true, rotation: true, tint: true });
+        super(NUMBER_LIMIT, { vertices: true, rotation: true, tint: true });
 
         new Loader()
             .add(sheetSource)
@@ -98,8 +99,10 @@ export default class Leaves extends ParticleContainer {
                     if (!leaf.falling) {
                         leaf.falling = true;
                     } else {
-                        for (let j = rand(2, Math.max(2, this.options.multiply)); j > 0; j--) {
-                            this.addChild(Leaf.splitFrom(leaf, this));
+                        if (this.children.length < NUMBER_LIMIT) {
+                            for (let j = rand(2, Math.max(2, this.options.multiply)); j > 0; j--) {
+                                this.addChild(Leaf.splitFrom(leaf, this));
+                            }
                         }
                     }
                 }
