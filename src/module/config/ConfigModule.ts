@@ -5,6 +5,8 @@ import get from 'lodash/get';
 import merge from 'lodash/merge';
 import set from 'lodash/set';
 
+const UNSET = Symbol();
+
 export class Config {
     [key: string]: any;
 
@@ -12,11 +14,14 @@ export class Config {
     runtime: { [key: string]: any } = {};
 
     get<T>(path: string, defaultValue: T): Readonly<T> {
-        const savedValue = get(this, path, defaultValue);
-        const runtimeValue = get(this.runtime, path, defaultValue);
+        let savedValue: any = get(this, path, UNSET);
+        let runtimeValue: any = get(this.runtime, path, UNSET);
+
+        if (savedValue === UNSET) return runtimeValue === UNSET ? defaultValue : runtimeValue;
+        if (runtimeValue === UNSET) return savedValue;
 
         // saved value has a higher priority than runtime value
-        return typeof savedValue === 'object' ? merge(runtimeValue, savedValue) : savedValue || runtimeValue;
+        return typeof savedValue === 'object' ? merge(runtimeValue, savedValue) : savedValue;
     }
 }
 
