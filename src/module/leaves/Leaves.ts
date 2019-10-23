@@ -1,5 +1,4 @@
 import { clamp, rand } from '@/core/utils/math';
-import { LEAVES_NUMBER_MAX } from '@/defaults';
 import { Loader } from '@pixi/loaders';
 import { Point } from '@pixi/math';
 import { ParticleContainer } from '@pixi/particles';
@@ -20,7 +19,7 @@ const DEFAULT_OPTIONS = {
     autoFall: true,
 };
 
-const NUMBER_LIMIT = LEAVES_NUMBER_MAX * 1.5; // reserve some space for piece leaves!
+const NUMBER_LIMIT = 2000; // don't make too many piece leaves...
 const MAX_ANCHOR_OFFSET = 5;
 const PIECE_RATIO = 0.8;
 const NORMAL_FADING_STEP = 0.02;

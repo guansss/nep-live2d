@@ -49,4 +49,4 @@ export const SNOW_NUMBER_MAX = 9999;
 
 export const LEAVES_NUMBER = ~~(innerWidth / 10);
 export const LEAVES_NUMBER_MIN = 1;
-export const LEAVES_NUMBER_MAX = 2000;
+export const LEAVES_NUMBER_MAX = 500;
