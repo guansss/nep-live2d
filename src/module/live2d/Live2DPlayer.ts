@@ -49,6 +49,9 @@ export default class Live2DPlayer extends Player {
             }
 
             click(x: number, y: number) {
+                // TODO: Don't do this here!
+                if (self.mka) self.mka.pixiApp.stage.emit('hit', x, y);
+
                 self.sprites.forEach(sprite => sprite.hit(x, y));
             }
 

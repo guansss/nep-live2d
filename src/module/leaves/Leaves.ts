@@ -1,4 +1,4 @@
-import { rand } from '@/core/utils/math';
+import { clamp, rand } from '@/core/utils/math';
 import { LEAVES_NUMBER_MAX } from '@/defaults';
 import { Loader } from '@pixi/loaders';
 import { Point } from '@pixi/math';
@@ -11,14 +11,19 @@ const DEFAULT_OPTIONS = {
     height: 500,
     minSize: 75,
     maxSize: 150,
-    rotationSpeed: 0.001,
-    g: 0.0005, // gravity, pixel/ms^2
-    maxSpeed: 0.5, // pixel/ms
+    g: 0.0001, // gravity, pixel/ms^2
+    minSpeed: 0.1,
+    maxSpeed: 0.3,
     minDropRate: 2000,
     dropInterval: 5000,
     multiply: 3,
     autoFall: true,
 };
+
+const MAX_ANCHOR_OFFSET = 5;
+const PIECE_RATIO = 0.8;
+const NORMAL_FADING_STEP = 0.02;
+const SPLIT_FADING_STEP = 0.1;
 
 export default class Leaves extends ParticleContainer {
     private _number: number;
@@ -32,6 +37,7 @@ export default class Leaves extends ParticleContainer {
 
     set number(value: number) {
         this._number = value;
+        this.options.number = value;
         this.updateLeaves();
     }
 
@@ -68,7 +74,7 @@ export default class Leaves extends ParticleContainer {
 
         if (delta >= 0) {
             for (let i = 0, leaf; i < delta; i++) {
-                leaf = new Leaf(this.textures[~~rand(0, texturesNumber)], this.options, this.width);
+                leaf = new Leaf(this.textures[~~rand(0, texturesNumber)], this, this.options);
 
                 this.leaves.push(leaf);
                 this.addChild(leaf);
@@ -80,16 +86,21 @@ export default class Leaves extends ParticleContainer {
     }
 
     hit(x: number, y: number) {
+        const point = new Point(x, y);
+
         for (let i = this.children.length - 1, leaf: Leaf; i >= 0; i--) {
             leaf = this.children[i] as Leaf;
 
-            if (leaf.alpha === 1 && leaf.containsPoint(new Point(x, y))) {
-                if (!leaf.falling) {
-                    leaf.falling = true;
-                } else {
-                    for (let j = rand(0, this.options.multiply); j > 0; i--) {
-                        leaf = Leaf.scatterFrom(leaf);
-                        this.addChild(leaf);
+            if (leaf.alpha > 0) {
+                leaf.updateTransform();
+
+                if (leaf.containsPoint(point)) {
+                    if (!leaf.falling) {
+                        leaf.falling = true;
+                    } else {
+                        for (let j = rand(2, Math.max(2, this.options.multiply)); j > 0; j--) {
+                            this.addChild(Leaf.splitFrom(leaf, this));
+                        }
                     }
                 }
             }
@@ -120,34 +131,43 @@ export default class Leaves extends ParticleContainer {
         }
 
         const removals = [];
+        let leaf: Leaf;
+        let t: number;
+        let sqt: number;
 
-        for (let i = this.children.length - 1, leaf; i >= 0; i--) {
+        for (let i = this.children.length - 1; i >= 0; i--) {
             leaf = this.children[i] as Leaf;
 
-            if (leaf.alpha < 1) leaf.alpha += 0.02;
+            // fade-in newly grown leaves, fade-out split leaves
+            leaf.alpha = clamp(leaf.alpha + leaf.fadingStep, 0, 1);
 
-            if (leaf.y < options.height) {
-                if (leaf.scattered || leaf.falling) {
-                    if (leaf.vy < options.maxSpeed) leaf.vy += options.g * dt;
+            if (leaf.falling) {
+                if (leaf.y < leaf.maxY) {
+                    if (leaf.vy < leaf.maxSpeed) {
+                        leaf.vy += options.g * dt;
+                    }
 
-                    if (leaf.rotation < leaf.maxRotation && leaf.rotation > -leaf.maxRotation) {
+                    if (leaf.piece) {
                         leaf.rotation += leaf.vy * leaf.rotationSpeed * dt;
+                    } else {
+                        // ease-in-out curve, see Solution 3 from https://stackoverflow.com/a/25730573
+                        t = leaf.maxRotation - Math.abs(leaf.rotation);
+                        sqt = t ** 2;
+                        leaf.rotation += (sqt / (2 * (sqt - t) + 1)) * leaf.rotationSpeed * dt;
                     }
 
                     leaf.y += leaf.vy * dt;
-                } else if (shouldFall) {
-                    // drop at most one leaf at a time
-                    shouldFall = false;
-                    leaf.falling = true;
-                }
-            } else {
-                if (leaf.scattered) {
-                    // remove scattered leaves when they fall to ground
+                } else if (leaf.piece) {
+                    // remove piece leaves when they fall to ground
                     removals.push(leaf);
                 } else {
                     // reset normal leaves to top when they fall to ground
-                    leaf.reset(this.width);
+                    leaf.reset(this);
                 }
+            } else if (shouldFall) {
+                // drop at most one leaf at a time
+                shouldFall = false;
+                leaf.falling = true;
             }
         }
 
@@ -169,56 +189,96 @@ class Leaf extends Sprite {
     // vx = 0;
     vy = 0;
 
-    scattered = false;
+    maxY: number; // when Y reaches this value, the leaf is considered to fall to ground
+    maxSpeed: number;
+    maxRotation = rand(Math.PI / 2.5, Math.PI / 1.5);
+
     falling = false;
+    split = false;
+    piece = false;
 
     direction: -1 | 1 = Math.random() > 0.5 ? 1 : -1;
-    rotationSpeed = 0;
-    maxRotation = Math.PI / 2;
+    rotationSpeed = this.direction * rand(0.0002, 0.0005);
+    fadingStep = NORMAL_FADING_STEP;
 
-    constructor(texture: PIXI.Texture, readonly options: typeof DEFAULT_OPTIONS, containerWidth?: number) {
+    constructor(texture: PIXI.Texture, container: PIXI.Container, readonly options: typeof DEFAULT_OPTIONS) {
         super(texture);
 
         const size = ~~rand(options.minSize, options.maxSize);
         this.width = size;
         this.height = size;
-        this.anchor.set(0.5, 0.5);
-        this.rotationSpeed = this.direction * rand(0.0005, options.rotationSpeed);
 
-        this.reset(containerWidth || options.width);
+        this.anchor.set(0.5, 0.5);
+        this.maxY = container.height + size * 0.5;
+        this.maxSpeed = rand(options.minSpeed, options.maxSpeed);
+
+        this.reset(container);
     }
 
-    reset(containerWidth: number) {
+    reset(container: PIXI.Container) {
         this.falling = false;
-        this.x = rand(0, containerWidth);
-        this.y = rand(-0.4, 0.4) * this.height;
+        this.split = false;
+        this.x = rand(0, container.width);
+        this.y = rand(-0.3, 0.3) * this.height;
         this.vy = 0;
         this.alpha = 0;
 
-        this.rotation = this.direction * Math.random() * (Math.PI / 3);
+        this.rotation = this.direction * rand(0, Math.PI / 3);
     }
 
-    static scatterFrom(leaf: Leaf) {
-        const scattered = new Leaf(leaf.texture, leaf.options);
+    static splitFrom(leaf: Leaf, container: PIXI.Container) {
+        leaf.split = true;
+        leaf.fadingStep = -SPLIT_FADING_STEP; // prepare to fade out
 
-        scattered.scattered = true;
+        const piece = new Leaf(leaf.texture, container, leaf.options);
 
-        scattered.transform.localTransform.copyFrom(leaf.transform.localTransform);
-        scattered.transform.worldTransform.copyFrom(leaf.transform.worldTransform);
-        scattered.vy = leaf.vy;
-        scattered.width = leaf.width * 0.8;
-        scattered.height = leaf.height * 0.8;
+        piece.piece = true;
+        piece.falling = true;
 
-        const ax = rand(0.05, 3);
-        const ay = rand(0.05, 3);
+        piece.vy = leaf.vy * 1.5;
+        piece.width = leaf.width * PIECE_RATIO;
+        piece.height = leaf.height * PIECE_RATIO;
+        piece.rotation = leaf.rotation;
+        piece.fadingStep = SPLIT_FADING_STEP;
 
-        scattered.anchor.set(ax, ay);
-        scattered.x = leaf.x + (ax - 0.5) * leaf.width;
-        scattered.y = leaf.y + (ay - 0.5) * leaf.height;
+        const ax = rand(-MAX_ANCHOR_OFFSET, MAX_ANCHOR_OFFSET);
+        const ay = rand(-MAX_ANCHOR_OFFSET, MAX_ANCHOR_OFFSET);
 
-        scattered.rotationSpeed = leaf.rotationSpeed * 3; // rotate faster!
-        scattered.maxRotation = Infinity;
+        piece.anchor.set(ax, ay);
+        piece.x = leaf.x;
+        piece.y = leaf.y;
 
-        return scattered;
+        /*
+         * The accurate value should be:
+         *
+         * container.height + piece.height * Math.sqrt(ax ** 2 + ay ** 2)
+         *
+         * But using `MAX_ANCHOR_OFFSET` is faster and the error can be just ignored
+         */
+        piece.maxY = container.height + piece.height * MAX_ANCHOR_OFFSET;
+
+        /*
+         * Offset to correct position by the new transform.
+         *
+         *            w
+         * originX = --- * [(ax' - 0.5) * R - (ax - 0.5)]
+         *            R
+         *                               ax - 0.5
+         *         = w * [(ax' - 0.5) - ----------]
+         *                                  R
+         *
+         * ax' = piece.anchor.x
+         * ax  = leaf.anchor.x
+         */
+        const origin = new Point(
+            piece.texture.width * (ax - 0.5 - (leaf.anchor.x - 0.5) / PIECE_RATIO),
+            piece.texture.height * (ay - 0.5 - (leaf.anchor.y - 0.5) / PIECE_RATIO),
+        );
+        piece.toGlobal(origin, piece.position);
+
+        piece.rotationSpeed = clamp(leaf.rotationSpeed * 3, -0.01, 0.01);
+        piece.maxRotation = Infinity;
+
+        return piece;
     }
 }

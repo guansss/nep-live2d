@@ -44,6 +44,9 @@ export default class LeavesPlayer extends Player {
 
         if (this.mka) {
             const pixiApp = this.mka.pixiApp;
+
+            pixiApp.stage.on('hit', this.hit, this);
+
             if (!pixiApp.stage.children.includes(this.leaves!)) {
                 if (pixiApp.renderer.width !== this.leaves.width || pixiApp.renderer.height !== this.leaves.height) {
                     this.leaves.resize(pixiApp.renderer.width, pixiApp.renderer.height);
@@ -69,6 +72,10 @@ export default class LeavesPlayer extends Player {
         this.destroy();
     }
 
+    hit(x: number, y: number) {
+        this.leaves && this.leaves.hit(x, y);
+    }
+
     update(): boolean {
         if (this.leaves) {
             // TODO: calculate dt and now
@@ -81,8 +88,12 @@ export default class LeavesPlayer extends Player {
 
     destroy() {
         if (this.leaves) {
-            if (this.mka && this.mka.pixiApp.stage.children.includes(this.leaves!)) {
-                this.mka.pixiApp.stage.removeChild(this.leaves!);
+            if (this.mka) {
+                this.mka.pixiApp.stage.off('hit', this.hit);
+
+                if (this.mka.pixiApp.stage.children.includes(this.leaves!)) {
+                    this.mka.pixiApp.stage.removeChild(this.leaves!);
+                }
             }
 
             this.leaves.destroy();
