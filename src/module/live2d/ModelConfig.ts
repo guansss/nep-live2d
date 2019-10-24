@@ -9,6 +9,7 @@ export interface ModelConfig {
     scale?: number;
     x?: number;
     y?: number;
+    preview?: string;
 }
 
 export const DEFAULT_MODEL_CONFIG: Omit<ModelConfig, 'id' | 'path'> = {

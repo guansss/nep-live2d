@@ -14,7 +14,7 @@
                 :class="['item', { selected: selectedIndex === i }]"
                 @click="selectedIndex = i"
             >
-                <img v-if="model.preview" :src="model.preview" class="preview" />
+                <img v-if="model.config && model.config.preview" :src="model.config.preview" class="preview" />
                 <div v-else class="preview-alt">{{ model.name }}</div>
 
                 <div
@@ -85,7 +85,6 @@ class ModelEntity {
     name: string;
     path: string;
 
-    preview?: string;
     width = 0;
     height = 0;
 
@@ -112,7 +111,6 @@ class ModelEntity {
     attach(live2dModel: Live2DModel) {
         this.loaded = true;
         this.name = live2dModel.name;
-        this.preview = live2dModel.modelSettings.preview;
         this.width = live2dModel.width;
         this.height = live2dModel.height;
     }

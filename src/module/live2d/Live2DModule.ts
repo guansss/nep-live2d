@@ -88,6 +88,11 @@ export default class Live2DModule implements Module {
         // prepare before emitting the event
         loaded && loaded(sprite);
 
+        if (sprite.model.modelSettings.preview) {
+            // save the preview so we can show it without the need to load a model
+            this.app.emit('live2dConfig', id, { preview: sprite.model.modelSettings.preview });
+        }
+
         this.app.emit('live2dLoaded', id, sprite);
     }
 
