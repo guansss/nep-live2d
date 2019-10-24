@@ -190,7 +190,7 @@ export default class Live2DModule implements Module {
                 if (sprite) {
                     // remove sprite when existing but not enabled
                     this.player.removeSprite(sprite);
-                } else {
+                } else if (config.enabled === false) {
                     // remove sprite right after it finishes loading
                     this.pendingRemoveIDs.push(id);
                 }
