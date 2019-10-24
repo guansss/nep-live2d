@@ -43,6 +43,7 @@ export default class Leaves extends ParticleContainer {
 
     options = DEFAULT_OPTIONS;
 
+    texture?: PIXI.Texture; // texture of the sprite sheet
     textures: PIXI.Texture[] = [];
 
     leaves: Leaf[] = [];
@@ -55,6 +56,7 @@ export default class Leaves extends ParticleContainer {
         new Loader()
             .add(sheetSource)
             .load((loader: Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) => {
+                this.texture = resources[sheetSource]!.children[0].texture;
                 this.textures = Object.values(resources[sheetSource]!.spritesheet!.textures);
                 this.updateLeaves();
             });
@@ -183,6 +185,14 @@ export default class Leaves extends ParticleContainer {
 
     _calculateBounds() {
         this._bounds.addFrame(this.transform, 0, 0, this._width, this._height);
+    }
+
+    destroy() {
+        super.destroy();
+
+        // manually destroy textures, otherwise Pixi will warn that it's already in cache when loading same sprite sheet again
+        this.texture && this.texture.destroy(true);
+        this.textures.forEach(texture => texture.destroy());
     }
 }
 
