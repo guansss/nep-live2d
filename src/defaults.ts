@@ -1,7 +1,5 @@
 import { Theme } from '@/module/theme/ThemeModule';
 
-export const LIVE2D_DIRECTORY = 'live2d';
-
 export const THEMES: Theme[] = [
     {
         v: 1,
@@ -43,6 +41,9 @@ export const THEMES: Theme[] = [
     },
 ];
 
+export const BACKGROUNDS = THEMES.map(theme => theme.bg);
+
+export const LIVE2D_DIRECTORY = 'live2d';
 export const LIVE2D_SCALE_MAX = 1.5;
 
 export const FOCUS_TIMEOUT = 2000;

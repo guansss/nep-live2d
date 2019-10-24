@@ -18,6 +18,7 @@
 import CheckSVG from '@/assets/img/check.svg';
 import ImageSVG from '@/assets/img/image.svg';
 import { inWallpaperEngine } from '@/core/utils/misc';
+import { BACKGROUNDS } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
 import Scrollable from '@/module/config/reusable/Scrollable.vue';
@@ -34,7 +35,7 @@ export default class BackgroundSettings extends Vue {
 
     @Prop() readonly configModule!: ConfigModule;
 
-    images: string[] = [];
+    images: string[] = BACKGROUNDS.slice();
 
     selected = '';
 
@@ -50,6 +51,7 @@ export default class BackgroundSettings extends Vue {
         if (!inWallpaperEngine) {
             // get some random images!
             this.images = [
+                ...BACKGROUNDS,
                 'https://w.wallhaven.cc/full/r2/wallhaven-r2qqlj.jpg',
                 'https://w.wallhaven.cc/full/kw/wallhaven-kw1ky1.jpg',
                 'https://w.wallhaven.cc/full/vm/wallhaven-vmx153.jpg',
@@ -62,7 +64,7 @@ export default class BackgroundSettings extends Vue {
     }
 
     imageChange(files: string[], allFiles: string[]) {
-        this.images = [...allFiles];
+        this.images = [...BACKGROUNDS, ...allFiles];
     }
 
     selectImage(image: string) {
