@@ -67,7 +67,6 @@ export default class Snow extends Mesh {
         this.state.blend = true;
         this.state.blendMode = BLEND_MODES.NORMAL_NPM;
         this.state.depthTest = false;
-        this.state.culling = true;
 
         this.setup();
     }
