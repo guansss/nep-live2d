@@ -38,7 +38,7 @@
             <ToggleSwitch key="dont reuse me!!" v-model="bottomSubtitle">Bottom Subtitle</ToggleSwitch>
         </div>
         <div v-else>
-            <details class="details" :open="detailsExpanded" @click.prevent="detailsExpanded = !detailsExpanded">
+            <details class="details button" :open="detailsExpanded" @click.prevent="detailsExpanded = !detailsExpanded">
                 <summary>Details</summary>
                 <template v-if="detailsExpanded">
                     <div>File: {{ selectedModel.path }}</div>
@@ -395,25 +395,17 @@ $selectableCard
             fill currentColor
 
 .details
-    @extend $card
-    @extend $card-hover
     display inline-block
     margin 8px 16px
     padding 8px
-    background #666
-    color #EEE
     font .8em / 1.2em Consolas, monospace
     white-space pre-wrap
-    cursor pointer
 
     &[open]
         display block
 
         >>> summary
             margin-bottom 4px
-
-    &:hover
-        background #444
 
     >>> summary
         outline none

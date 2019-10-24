@@ -59,29 +59,16 @@ body
     display inline-block
     margin-bottom 8px
     padding 8px 16px
-    background-color var(--accentColor)
+    background-color #555
     color white
     font-size 14px
     cursor pointer
     box-shadow 0 1px 2px #0004
     transition box-shadow .15s ease-out
 
-    &:after
-        content ''
-        position absolute
-        top 0
-        right 0
-        bottom 0
-        left 0
-        display block
-        background #0001
-        transition background-color .15s ease-out
-
     &:hover
+        background #222
         box-shadow 0 2px 4px #0006
-
-        &:after
-            background transparent
 
     &:active
         box-shadow none

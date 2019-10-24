@@ -185,6 +185,9 @@ export default class ConsoleSettings extends Vue {
     overflow hidden
     background #e72917
 
+    &:hover
+        background #cf1100
+
     .cover
         position absolute
         top 0
