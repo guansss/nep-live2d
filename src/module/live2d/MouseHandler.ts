@@ -1,3 +1,4 @@
+import { FOCUS_TIMEOUT } from '@/defaults';
 import autobind from 'autobind-decorator';
 import debounce from 'lodash/debounce';
 import Cancelable = _.Cancelable;
@@ -11,7 +12,7 @@ export default class MouseHandler {
     private focusOnPress = false;
 
     /** How long will the focus last. Setting 0 or negative value is equivalent to `Infinity` */
-    private loseFocusTimeout: DOMHighResTimeStamp = Infinity;
+    private loseFocusTimeout: DOMHighResTimeStamp = FOCUS_TIMEOUT;
 
     private pressed = false;
     private dragging = false;

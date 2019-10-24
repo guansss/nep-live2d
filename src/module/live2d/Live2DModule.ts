@@ -1,5 +1,6 @@
 import { App, Module } from '@/App';
 import { error } from '@/core/utils/log';
+import { FOCUS_TIMEOUT } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import Live2DPlayer from '@/module/live2d/Live2DPlayer';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
@@ -51,14 +52,20 @@ export default class Live2DModule implements Module {
 
         app.mka!.addPlayer('live2d', this.player);
 
-        app.on('configReady', (config: Config) => {
-                this.config = config;
-                this.loadSavedModels();
-            })
-            .on('config:live2d.draggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable))
+        app.on('config:live2d.draggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable))
+            .on('config:live2d.fPress', this.player.mouseHandler.setFocusOnPress, this.player.mouseHandler)
+            .on('config:live2d.fTime', this.player.mouseHandler.setLoseFocusTimeout, this.player.mouseHandler)
             .on('live2dConfig', this.configureModel, this)
             .on('live2dAdd', this.addModel, this)
-            .on('live2dRemove', this.removeModel, this);
+            .on('live2dRemove', this.removeModel, this)
+            .on('configReady', (config: Config) => {
+                this.config = config;
+
+                app.emit('config', 'live2d.fPress', false, true);
+                app.emit('config', 'live2d.fTime', FOCUS_TIMEOUT, true);
+
+                this.loadSavedModels();
+            });
     }
 
     private loadSavedModels() {

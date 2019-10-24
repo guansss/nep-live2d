@@ -34,8 +34,11 @@
         </div>
 
         <div v-if="!selectedModel">
-            <ToggleSwitch key="dont reuse me!" v-model="draggable">Draggable</ToggleSwitch>
-            <ToggleSwitch key="dont reuse me!!" v-model="bottomSubtitle">Bottom Subtitle</ToggleSwitch>
+            <ToggleSwitch key="s1" v-model="draggable">Draggable</ToggleSwitch>
+            <ToggleSwitch key="s2" v-model="focusOnPress">Focus On Press</ToggleSwitch>
+            <Slider v-if="!focusOnPress" overlay :min="0" :max="focusTimeoutMax" v-model="focusTimeout">Focus Timeout
+            </Slider>
+            <ToggleSwitch key="s3" v-model="bottomSubtitle">Bottom Subtitle</ToggleSwitch>
         </div>
         <div v-else>
             <details class="details button" :open="detailsExpanded" @click.prevent="detailsExpanded = !detailsExpanded">
@@ -54,7 +57,7 @@
 
             <template v-else>
                 <ToggleSwitch :value="selectedModel.config.enabled" @change="enableChanged">Enabled</ToggleSwitch>
-                <Slider :value="selectedModel.config.scale" overlay :min="0.01" :max="1.5" @change="scaleChanged"
+                <Slider :value="selectedModel.config.scale" overlay :min="0.01" :max="scaleMax" @change="scaleChanged"
                 >Scale
                 </Slider>
             </template>
@@ -68,6 +71,7 @@ import TShirtSVG from '@/assets/img/tshirt.svg';
 import TuneSVG from '@/assets/img/tune.svg';
 import Live2DModel from '@/core/live2d/Live2DModel';
 import { clamp } from '@/core/utils/math';
+import { FOCUS_TIMEOUT_MAX, LIVE2D_SCALE_MAX } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
@@ -139,7 +143,12 @@ export default class CharacterSettings extends Vue {
     detailsExpanded = false;
 
     draggable = this.configModule.getConfig('live2d.draggable', false);
+    focusOnPress = this.configModule.getConfig('live2d.fPress', false);
+    focusTimeout = this.configModule.getConfig('live2d.fTime', 0) / 1000;
     bottomSubtitle = this.configModule.getConfig('sub.bottom', false);
+
+    scaleMax = LIVE2D_SCALE_MAX;
+    focusTimeoutMax = FOCUS_TIMEOUT_MAX / 1000;
 
     get selectedModel() {
         return this.models[this.selectedIndex];
@@ -159,6 +168,16 @@ export default class CharacterSettings extends Vue {
     @Watch('draggable')
     draggableChanged(value: boolean) {
         this.configModule.app.emit('config', 'live2d.draggable', value, true);
+    }
+
+    @Watch('focusOnPress')
+    focusOnPressChanged(value: boolean) {
+        this.configModule.app.emit('config', 'live2d.fPress', value);
+    }
+
+    @Watch('focusTimeout')
+    focusTimeoutChanged(value: number) {
+        this.configModule.app.emit('config', 'live2d.fTime', ~~(value * 1000));
     }
 
     @Watch('bottomSubtitle')
