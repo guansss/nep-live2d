@@ -1,6 +1,6 @@
 <template>
     <div>
-        <TransitionGroup appear v-if="showImage" name="list" tag="div" class="bg-list">
+        <div v-if="showImage" class="bg-list">
             <div
                 v-for="image in images"
                 :key="image"
@@ -10,7 +10,7 @@
                 <img class="bg-item-img" :title="image" :src="image" />
                 <CheckSVG class="check" />
             </div>
-        </TransitionGroup>
+        </div>
     </div>
 </template>
 
@@ -141,15 +141,4 @@ export default class BackgroundSettings extends Vue {
     opacity 0
     object-fit cover
     transition opacity .2s
-
-/* animation */
-.bg-item
-    display block
-    transition all .2s
-
-.list-enter, .list-leave-to
-    opacity 0
-
-.list-leave-active
-    position absolute
 </style>
