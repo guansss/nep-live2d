@@ -1,18 +1,21 @@
-import clamp from 'lodash/clamp';
+const EPSILON = 0.01; // Minimum distance to respond
 
-/** Minimum distance to respond */
-const EPSILON = 0.01;
+const FRAME_RATE = 60;
+const MAX_SPEED = 40 / 7.5 / FRAME_RATE;
+const ACCELERATION_TIME = 1 / (0.15 * 1000);
 
 export default class FocusController {
-    maxSpeed = 0.01;
-    maxAccSpeed = 0.008;
-
     targetX = 0;
     targetY = 0;
     x = 0;
     y = 0;
-    v = 0;
 
+    vx = 0;
+    vy = 0;
+
+    /**
+     * Focus in range [-1, 1].
+     */
     focus(x: number, y: number) {
         this.targetX = x;
         this.targetY = y;
@@ -25,30 +28,33 @@ export default class FocusController {
         if (Math.abs(dx) < EPSILON && Math.abs(dy) < EPSILON) return;
 
         const d = Math.sqrt(dx ** 2 + dy ** 2);
-        const v = clamp(d / dt, 0, this.maxSpeed);
-        const a = clamp((v - this.v) / dt, -this.maxAccSpeed, this.maxAccSpeed);
-        this.v += a * dt;
 
-        const dd = this.v * dt;
-        this.x += (dd * dx) / d;
-        this.y += (dd * dy) / d;
+        let ax = MAX_SPEED * (dx / d) - this.vx;
+        let ay = MAX_SPEED * (dy / d) - this.vy;
 
-        // ==========================================================================================
-        // Hmm, I can't understand this.
-        //
-        //            2  6           2               3
-        //      sqrt(a  t  + 16 a h t  - 8 a h) - a t
-        // v = --------------------------------------
-        //                    2
-        //                 4 t  - 2
-        //(t=1)
+        const a = Math.sqrt(ax ** 2 + ay ** 2);
+        const maxA = MAX_SPEED * ACCELERATION_TIME * dt;
 
-        // var max_v = 0.5 * (Math.sqrt(MAX_A * MAX_A + 16 * MAX_A * d - 8 * MAX_A * d) - MAX_A);
-        // var cur_v = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-        // if (cur_v > max_v) {
-        //     this.vx *= max_v / cur_v;
-        //     this.vy *= max_v / cur_v;
-        // }
-        // ==========================================================================================
+        if (a > maxA) {
+            ax *= maxA / a;
+            ay *= maxA / a;
+        }
+
+        this.vx += ax;
+        this.vy += ay;
+
+        const v = Math.sqrt(this.vx ** 2 + this.vy ** 2);
+        const maxV = 0.5 * (Math.sqrt(maxA ** 2 + 8 * maxA * d) - maxA);
+
+        if (v > maxV) {
+            this.vx *= maxV / v;
+            this.vy *= maxV / v;
+        }
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // so many sqrt's here, it's painful...
+        // I tried hard to reduce the amount of them, but finally failed :(
     }
 }

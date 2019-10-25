@@ -142,17 +142,14 @@ export default class Live2DModel {
 
         const model = this.internalModel;
 
-        // model.loadParam();
+        model.loadParam();
 
         const updated = this.motionManager.update();
         if (!updated) {
             this.eyeBlink.update(dt);
         }
 
-        // model.saveParam();
-
-        this.physics && this.physics.update(dt);
-        this.pose && this.pose.update(dt);
+        model.saveParam();
 
         // update focus and natural movements
         this.focusController.update(dt);
@@ -166,6 +163,9 @@ export default class Live2DModel {
         model.addToParamFloat('PARAM_ANGLE_Z', focusX * focusY * -30 + 10 * Math.sin(t / 5.5345) * 0.5);
         model.addToParamFloat('PARAM_BODY_ANGLE_X', focusX * 10 + 4 * Math.sin(t / 15.5345) * 0.5);
         model.setParamFloat('PARAM_BREATH', 0.5 + 0.5 * Math.sin(t / 3.2345));
+
+        this.physics && this.physics.update(dt);
+        this.pose && this.pose.update(dt);
 
         model.update();
 
