@@ -56,9 +56,11 @@ export default class Leaves extends ParticleContainer {
         new Loader()
             .add(sheetSource)
             .load((loader: Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) => {
-                this.texture = resources[sheetSource]!.children[0].texture;
-                this.textures = Object.values(resources[sheetSource]!.spritesheet!.textures);
-                this.updateLeaves();
+                if (!this._destroyed) {
+                    this.texture = resources[sheetSource]!.children[0].texture;
+                    this.textures = Object.values(resources[sheetSource]!.spritesheet!.textures);
+                    this.updateLeaves();
+                }
             });
 
         Object.assign(this.options, options);
