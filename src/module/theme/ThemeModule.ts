@@ -1,5 +1,5 @@
 import { App, Module } from '@/App';
-import { CHRISTMAS } from '@/core/utils/date';
+import { CHRISTMAS, HALLOWEEN } from '@/core/utils/date';
 import { screenAspectRatio } from '@/core/utils/misc';
 import { THEMES } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
@@ -49,7 +49,7 @@ export default class ThemeModule implements Module {
     }
 
     getDefault() {
-        const name = CHRISTMAS ? 'Christmas' : 'Default';
+        const name = HALLOWEEN ? 'Halloween' : CHRISTMAS ? 'Christmas' : 'Default';
         const index = this.themes.findIndex(theme => theme.name === name);
         return index >= 0 ? index : 0;
     }

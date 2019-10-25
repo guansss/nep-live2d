@@ -22,6 +22,25 @@ export const THEMES: Theme[] = [
     },
     {
         v: 1,
+        name: 'Halloween',
+        bg: 'img/bg_halloween.jpg',
+        snow: true,
+        leaves: false,
+        models: [
+            {
+                file: 'live2d/neptune/neptune.model.json',
+                profiles: {
+                    '16:9': {
+                        scale: 0.0004,
+                        x: 0.5,
+                        y: 0.7,
+                    },
+                },
+            },
+        ],
+    },
+    {
+        v: 1,
         name: 'Christmas',
         bg: 'img/bg_lowee.jpg',
         snow: true,
