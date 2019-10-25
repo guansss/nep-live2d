@@ -1,6 +1,6 @@
 type DateRange = [string, string];
 
-const date = new Date('11-1');
+const date = new Date();
 const year = date.getFullYear();
 
 function isInRange(range: DateRange) {

@@ -60,6 +60,9 @@ export const THEMES: Theme[] = [
     },
 ];
 
+export const THEME_HALLOWEEN = 1;
+export const THEME_CHRISTMAS = 2;
+
 export const BACKGROUNDS = THEMES.map(theme => theme.bg);
 
 export const LIVE2D_DIRECTORY = 'live2d';

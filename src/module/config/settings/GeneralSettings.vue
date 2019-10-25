@@ -11,6 +11,7 @@
                     {{ theme.name }}
                 </div>
             </div>
+            <ToggleSwitch v-model="themeAuto">Auto Holiday Theme</ToggleSwitch>
         </div>
         <div class="section" data-title="Miscellaneous">
             <Slider progress v-model="volume">Volume</Slider>
@@ -23,12 +24,13 @@ import ShapeSVG from '@/assets/img/shape.svg';
 import { THEMES } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import Slider from '@/module/config/reusable/Slider.vue';
+import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
 import { Theme } from '@/module/theme/ThemeModule';
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
-    components: { Slider },
+    components: { ToggleSwitch, Slider },
 })
 export default class GeneralSettings extends Vue {
     static readonly ICON = ShapeSVG;
@@ -38,6 +40,7 @@ export default class GeneralSettings extends Vue {
 
     themes: Theme[] = THEMES;
     themeSelected = this.configModule.getConfig('theme.selected', -1);
+    themeAuto = this.configModule.getConfig('theme.auto', true);
 
     volume = this.configModule.getConfig('volume', 0);
 
@@ -48,7 +51,13 @@ export default class GeneralSettings extends Vue {
 
     @Watch('themeSelected')
     themeChanged(value: number) {
+        this.themeAuto = false;
         this.configModule.setConfig('theme.selected', value);
+    }
+
+    @Watch('themeAuto')
+    themeAutoChanged(value: boolean) {
+        this.configModule.setConfig('theme.auto', value);
     }
 }
 </script>

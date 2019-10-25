@@ -1,7 +1,7 @@
 import { App, Module } from '@/App';
 import { CHRISTMAS, HALLOWEEN } from '@/core/utils/date';
 import { screenAspectRatio } from '@/core/utils/misc';
-import { THEMES } from '@/defaults';
+import { THEME_CHRISTMAS, THEME_HALLOWEEN, THEMES } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import { ModelConfig } from '@/module/live2d/ModelConfig';
 
@@ -41,17 +41,26 @@ export default class ThemeModule implements Module {
     init(config: Config) {
         this.config = config;
 
-        this.app.emit('config', 'theme.selected', this.getDefault(), true);
-
-        this.changeTheme(config.get('theme.selected', 0), false);
+        this.setupInitialTheme(config);
 
         this.app.on('config:theme.selected', (index: number) => this.changeTheme(index, true));
     }
 
-    getDefault() {
-        const name = HALLOWEEN ? 'Halloween' : CHRISTMAS ? 'Christmas' : 'Default';
-        const index = this.themes.findIndex(theme => theme.name === name);
-        return index >= 0 ? index : 0;
+    setupInitialTheme(config: Config) {
+        this.app.emit('config', 'theme.auto', true, true);
+
+        const autoHolidayTheme = config.get('theme.auto', true);
+
+        if (autoHolidayTheme) {
+            const index = HALLOWEEN ? THEME_HALLOWEEN : CHRISTMAS ? THEME_CHRISTMAS : 0;
+            const shouldOverride = index !== config.get('theme.selected', -1);
+
+            this.app.emit('config', 'theme.selected', index);
+            this.changeTheme(index, shouldOverride);
+        } else {
+            this.app.emit('config', 'theme.selected', 0, true);
+            this.changeTheme(config.get('theme.selected', 0), false);
+        }
     }
 
     changeTheme(index: number, byUser: boolean) {
@@ -79,9 +88,16 @@ export default class ThemeModule implements Module {
             });
 
             if (byUser) {
-                // disable all custom models
                 this.config.get<ModelConfig[]>('live2d.models', []).forEach(config => {
-                    this.app.emit('live2dConfig', config.id, { enabled: false });
+                    if (config.internal) {
+                        // enable internal models only if they belong to this theme
+                        this.app.emit('live2dConfig', config.id, {
+                            enabled: theme.models.find(model => model.file === config.path),
+                        });
+                    } else {
+                        // disable all custom models
+                        this.app.emit('live2dConfig', config.id, { enabled: false });
+                    }
                 });
             }
         }
