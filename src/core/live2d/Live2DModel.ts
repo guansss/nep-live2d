@@ -1,3 +1,4 @@
+import FocusController from '@/core/live2d/FocusController';
 import Live2DEyeBlink from '@/core/live2d/Live2DEyeBlink';
 import { loadModel, loadModelSettings, loadPhysics, loadPose } from '@/core/live2d/Live2DLoader';
 import Live2DPhysics from '@/core/live2d/Live2DPhysics';
@@ -28,8 +29,7 @@ export default class Live2DModel {
     readonly offsetX: number;
     readonly offsetY: number;
 
-    focusX = 0;
-    focusY = 0;
+    focusController = new FocusController();
 
     static async create(file: string) {
         const modelSettings = await loadModelSettings(file);
@@ -155,13 +155,16 @@ export default class Live2DModel {
         this.pose && this.pose.update(dt);
 
         // update focus and natural movements
+        this.focusController.update(dt);
+        const focusX = this.focusController.x;
+        const focusY = this.focusController.y;
         const t = (performance.now() / 1000) * 2 * Math.PI;
-        model.addToParamFloat('PARAM_EYE_BALL_X', this.focusX);
-        model.addToParamFloat('PARAM_EYE_BALL_Y', this.focusY);
-        model.addToParamFloat('PARAM_ANGLE_X', this.focusX * 30 + 15 * Math.sin(t / 6.5345) * 0.5);
-        model.addToParamFloat('PARAM_ANGLE_Y', this.focusY * 30 + 8 * Math.sin(t / 3.5345) * 0.5);
-        model.addToParamFloat('PARAM_ANGLE_Z', this.focusX * this.focusY * -30 + 10 * Math.sin(t / 5.5345) * 0.5);
-        model.addToParamFloat('PARAM_BODY_ANGLE_X', this.focusX * 10 + 4 * Math.sin(t / 15.5345) * 0.5);
+        model.addToParamFloat('PARAM_EYE_BALL_X', focusX);
+        model.addToParamFloat('PARAM_EYE_BALL_Y', focusY);
+        model.addToParamFloat('PARAM_ANGLE_X', focusX * 30 + 15 * Math.sin(t / 6.5345) * 0.5);
+        model.addToParamFloat('PARAM_ANGLE_Y', focusY * 30 + 8 * Math.sin(t / 3.5345) * 0.5);
+        model.addToParamFloat('PARAM_ANGLE_Z', focusX * focusY * -30 + 10 * Math.sin(t / 5.5345) * 0.5);
+        model.addToParamFloat('PARAM_BODY_ANGLE_X', focusX * 10 + 4 * Math.sin(t / 15.5345) * 0.5);
         model.setParamFloat('PARAM_BREATH', 0.5 + 0.5 * Math.sin(t / 3.2345));
 
         model.update();

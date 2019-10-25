@@ -1,4 +1,3 @@
-import FocusController from '@/core/live2d/FocusController';
 import Mka from '@/core/mka/Mka';
 import Player from '@/core/mka/Player';
 import { clamp } from '@/core/utils/math';
@@ -18,7 +17,6 @@ export default class Live2DPlayer extends Player {
     readonly container = new Container();
     readonly sprites: Live2DSprite[] = [];
 
-    focusController: FocusController;
     mouseHandler: MouseHandler;
 
     constructor(mka: Mka) {
@@ -28,24 +26,22 @@ export default class Live2DPlayer extends Player {
 
         Live2D.setGL(this.gl);
 
-        this.focusController = new FocusController();
-
         const self = this;
 
         this.mouseHandler = new class extends MouseHandler {
             focus(x: number, y: number) {
-                self.focusController.focus(
-                    (x / MOUSE_HANDLING_ELEMENT.offsetWidth) * 2 - 1,
-                    (y / MOUSE_HANDLING_ELEMENT.offsetHeight) * 2 - 1,
+                self.sprites.forEach(sprite =>
+                    sprite.model.focusController.focus(
+                        clamp(((x - sprite.x) / sprite.width) * 2 - 1, -1, 1),
+                        -clamp(((y - sprite.y) / sprite.height) * 2 - 1, -1, 1),
+                    ),
                 );
             }
 
             clearFocus() {
                 super.clearFocus();
 
-                self.sprites.forEach(sprite => {
-                    sprite.model.focusX = sprite.model.focusY = 0;
-                });
+                self.sprites.forEach(sprite => sprite.model.focusController.focus(0, 0));
             }
 
             click(x: number, y: number) {
@@ -110,34 +106,7 @@ export default class Live2DPlayer extends Player {
 
     /** @override */
     update() {
-        if (this.mouseHandler.focusing) {
-            // TODO: calculate dt
-            this.updateFocus(16);
-        }
-
         return true;
-    }
-
-    private updateFocus(dt: number) {
-        this.focusController.update(dt);
-
-        /*
-            pixelX = (x + 1) / 2 * canvasWidth
-
-          logicalX = (pixelX - spriteX) * 2 / spriteWidth - 1
-
-                   = ((x + 1) * canvasWidth - spriteX * 2) / spriteWidth - 1
-                      |-------------------|
-                              tmpX
-        */
-
-        const tmpX = (this.focusController.x + 1) * MOUSE_HANDLING_ELEMENT.offsetWidth;
-        const tmpY = (this.focusController.y + 1) * MOUSE_HANDLING_ELEMENT.offsetHeight;
-
-        this.sprites.forEach(sprite => {
-            sprite.model.focusX = clamp((tmpX - sprite.position.x * 2) / sprite.width - 1, -1, 1);
-            sprite.model.focusY = -clamp((tmpY - sprite.position.y * 2) / sprite.height - 1, -1, 1);
-        });
     }
 
     destroy() {
