@@ -1,4 +1,5 @@
 import { App, Module } from '@/App';
+import { CHRISTMAS } from '@/core/utils/date';
 import { screenAspectRatio } from '@/core/utils/misc';
 import { THEMES } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
@@ -40,12 +41,17 @@ export default class ThemeModule implements Module {
     init(config: Config) {
         this.config = config;
 
-        // defaults to first theme in list
-        this.app.emit('config', 'theme.selected', 0, true);
+        this.app.emit('config', 'theme.selected', this.getDefault(), true);
 
         this.changeTheme(config.get('theme.selected', 0), false);
 
         this.app.on('config:theme.selected', (index: number) => this.changeTheme(index, true));
+    }
+
+    getDefault() {
+        const name = CHRISTMAS ? 'Christmas' : 'Default';
+        const index = this.themes.findIndex(theme => theme.name === name);
+        return index >= 0 ? index : 0;
     }
 
     changeTheme(index: number, byUser: boolean) {
