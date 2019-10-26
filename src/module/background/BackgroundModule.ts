@@ -17,6 +17,6 @@ export default class BackgroundModule implements Module {
     }
 
     selectImage(file: string) {
-        document.body.style.backgroundImage = `url(${file})`;
+        document.body.style.backgroundImage = `url("${file}")`;
     }
 }
