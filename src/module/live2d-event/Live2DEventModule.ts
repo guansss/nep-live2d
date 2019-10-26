@@ -1,4 +1,6 @@
 import { App, Module } from '@/App';
+import { Config } from '@/module/config/ConfigModule';
+import greet from '@/module/live2d-event/greeting-event';
 import registerHitEvent from '@/module/live2d-event/hit-event';
 import Live2DModule from '@/module/live2d/Live2DModule';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
@@ -7,7 +9,7 @@ import { DisplayObject } from '@pixi/display';
 export default class Live2DEventModule implements Module {
     name = 'Live2DEvent';
 
-    sprites: Live2DSprite[] = [];
+    config?: Config;
 
     constructor(app: App) {
         const live2dModule = app.modules['Live2D'];
@@ -19,18 +21,13 @@ export default class Live2DEventModule implements Module {
                 this.processSprite(obj);
             }
         });
-        live2dModule.player.container.on('childRemoved', (obj: DisplayObject) => {
-            const index = (this.sprites as DisplayObject[]).indexOf(obj);
 
-            if (index >= 0) {
-                this.sprites.splice(index, 1);
-            }
-        });
+        app.on('configReady', (config: Config) => (this.config = config));
     }
 
     processSprite(sprite: Live2DSprite) {
-        this.sprites.push(sprite);
-
         registerHitEvent(sprite);
+
+        this.config && greet(sprite, this.config);
     }
 }

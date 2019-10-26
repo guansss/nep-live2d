@@ -23,6 +23,9 @@ export interface MotionDefinition {
 
     /** Start time in hours (for start-up motions only). */
     readonly time?: number;
+
+    /** Used by greeting. */
+    readonly season?: string;
 }
 
 export interface ExpressionDefinition {
@@ -147,6 +150,7 @@ export default class ModelSettings {
 
                             copyProperty(copy, motion, 'sound', 'string');
                             copyProperty(copy, motion, 'subtitle', 'string');
+                            copyProperty(copy, motion, 'season', 'string');
                             copyProperty(copy, motion, 'fadeIn', 'number');
                             copyProperty(copy, motion, 'fadeOut', 'number');
                             copyProperty(copy, motion, 'time', 'number');

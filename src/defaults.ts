@@ -23,6 +23,7 @@ export const THEMES: Theme[] = [
     {
         v: 1,
         name: 'Halloween',
+        season: 'Halloween',
         bg: 'img/bg_halloween.jpg',
         snow: true,
         leaves: false,
@@ -42,6 +43,7 @@ export const THEMES: Theme[] = [
     {
         v: 1,
         name: 'Christmas',
+        season: 'Christmas',
         bg: 'img/bg_lowee.jpg',
         snow: true,
         leaves: false,

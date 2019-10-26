@@ -8,6 +8,7 @@ import { ModelConfig } from '@/module/live2d/ModelConfig';
 export interface Theme {
     v: number;
     name: string;
+    season?: string;
     bg: string;
     snow: boolean;
     leaves: boolean;
