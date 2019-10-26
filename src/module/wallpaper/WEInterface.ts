@@ -116,5 +116,9 @@ export namespace WEInterface {
         userDirectoryFilesRemoved(propName, files) {
             removeFiles(propName, files.map(file => 'file://' + unescape(file)));
         },
+
+        setPaused(paused) {
+            eventEmitter && eventEmitter.sticky(paused ? 'pause' : 'resume');
+        },
     };
 }

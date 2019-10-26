@@ -22,20 +22,16 @@ export class App extends EventEmitter {
     destroyed = false;
 
     readonly mka: Mka;
-    readonly vueApp: VueApp;
 
     readonly modules: { [name: string]: Module } = {};
 
-    constructor(vueApp: VueApp) {
+    constructor(readonly vueApp: VueApp) {
         super();
 
         const canvas = (vueApp as any).canvas as HTMLCanvasElement;
         this.mka = new Mka(canvas);
 
-        // TODO: Remove this in release
-        eval('window.mka = this.mka');
-
-        this.vueApp = vueApp;
+        this.on('pause', () => this.mka.pause()).on('resume', () => this.mka.resume());
     }
 
     use(M: ModuleConstructor) {

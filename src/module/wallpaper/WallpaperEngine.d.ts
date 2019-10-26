@@ -8,6 +8,8 @@ declare interface Window {
 
         userDirectoryFilesAddedOrChanged(propName: string, files: string[]): void;
         userDirectoryFilesRemoved(propName: string, files: string[]): void;
+
+        setPaused(paused: boolean): void;
     };
 }
 
