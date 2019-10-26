@@ -5,6 +5,8 @@ import Modules from './module';
 
 Vue.config.productionTip = false;
 
+document.getElementById('message').remove();
+
 function startup() {
     const mainApp = new Vue({
         render: h => h(VueApp, { ref: 'vueApp' }),
