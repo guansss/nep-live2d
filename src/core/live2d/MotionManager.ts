@@ -29,6 +29,7 @@ export default class MotionManager extends MotionQueueManager {
     expressionManager?: ExpressionManager;
 
     currentPriority = Priority.None;
+    reservePriority = Priority.None;
 
     constructor(
         name: string,
@@ -89,21 +90,28 @@ export default class MotionManager extends MotionQueueManager {
     }
 
     async startMotionByPriority(group: string, index: number, priority: Priority = Priority.Normal): Promise<boolean> {
-        if (priority != Priority.Force && priority <= this.currentPriority) {
-            log(this.tag, 'Cannot start motion because another motion of higher priority is running');
+        if (priority !== Priority.Force && (priority <= this.currentPriority || priority <= this.reservePriority)) {
+            log(this.tag, 'Cannot start motion because another motion of same or higher priority is running');
             return false;
         }
-        this.currentPriority = priority;
 
-        if (priority > Priority.Idle) {
-            this.expressionManager && this.expressionManager.resetExpression();
-        }
+        this.reservePriority = priority;
 
         const motion =
             (this.motionGroups[group] && this.motionGroups[group][index]) || (await this.loadMotion(group, index));
         if (!motion) return false;
 
-        log(this.tag, 'Starting motion:', this.definitions[group][index]);
+        if (priority === this.reservePriority) {
+            this.reservePriority = Priority.None;
+        }
+
+        this.currentPriority = priority;
+
+        log(this.tag, 'Starting motion:', this.definitions[group][index].file);
+
+        if (priority > Priority.Idle) {
+            this.expressionManager && this.expressionManager.resetExpression();
+        }
 
         this.startMotion(motion);
 
