@@ -51,7 +51,7 @@ async function copyFiles(...filePairs) {
 }
 
 async function setupProjectJSON() {
-    const projectJSON = generateProjectJSON();
+    const projectJSON = generateProjectJSON(true);
 
     for (const jsonPath of [
         path.join(env.WALLPAPER_PATH, 'project.json'),

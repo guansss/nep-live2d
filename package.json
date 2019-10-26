@@ -9,7 +9,7 @@
   "scripts": {
     "setup": "babel-node --presets @babel/env scripts/setup.js",
     "serve": "vue-cli-service serve src/main.js",
-    "build": "vue-cli-service build src/main.js",
+    "build": "vue-cli-service build src/main.js & babel-node --presets @babel/env scripts/build.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
