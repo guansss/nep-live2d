@@ -32,9 +32,9 @@ export default class WallpaperModule implements Module {
 
 async function setupDefault() {
     try {
-        // actually loading "/wallpaper/project.json", but "/wallpaper" is the content root of DevServer,
-        //  so we need to call "/project.json"
-        const project = await getJSON('/project.json');
+        // actually loading "wallpaper/project.json", but "wallpaper" is the content root of DevServer,
+        //  so we need to call "project.json"
+        const project = await getJSON('project.json');
 
         if (project) {
             window.wallpaperPropertyListener.applyUserProperties(project.general.properties);
@@ -43,7 +43,7 @@ async function setupDefault() {
             throw 'Empty response';
         }
     } catch (e) {
-        error('WE', 'Failed to load /wallpaper/project.json, have you run `yarn setup` ?', e);
+        error('WE', 'Failed to load project.json, have you run `yarn setup` ?', e);
     }
 }
 

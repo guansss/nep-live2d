@@ -4,6 +4,8 @@ const webpack = require('webpack');
 
 module.exports = {
     productionSourceMap: false,
+    publicPath: '', // use empty to make generated files be able to load by 'file://' scheme
+
     devServer: {
         contentBase: path.resolve('wallpaper'),
         historyApiFallback: false,
@@ -46,6 +48,7 @@ module.exports = {
             });
         },
     },
+
     chainWebpack(config) {
         // embed the version number in package.json
         // see https://github.com/webpack/webpack/issues/237
@@ -55,8 +58,8 @@ module.exports = {
             return args;
         });
 
+        // load SVGs
         const svgRule = config.module.rule('svg');
-
         svgRule.uses.clear();
         svgRule.use('vue-svg-loader').loader('vue-svg-loader');
     },
