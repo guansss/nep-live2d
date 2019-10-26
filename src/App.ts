@@ -7,7 +7,7 @@ import Vue, { VueConstructor } from 'vue';
 export interface ModuleConstructor {
     // @formatter:off
 
-    new (app: App): Module;
+    new(app: App): Module;
 
     // @formatter:on
 }
@@ -19,6 +19,8 @@ export interface Module {
 const TAG = 'App';
 
 export class App extends EventEmitter {
+    destroyed = false;
+
     readonly mka: Mka;
     readonly vueApp: VueApp;
 
@@ -50,6 +52,7 @@ export class App extends EventEmitter {
     }
 
     destroy() {
+        this.destroyed = true;
         this.emit('destroy');
         this.vueApp.$destroy();
         this.mka.destroy();
