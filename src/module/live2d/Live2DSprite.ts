@@ -42,14 +42,9 @@ class Live2DSprite extends Container {
     private constructor(public model: Live2DModel) {
         super();
 
-        this.textures = model.modelSettings.textures.map(file => {
-            const texture = Texture.from(file);
-            texture.baseTexture.on('loaded', (baseTexture: PIXI.BaseTexture) => {
-                // console.warn(baseTexture._glTextures);
-                // model.bindTexture()
-            });
-            return texture;
-        });
+        this.textures = model.modelSettings.textures.map(file =>
+            Texture.from(file, { resourceOptions: { crossOrigin: true } }),
+        );
 
         const originalFn = model.motionManager.startMotionByPriority.bind(model.motionManager);
 

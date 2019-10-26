@@ -54,7 +54,7 @@ export default class Leaves extends ParticleContainer {
         super(NUMBER_LIMIT, { vertices: true, rotation: true, tint: true });
 
         new Loader()
-            .add(sheetSource)
+            .add(sheetSource, { crossOrigin: true })
             .load((loader: Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) => {
                 if (!this._destroyed) {
                     this.texture = resources[sheetSource]!.children[0].texture;
