@@ -149,12 +149,20 @@ export default class Live2DModule implements Module {
     }
 
     private removeModel(id: number) {
+        // remove saved model
         const configs = this.modelConfigs;
-
-        const excluded = configs.filter(config => config.id !== id);
+        let excluded = configs.filter(config => config.id !== id);
 
         if (configs.length !== excluded.length) {
             this.app.emit('config', 'live2d.models', excluded);
+        }
+
+        // remove internal model
+        const internalConfigs = this.internalModelConfigs;
+        excluded = internalConfigs.filter(config => config.id !== id);
+
+        if (internalConfigs.length !== excluded.length) {
+            this.app.emit('config', 'live2d.internalModels', excluded, true);
         }
 
         let spriteRemoved = false;

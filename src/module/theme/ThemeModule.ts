@@ -89,15 +89,8 @@ export default class ThemeModule implements Module {
 
             if (byUser) {
                 this.config.get<ModelConfig[]>('live2d.models', []).forEach(config => {
-                    if (config.internal) {
-                        // enable internal models only if they belong to this theme
-                        this.app.emit('live2dConfig', config.id, {
-                            enabled: theme.models.find(model => model.file === config.path),
-                        });
-                    } else {
-                        // disable all custom models
-                        this.app.emit('live2dConfig', config.id, { enabled: false });
-                    }
+                    // disable all existing models
+                    this.app.emit('live2dConfig', config.id, { enabled: false });
                 });
             }
         }
