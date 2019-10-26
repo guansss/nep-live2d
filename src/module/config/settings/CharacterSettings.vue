@@ -34,8 +34,8 @@
         </div>
 
         <div v-if="!selectedModel">
-            <ToggleSwitch key="s1" v-model="draggable">Draggable</ToggleSwitch>
-            <ToggleSwitch key="s2" v-model="focusOnPress">Focus On Press</ToggleSwitch>
+            <ToggleSwitch key="s1" v-model="draggable">Dragging</ToggleSwitch>
+            <ToggleSwitch key="s2" v-model="focusOnPress">Focus on Press</ToggleSwitch>
             <Slider v-if="!focusOnPress" overlay :min="0" :max="focusTimeoutMax" v-model="focusTimeout">Focus Timeout
             </Slider>
             <ToggleSwitch key="s3" v-model="bottomSubtitle">Bottom Subtitle</ToggleSwitch>
