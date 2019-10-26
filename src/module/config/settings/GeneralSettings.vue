@@ -11,7 +11,7 @@
                     {{ theme.name }}
                 </div>
             </div>
-            <ToggleSwitch v-model="themeAuto">Auto Holiday Theme</ToggleSwitch>
+            <ToggleSwitch v-model="themeAuto">Seasonal Theming</ToggleSwitch>
         </div>
         <div class="section" data-title="Miscellaneous">
             <Slider progress v-model="volume">Volume</Slider>
