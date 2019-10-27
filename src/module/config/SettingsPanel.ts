@@ -46,16 +46,6 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
         this.panelHeight = this._configModule.getConfig('settings.panelHeight', this.panelHeight);
     }
 
-    mounted() {
-        this._configModule.app.on('we:schemecolor', (color: string) => {
-            const rgb = color
-                .split(' ')
-                .map(float => ~~(parseFloat(float) * 255))
-                .join(',');
-            document.documentElement.style.setProperty('--accentColor', `rgb(${rgb})`);
-        });
-    }
-
     async selectPage(index: number) {
         this.selectedPage = index;
 

@@ -82,9 +82,10 @@ export default class VueLive2DMotion extends Vue {
         padding 4px 8px
         border 1px solid white
         border-radius 2px
-        background #AE2839
+        background var(--accentColor)
         color white
         font-size 1.5em
+        line-height 1.25em
 
 // animation
 

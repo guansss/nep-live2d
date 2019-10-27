@@ -31,7 +31,15 @@ export class App extends EventEmitter {
         const canvas = (vueApp as any).canvas as HTMLCanvasElement;
         this.mka = new Mka(canvas);
 
-        this.on('pause', () => this.mka.pause()).on('resume', () => this.mka.resume());
+        this.on('pause', () => this.mka.pause())
+            .on('resume', () => this.mka.resume())
+            .on('we:schemecolor', (color: string) => {
+                const rgb = color
+                    .split(' ')
+                    .map(float => ~~(parseFloat(float) * 255))
+                    .join(',');
+                document.documentElement.style.setProperty('--accentColor', `rgb(${rgb})`);
+            });
     }
 
     use(M: ModuleConstructor) {
