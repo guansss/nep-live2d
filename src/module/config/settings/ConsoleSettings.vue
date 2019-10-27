@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import ConsoleSVG from '@/assets/img/console.svg';
-import { LogRecord, logs as _logs } from '@/core/utils/log';
+import { log, LogRecord, logs as _logs } from '@/core/utils/log';
 import { randomHSLColor } from '@/core/utils/string';
 import ConfigModule from '@/module/config/ConfigModule';
 import Scrollable from '@/module/config/reusable/Scrollable.vue';
@@ -123,7 +123,15 @@ export default class ConsoleSettings extends Vue {
     }
 
     dumpStorage() {
-        prompt('Dump result', JSON.stringify(localStorage));
+        // print to console
+        Object.entries(localStorage).forEach(([key, value]) => log(`Storage(${key})`, value));
+
+        prompt(
+            'Dump result',
+            Object.entries(localStorage)
+                .map(([key, value]) => `${key}:${value}`)
+                .join('##'),
+        );
     }
 
     resetStart() {
@@ -210,6 +218,7 @@ export default class ConsoleSettings extends Vue {
 .message
     flex-grow 1
     white-space pre-wrap
+    word-break break-word
     border-bottom 1px solid #0001
 
 .error
