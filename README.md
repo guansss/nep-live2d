@@ -1,6 +1,8 @@
 # nep-live2d
-
-[Current Progress](https://github.com/guansss/nep-live2d/projects/1)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/guansss/nep-live2d?style=flat-square)
+[![Codacy Badge](https://img.shields.io/codacy/grade/2a104c4ef281488bafe5404adb27ee28?style=flat-square&logo=codacy)](https://www.codacy.com/manual/guansss/nep-live2d?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=guansss/nep-live2d&amp;utm_campaign=Badge_Grade)
+[![Steam Subscriptions](https://img.shields.io/steam/subscriptions/1078208425?style=flat-square&logo=steam&color=blue)](https://steamcommunity.com/sharedfiles/filedetails/?id=1078208425)
+![Made with](https://img.shields.io/badge/made%20with-%E2%99%A5-ff69b4?style=flat-square)
 
 This is the new version of *Neptune Live2D* wallpaper and still in early development state.
 
@@ -95,4 +97,8 @@ Now, just like serving for browsers, run `yarn serve`, and select the wallpaper,
 
 ## Building
 
-Not yet...
+``` sh
+yarn build
+```
+
+Don't forget to copy the contents in */wallpaper*.
