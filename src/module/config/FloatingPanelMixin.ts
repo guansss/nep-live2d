@@ -25,8 +25,8 @@ export default class FloatingPanelMixin extends Vue {
     stateClass = 'switch';
     snapped = false;
 
-    switchTop = 0;
-    switchLeft = innerWidth; // snap to right please!
+    switchTop = innerHeight / 2 - 32;
+    switchLeft = innerWidth / 2 - 32;
     switchWidth = 64;
     switchHeight = 64;
     switchBorderRadius = '50%';

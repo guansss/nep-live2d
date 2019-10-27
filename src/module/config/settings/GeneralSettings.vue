@@ -72,6 +72,9 @@ export default class GeneralSettings extends Vue {
     color #333
     transition background-color .15s ease-out, color .15s, box-shadow .15s ease-out
 
+    &:hover
+        background #CCC
+
     &.selected
         background #555
         color white

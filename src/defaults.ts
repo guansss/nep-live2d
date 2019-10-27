@@ -12,9 +12,9 @@ export const THEMES: Theme[] = [
                 file: 'live2d/neptune/neptune.model.json',
                 profiles: {
                     '16:9': {
-                        scale: 0.0004,
-                        x: 0.5,
-                        y: 0.7,
+                        scale: 0.0004141,
+                        x: 0.75,
+                        y: 0.6,
                     },
                 },
             },
@@ -32,9 +32,9 @@ export const THEMES: Theme[] = [
                 file: 'live2d/neptune/neptune.model.json',
                 profiles: {
                     '16:9': {
-                        scale: 0.0004,
-                        x: 0.5,
-                        y: 0.7,
+                        scale: 0.0004141,
+                        x: 0.75,
+                        y: 0.6,
                     },
                 },
             },
@@ -52,9 +52,9 @@ export const THEMES: Theme[] = [
                 file: 'live2d/nepsanta/nepsanta.model.json',
                 profiles: {
                     '16:9': {
-                        scale: 0.0004,
-                        x: 0.5,
-                        y: 0.7,
+                        scale: 0.0004141,
+                        x: 0.75,
+                        y: 0.6,
                     },
                 },
             },

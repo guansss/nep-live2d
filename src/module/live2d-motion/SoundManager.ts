@@ -4,7 +4,7 @@ import { clamp } from '@/core/utils/math';
 const TAG = 'SoundManager';
 
 export default class SoundManager {
-    private _volume = 0;
+    private _volume = 0.3;
 
     get volume(): number {
         return this._volume;
