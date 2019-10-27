@@ -66,8 +66,8 @@ export default class ConfigModule implements Module {
 
         app.addComponent(SettingsPanel, { configModule: () => this }).then();
 
-        if (!localStorage.v) {
-            app.sticky('init');
+        if (localStorage.v !== process.env.VERSION) {
+            app.sticky('init', localStorage.v);
             localStorage.v = process.env.VERSION;
         }
     }

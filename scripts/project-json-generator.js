@@ -5,14 +5,19 @@ function generate(devMode) {
 
     fs.readdirSync('assets/project-json/locales').forEach(file => {
         const locale = file.slice(0, file.indexOf('.json'));
-        const content = require('../assets/project-json/locales/' + file);
+        let content = fs.readFileSync('assets/project-json/locales/' + file, 'utf8');
 
-        project.general.localization[locale] = content;
+        content = content.replace('{VERSION}', process.env.npm_package_version);
 
-        if (devMode) {
-            project.title = '[DEV] ' + project.title;
-        }
+        project.general.localization[locale] = JSON.parse(content);
     });
+
+    if (process.env.npm_package_version.includes('beta')) {
+        project.title = '[BETA] ' + project.title;
+    }
+    if (devMode) {
+        project.title = '[DEV] ' + project.title;
+    }
 
     return JSON.stringify(project);
 }
