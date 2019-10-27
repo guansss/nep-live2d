@@ -35,7 +35,11 @@ export default class Live2DMotionModule implements Module {
     }
 
     processSprite(sprite: Live2DSprite) {
-        this.subtitleManager.loadSubtitle(sprite.model).then();
+        const subtitleFile = sprite.model.modelSettings.subtitle;
+
+        if (subtitleFile) {
+            this.subtitleManager.loadSubtitle(subtitleFile).then();
+        }
 
         (sprite as EventEmitter).on('motion', async (group: string, index: number) => {
             const motionDefinition = sprite.model.modelSettings.motions[group][index];
@@ -46,10 +50,10 @@ export default class Live2DMotionModule implements Module {
                 audio = this.soundManager.playSound(motionDefinition.sound);
             }
 
-            if (motionDefinition.subtitle) {
+            if (subtitleFile && motionDefinition.subtitle) {
                 const timingPromise = audio && new Promise(resolve => audio!.addEventListener('ended', resolve));
 
-                this.subtitleManager.showSubtitle(sprite.model, motionDefinition.subtitle, timingPromise);
+                this.subtitleManager.showSubtitle(subtitleFile, motionDefinition.subtitle, timingPromise);
             }
         });
     }

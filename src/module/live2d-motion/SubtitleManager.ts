@@ -1,4 +1,3 @@
-import Live2DModel from '@/core/live2d/Live2DModel';
 import { error } from '@/core/utils/log';
 import { getJSON } from '@/core/utils/net';
 
@@ -29,10 +28,12 @@ export default class SubtitleManager {
 
     subtitles: { [file: string]: SubtitleJSON } = {};
 
-    async loadSubtitle(model: Live2DModel) {
-        const file = model.modelSettings.subtitle;
+    tasks: { [file: string]: Promise<any> } = {};
 
-        if (file) {
+    async loadSubtitle(file: string) {
+        if (this.subtitles[file]) return;
+
+        this.tasks[file] = (async () => {
             try {
                 const languages = (await getJSON(file)) as SubtitleJSON;
 
@@ -50,14 +51,19 @@ export default class SubtitleManager {
 
                 this.subtitles[file] = languages;
             } catch (e) {
-                error(TAG, `Failed to load subtitles for [${model.name}] from ${file}`, e);
+                error(TAG, `Failed to load subtitles from ${file}`, e);
+            } finally {
+                delete this.tasks[file];
             }
-        }
+        })();
     }
 
-    getSubtitle(file: string, name: string) {
-        const json = this.subtitles[file];
+    async getSubtitle(file: string, name: string) {
+        if (this.tasks[file]) {
+            await this.tasks[file];
+        }
 
+        const json = this.subtitles[file];
         if (!json) return;
 
         const getFromLocale = (locale: string) => {
@@ -77,14 +83,17 @@ export default class SubtitleManager {
         return getFromLocale(this.locale) || getFromLocale(DEFAULT_LOCALE);
     }
 
-    showSubtitle(model: Live2DModel, name: string, timingPromise?: Promise<any>) {
-        const subtitle = this.getSubtitle(model.modelSettings.subtitle || '', name);
+    async showSubtitle(file: string, name: string, timingPromise?: Promise<any>) {
+        const start = Date.now();
+
+        const subtitle = await this.getSubtitle(file, name);
 
         if (subtitle) {
             const id = this.show(subtitle);
 
             if (!isNaN(subtitle.duration!)) {
-                setTimeout(() => this.dismiss(id), subtitle.duration);
+                const remains = subtitle.duration! - (Date.now() - start);
+                setTimeout(() => this.dismiss(id), remains);
             } else if (timingPromise) {
                 timingPromise.then(() => this.dismiss(id));
             }
