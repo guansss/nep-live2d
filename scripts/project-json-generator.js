@@ -1,16 +1,17 @@
-import fs from 'fs';
+const fs = require('fs');
+const pickBy = require('lodash/pickBy');
 
 function generate(devMode) {
-    const project = require('../assets/project-json/base.json');
+    const project = require('../assets/project.json');
 
-    fs.readdirSync('assets/project-json/locales').forEach(file => {
-        const locale = file.slice(0, file.indexOf('.json'));
-        let content = fs.readFileSync('assets/project-json/locales/' + file, 'utf8');
+    const locales = readLocales();
 
-        content = content.replace('{VERSION}', process.env.npm_package_version);
-
-        project.general.localization[locale] = JSON.parse(content);
+    // accept only the properties start with "ui_"
+    Object.keys(locales).forEach(locale => {
+        locales[locale] = pickBy(locales[locale], (value, key) => key.startsWith('ui_'));
     });
+
+    project.general.localization = locales;
 
     if (process.env.npm_package_version.includes('beta')) {
         project.title = '[BETA] ' + project.title;
@@ -22,4 +23,25 @@ function generate(devMode) {
     return JSON.stringify(project);
 }
 
-module.exports = generate;
+function readLocales() {
+    const locales = {};
+
+    fs.readdirSync('assets/locales').forEach(file => {
+        const locale = file.slice(0, file.indexOf('.json'));
+        let content = fs.readFileSync('assets/locales/' + file, 'utf8');
+
+        content = populate(content);
+        locales[locale] = JSON.parse(content);
+    });
+
+    return locales;
+}
+
+function populate(text) {
+    text = text.replace(/{VERSION}/g, process.env.npm_package_version);
+
+    return text;
+}
+
+module.exports.generate = generate;
+module.exports.readLocales = readLocales;

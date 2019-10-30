@@ -1,6 +1,6 @@
 import fs from 'fs';
 import chalk from 'chalk';
-import generateProjectJSON from './project-json-generator';
+import { generate as generateProjectJSON } from './project-json-generator';
 
 (async function setup() {
     console.log(chalk.black.bgBlue(' BUILD '), 'Wallpaper Engine');
