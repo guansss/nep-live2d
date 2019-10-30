@@ -1,4 +1,3 @@
-import { Vue } from '*.vue';
 import CloseSVG from '@/assets/img/close.svg';
 import ConfigModule from '@/module/config/ConfigModule';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
@@ -9,6 +8,7 @@ import ConsoleSettings from '@/module/config/settings/ConsoleSettings.vue';
 import EffectsSettings from '@/module/config/settings/EffectsSettings.vue';
 import GeneralSettings from '@/module/config/settings/GeneralSettings.vue';
 import { Component, Mixins, Prop, Ref } from 'vue-property-decorator';
+import { Vue } from 'vue/types/vue';
 
 @Component({
     components: { CloseSVG, Scrollable },
