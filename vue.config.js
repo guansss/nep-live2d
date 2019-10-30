@@ -1,6 +1,6 @@
 const path = require('path');
 const merge = require('lodash/merge');
-const webpack = require('webpack');
+const { readLocales } = require('./scripts/project-json-generator');
 
 module.exports = {
     productionSourceMap: false,
@@ -55,6 +55,7 @@ module.exports = {
         // and https://stackoverflow.com/questions/53076540/vue-js-webpack-problem-cant-add-plugin-to-vue-config-js-with-configurewebpack
         config.plugin('define').tap(args => {
             args[0]['process.env'].VERSION = JSON.stringify(process.env.npm_package_version);
+            args[0]['process.env'].I18N = JSON.stringify(readLocales());
             return args;
         });
 
