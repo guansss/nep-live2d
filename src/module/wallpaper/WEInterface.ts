@@ -4,11 +4,19 @@ import union from 'lodash/union';
 export interface App {
     on(event: 'we:*', fn: (name: string, value: string | number) => void, context?: any): this;
 
-    on(event: 'we:{prop}', fn: (value: string | number) => void, context?: any): this;
+    on<T extends keyof WEProperties>(event: 'we:{T}', fn: (value: string) => void, context?: any): this;
 
-    on(event: 'weFilesUpdate:{prop}', fn: (files: string[], allFiles: string[]) => void, context?: any): this;
+    on<T extends keyof WEFiles>(
+        event: 'weFilesUpdate:{T}',
+        fn: (files: string[], allFiles: string[]) => void,
+        context?: any,
+    ): this;
 
-    on(event: 'weFilesRemove:{prop}', fn: (files: string[], allFiles: string[]) => void, context?: any): this;
+    on<T extends keyof WEFiles>(
+        event: 'weFilesRemove:{T}',
+        fn: (files: string[], allFiles: string[]) => void,
+        context?: any,
+    ): this;
 }
 
 export namespace WEInterface {
@@ -18,11 +26,7 @@ export namespace WEInterface {
 
     export const props: WEProperties = {};
 
-    export const propFiles: { [propName: string]: string[] } = {};
-
-    const TYPE_MAP: { [name: string]: string } = {
-        schemecolor: 'string',
-    };
+    export const propFiles: WEFiles = {};
 
     let eventEmitter: EventEmitter;
 
@@ -30,36 +34,26 @@ export namespace WEInterface {
         eventEmitter = emitter;
 
         // immediately emit all properties and files
-        Object.keys(props).forEach(emitProp);
-        Object.entries(propFiles).forEach(([propName, files]) => emitFilesUpdate(propName, files));
+        (Object.keys(props) as (keyof WEProperties)[]).forEach(emitProp);
+        (Object.entries(propFiles) as [keyof WEFiles, string[]][]).forEach(([propName, files]) =>
+            emitFilesUpdate(propName, files),
+        );
     }
 
-    export function getPropValue(name: string): string | number | undefined {
+    export function getPropValue<T extends keyof WEProperties>(name: T): string | undefined {
         const prop = props[name];
-        const type = TYPE_MAP[name];
 
         if (prop) {
-            switch (type) {
-                case 'number': {
-                    const number = parseInt(prop.value as string);
-
-                    if (!Number.isNaN(number)) return number;
-                    break;
-                }
-
-                case 'string':
-                default:
-                    return prop.value;
-            }
+            return typeof prop === 'string' ? prop : prop.value;
         }
     }
 
     function updateProps(_props: WEProperties) {
         Object.assign(props, _props);
-        Object.keys(_props).forEach(emitProp);
+        (Object.keys(_props) as (keyof WEProperties)[]).forEach(emitProp);
     }
 
-    function updateFiles(propName: string, files: string[]) {
+    function updateFiles<T extends keyof WEFiles>(propName: T, files: string[]) {
         if (propFiles[propName]) {
             propFiles[propName] = union(propFiles[propName], files);
         } else {
@@ -69,9 +63,9 @@ export namespace WEInterface {
         emitFilesUpdate(propName, files);
     }
 
-    function removeFiles(propName: string, files: string[]) {
+    function removeFiles<T extends keyof WEFiles>(propName: T, files: string[]) {
         if (propFiles[propName]) {
-            propFiles[propName] = propFiles[propName].filter(file => !files.includes(file));
+            propFiles[propName] = propFiles[propName]!.filter(file => !files.includes(file));
         } else {
             // make sure the array exists even when it's empty
             propFiles[propName] = [];
@@ -80,7 +74,7 @@ export namespace WEInterface {
         emitFilesRemove(propName, files);
     }
 
-    function emitProp(name: string) {
+    function emitProp<T extends keyof WEProperties>(name: T) {
         if (eventEmitter) {
             const value = getPropValue(name);
 
@@ -91,14 +85,14 @@ export namespace WEInterface {
         }
     }
 
-    function emitFilesUpdate(propName: string, files: string[]) {
+    function emitFilesUpdate<T extends keyof WEFiles>(propName: T, files: string[]) {
         if (eventEmitter) {
             eventEmitter.sticky(PREFIX_FILES_UPDATE + propName, files, propFiles[propName]);
             eventEmitter.sticky(PREFIX_FILES_UPDATE + '*', propName, files, propFiles[propName]);
         }
     }
 
-    function emitFilesRemove(propName: string, files: string[]) {
+    function emitFilesRemove<T extends keyof WEFiles>(propName: T, files: string[]) {
         if (eventEmitter) {
             eventEmitter.emit(PREFIX_FILES_REMOVE + propName, files, propFiles[propName]);
             eventEmitter.emit(PREFIX_FILES_REMOVE + '*', propName, files, propFiles[propName]);

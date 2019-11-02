@@ -1,31 +1,30 @@
+// make sure user properties are included in "/assets/project-json/base.json"
+type WEUserPropertyNames = 'schemecolor' | 'bgDirectory';
+type WEGeneralPropertyNames = 'language';
+
+type WEUserProperties = Partial<Record<WEUserPropertyNames, { value: string }>>;
+type WEGeneralProperties = Partial<Record<WEGeneralPropertyNames, string>>;
+
+// merged user properties and general properties
+type WEProperties = WEUserProperties & WEGeneralProperties;
+
+type WEFilePropertyNames = WEUserPropertyNames & 'bgDirectory';
+type WEFiles = Partial<Record<WEFilePropertyNames, string[]>>;
+
 declare interface Window {
     // see http://steamcommunity.com/sharedfiles/filedetails/?id=795674740
-    wallpaperRequestRandomFileForProperty?(name: string, response: (...args: any) => void): void;
+    wallpaperRequestRandomFileForProperty?<T extends keyof WEFilePropertyNames>(
+        name: T,
+        response: (...args: any) => void,
+    ): void;
 
     wallpaperPropertyListener: {
-        applyUserProperties(props: WEUserProperties): void;
-        applyGeneralProperties(props: WEGeneralProperties): void;
+        applyUserProperties<T extends WEUserProperties>(props: T): void;
+        applyGeneralProperties<T extends WEGeneralProperties>(props: T): void;
 
-        userDirectoryFilesAddedOrChanged(propName: string, files: string[]): void;
-        userDirectoryFilesRemoved(propName: string, files: string[]): void;
+        userDirectoryFilesAddedOrChanged<T extends keyof WEFiles>(propName: T, files: string[]): void;
+        userDirectoryFilesRemoved<T extends keyof WEFiles>(propName: T, files: string[]): void;
 
         setPaused(paused: boolean): void;
     };
-}
-
-declare interface WEProperty {
-    value: string | number;
-}
-
-declare interface WEUserProperties {
-    // make sure these are included in properties in "/assets/project-json/base.json"
-
-    schemecolor?: WEProperty;
-}
-
-declare interface WEGeneralProperties {}
-
-// merged user properties and general properties
-declare interface WEProperties extends WEUserProperties, WEGeneralProperties {
-    [name: string]: WEProperty | undefined;
 }

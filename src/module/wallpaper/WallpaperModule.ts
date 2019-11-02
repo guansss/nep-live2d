@@ -59,7 +59,10 @@ async function setupRemote() {
                 Object.entries(props.files).forEach(([propName, files]) => {
                     // files can be null if the directory is unset
                     if (files) {
-                        window.wallpaperPropertyListener.userDirectoryFilesAddedOrChanged(propName, files as string[]);
+                        window.wallpaperPropertyListener.userDirectoryFilesAddedOrChanged(
+                            propName as keyof WEFiles,
+                            files as string[],
+                        );
                     }
                 });
             }
