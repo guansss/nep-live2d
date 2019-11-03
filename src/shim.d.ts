@@ -7,6 +7,10 @@ declare module '*.vue' {
     export default Vue;
 }
 
+declare module 'vue-clickaway' {
+    export const directive: Function;
+}
+
 /**
  * PIXI shims
  * @see https://github.com/pixijs/pixi.js/issues/5397

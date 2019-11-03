@@ -35,8 +35,9 @@ export default class VueApp extends Vue {
 </script>
 <style lang="stylus">
 *
-    box-sizing: border-box
-    margin: 0
+    box-sizing border-box
+    margin 0
+    padding 0
 
 body
     background-color #333
@@ -71,5 +72,5 @@ body
         box-shadow 0 2px 4px #0006
 
     &:active
-        box-shadow none
+        box-shadow 0 1px 2px #0002
 </style>

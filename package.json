@@ -19,6 +19,7 @@
     "pixi.js": "^5.1.5",
     "raw-loader": "^3.1.0",
     "vue": "^2.6.10",
+    "vue-clickaway": "^2.2.2",
     "vue-i18n": "^8.15.0"
   },
   "devDependencies": {
