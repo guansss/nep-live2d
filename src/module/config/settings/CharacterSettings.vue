@@ -125,7 +125,7 @@ class ModelEntity {
 })
 export default class CharacterSettings extends Vue {
     static readonly ICON = TShirtSVG;
-    static readonly TITLE = 'CHARACTER';
+    static readonly TITLE = 'character';
 
     @Prop() readonly configModule!: ConfigModule;
 

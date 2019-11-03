@@ -1,4 +1,10 @@
 {
   "ui_info": "Neptune Live2D {VERSION}",
-  "ui_background_directory": "Background Images"
+  "ui_background_directory": "Background Images",
+
+  "general": "General",
+  "character": "Character",
+  "background": "Background",
+  "effect": "Effect",
+  "console": "Console"
 }

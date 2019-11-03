@@ -60,7 +60,7 @@ const cachedColors: { [key: string]: string } = {};
 })
 export default class ConsoleSettings extends Vue {
     static readonly ICON = ConsoleSVG;
-    static readonly TITLE = 'CONSOLE';
+    static readonly TITLE = 'console';
 
     @Prop() readonly configModule!: ConfigModule;
 

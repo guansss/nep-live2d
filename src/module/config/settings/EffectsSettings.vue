@@ -25,7 +25,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 })
 export default class EffectsSettings extends Vue {
     static readonly ICON = FlareSVG;
-    static readonly TITLE = 'EFFECTS';
+    static readonly TITLE = 'effect';
 
     @Prop() readonly configModule!: ConfigModule;
 

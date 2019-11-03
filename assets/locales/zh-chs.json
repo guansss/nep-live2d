@@ -1,4 +1,10 @@
 {
   "ui_info": "Neptune Live2D {VERSION}",
-  "ui_background_directory": "背景图"
+  "ui_background_directory": "背景图",
+
+  "general": "通用",
+  "character": "人物",
+  "background": "背景",
+  "effect": "特效",
+  "console": "控制台"
 }

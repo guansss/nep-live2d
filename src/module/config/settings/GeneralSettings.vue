@@ -34,7 +34,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 })
 export default class GeneralSettings extends Vue {
     static readonly ICON = ShapeSVG;
-    static readonly TITLE = 'GENERAL';
+    static readonly TITLE = 'general';
 
     @Prop() readonly configModule!: ConfigModule;
 

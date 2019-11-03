@@ -31,7 +31,7 @@ import { Component, Prop } from 'vue-property-decorator';
 })
 export default class BackgroundSettings extends Vue {
     static readonly ICON = ImageSVG;
-    static readonly TITLE = 'BACKGROUND';
+    static readonly TITLE = 'background';
 
     @Prop() readonly configModule!: ConfigModule;
 
