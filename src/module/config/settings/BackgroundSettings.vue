@@ -43,10 +43,9 @@ export default class BackgroundSettings extends Vue {
 
     private created() {
         this.configModule.app
+            .on('config:bg.img', (image: string) => (this.selected = image))
             .on('weFilesUpdate:bgDirectory', this.imageChange, this)
             .on('weFilesRemove:bgDirectory', this.imageChange, this);
-
-        this.selected = this.configModule.getConfig('bg.img', this.selected);
 
         if (!inWallpaperEngine) {
             // get some random images!
