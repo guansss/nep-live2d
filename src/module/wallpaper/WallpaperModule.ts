@@ -31,6 +31,11 @@ export default class WallpaperModule implements Module {
 }
 
 async function setupDefault() {
+    // supply general properties that does not exist in project.json
+    window.wallpaperPropertyListener.applyGeneralProperties({
+        language: 'en-us',
+    });
+
     try {
         // actually loading "wallpaper/project.json", but "wallpaper" is the content root of DevServer,
         //  so we need to call "project.json"

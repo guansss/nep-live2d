@@ -1,8 +1,9 @@
 import Mka from '@/core/mka/Mka';
 import EventEmitter from '@/core/utils/EventEmitter';
 import { error } from '@/core/utils/log';
+import { Config } from '@/module/config/ConfigModule';
 import VueApp from '@/VueApp.vue';
-import Vue, { VueConstructor } from 'vue';
+import { Vue, VueConstructor } from 'vue/types/vue';
 
 export interface ModuleConstructor {
     // @formatter:off
@@ -39,6 +40,14 @@ export class App extends EventEmitter {
                     .map(float => ~~(parseFloat(float) * 255))
                     .join(',');
                 document.documentElement.style.setProperty('--accentColor', `rgb(${rgb})`);
+            })
+            .on('config:locale', (locale: string) => {
+                vueApp.$i18n.locale = locale;
+            })
+            .on('configReady', (config: Config) => {
+                this.on('we:language', (locale: string) => {
+                    this.emit('config', 'locale', locale, true);
+                });
             });
     }
 

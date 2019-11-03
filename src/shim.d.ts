@@ -1,9 +1,9 @@
 /**
  * Vue shims
- * @see https://github.com/microsoft/TypeScript-Vue-Starter
  */
 declare module '*.vue' {
     import Vue from 'vue';
+    import 'vue-i18n';
     export default Vue;
 }
 
