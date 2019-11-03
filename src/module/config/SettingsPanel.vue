@@ -7,7 +7,7 @@
                         v-for="(page, i) in pages"
                         :key="page.title"
                         :class="['tab icon selectable', { selected: i === selectedPage }]"
-                        :data-title="page.TITLE"
+                        :data-title="$t(page.TITLE)"
                         @click="selectPage(i)"
                     >
                         <component :is="page.ICON" class="svg" />
@@ -129,30 +129,32 @@ $toolbarHeight = 36px
     z-index 1
 
     &:before
-        content: '';
-        position: absolute;
-        top: -6px;
-        left: 50%;
+        content ''
+        position absolute
+        top -6px
+        left 50%
         opacity 0
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        border-top: 6px solid #333;
-        transform: translateX(-50%);
+        border-left 6px solid transparent
+        border-right 6px solid transparent
+        border-top 6px solid #333
+        transform translateX(-50%)
         transition opacity .15s ease-out
 
     &:after
-        content: attr(data-title);
-        position: absolute;
-        display: block;
-        bottom: calc(100% + 6px);
-        left: 50%;
-        padding: 6px;
+        content attr(data-title)
+        position absolute
+        display block
+        bottom calc(100% + 6px)
+        left 50%
+        padding 6px
         opacity 0
-        background: #333;
+        background #333
         color #FFF
-        font-size: 14px;
-        border-radius: 2px;
-        transform: translateX(-50%);
+        font-size 14px
+        word-break keep-all
+        text-transform uppercase
+        border-radius 2px
+        transform translateX(-50%)
         transition opacity .15s
 
     &:hover
