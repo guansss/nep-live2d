@@ -2,6 +2,7 @@ import { App, Module } from '@/App';
 import { error } from '@/core/utils/log';
 import { inWallpaperEngine, redirectedFromBridge } from '@/core/utils/misc';
 import { getJSON, postJSON } from '@/core/utils/net';
+import { LOCALE } from '@/defaults';
 import { WEInterface } from '@/module/wallpaper/WEInterface';
 import debounce from 'lodash/debounce';
 
@@ -33,7 +34,7 @@ export default class WallpaperModule implements Module {
 async function setupDefault() {
     // supply general properties that does not exist in project.json
     window.wallpaperPropertyListener.applyGeneralProperties({
-        language: 'en-us',
+        language: LOCALE,
     });
 
     try {

@@ -2,6 +2,8 @@
   "ui_info": "Neptune Live2D {VERSION}",
   "ui_background_directory": "背景图",
 
+  "name": "中文",
+  "language": "语言",
   "general": "通用",
   "character": "人物",
   "background": "背景",

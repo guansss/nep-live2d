@@ -69,6 +69,7 @@ $toolbarHeight = 36px
 
     >>> .switch
     >>> .slider
+    >>> .select
         width 100%
 
     >>> .label

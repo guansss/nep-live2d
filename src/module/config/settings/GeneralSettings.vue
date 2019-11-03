@@ -15,14 +15,16 @@
         </div>
         <div class="section" data-title="Miscellaneous">
             <Slider progress v-model="volume">Volume</Slider>
+            <Select v-model="locale" :options="localeOptions">{{ $t('language') }}</Select>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import ShapeSVG from '@/assets/img/shape.svg';
-import { THEMES } from '@/defaults';
+import { LOCALE, THEMES } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
+import Select, { Option } from '@/module/config/reusable/Select.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
 import { Theme } from '@/module/theme/ThemeModule';
@@ -30,7 +32,7 @@ import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
-    components: { ToggleSwitch, Slider },
+    components: { Select, ToggleSwitch, Slider },
 })
 export default class GeneralSettings extends Vue {
     static readonly ICON = ShapeSVG;
@@ -44,10 +46,8 @@ export default class GeneralSettings extends Vue {
 
     volume = this.configModule.getConfig('volume', 0);
 
-    @Watch('volume')
-    volumeChanged(value: number) {
-        this.configModule.setConfig('volume', value);
-    }
+    locale: Option = null; // reactive
+    localeOptions!: Option[]; // non-reactive
 
     @Watch('themeSelected')
     themeChanged(value: number) {
@@ -58,6 +58,28 @@ export default class GeneralSettings extends Vue {
     @Watch('themeAuto')
     themeAutoChanged(value: boolean) {
         this.configModule.setConfig('theme.auto', value);
+    }
+
+    @Watch('volume')
+    volumeChanged(value: number) {
+        this.configModule.setConfig('volume', value);
+    }
+
+    @Watch('locale')
+    localeChanged(locale?: Option) {
+        locale && this.configModule.setConfig('locale', locale.value);
+    }
+
+    created() {
+        const locales = (process.env.I18N as any) as Record<string, { name: string }>;
+
+        this.localeOptions = Object.entries(locales).map(([locale, language]) => ({
+            text: `${language.name} (${locale})`,
+            value: locale,
+        }));
+
+        const locale = this.configModule.getConfig('locale', LOCALE);
+        this.locale = this.localeOptions.find(option => option.value === locale);
     }
 }
 </script>

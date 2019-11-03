@@ -1,5 +1,7 @@
 import { Theme } from '@/module/theme/ThemeModule';
 
+export const LOCALE = 'en-us';
+
 export const THEMES: Theme[] = [
     {
         v: 1,

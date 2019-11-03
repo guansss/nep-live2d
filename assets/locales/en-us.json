@@ -2,6 +2,8 @@
   "ui_info": "Neptune Live2D {VERSION}",
   "ui_background_directory": "Background Images",
 
+  "name": "English",
+  "language": "Language",
   "general": "General",
   "character": "Character",
   "background": "Background",
