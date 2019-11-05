@@ -517,7 +517,7 @@ $selectableCard
 
     .button
         margin-bottom 0
-        padding-right 8px
+        padding 8px
         line-height 1.3
 
         &:after
@@ -542,12 +542,15 @@ $selectableCard
 .languages
     @extend $card
     width 400px
-    background #FFF
+    background #FAFAFA
 
 .language
-    padding 8px
+    padding 8px 0
     color #999
     font-size 14px
+    border-right 8px solid transparent
+    border-bottom 1px solid #EEE
+    border-left 8px solid transparent
     transition background-color .15s ease-out
 
     &.selected
