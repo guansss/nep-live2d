@@ -78,8 +78,14 @@
                                     ]"
                                     @click="localeChanged(language.locale)"
                                 >
-                                    <div class="title">{{ language.name }}</div>
-                                    <div>{{ language.description }}</div>
+                                    <div class="title">
+                                        {{ language.name}}
+                                        <span v-if="language.locale.includes('default')">Default</span>
+                                    </div>
+                                    <div v-if="language.authors" class="authors">
+                                        <span v-for="author in language.authors" :key="author">{{ author }}</span>
+                                    </div>
+                                    <div v-if="language.description">{{ language.description }}</div>
                                 </li>
                             </ul>
                         </div>
@@ -102,7 +108,7 @@ import FileInput from '@/module/config/reusable/FileInput.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
 import Live2DMotionModule from '@/module/live2d-motion/Live2DMotionModule';
-import { SubtitleJSON } from '@/module/live2d-motion/SubtitleManager';
+import { Language, SubtitleJSON } from '@/module/live2d-motion/SubtitleManager';
 import Live2DModule from '@/module/live2d/Live2DModule';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import { makeModelPath, ModelConfig, toActualValues, toStorageValues } from '@/module/live2d/ModelConfig';
@@ -122,11 +128,7 @@ class ModelEntity {
     loaded = false;
     error?: string;
 
-    subtitleLanguages?: {
-        locale: string;
-        name: string;
-        description?: string;
-    }[];
+    subtitleLanguages?: (Pick<Language, 'locale' | 'name' | 'description'> & { authors?: string[] })[];
 
     get loading() {
         // missing config means the model is newly added and thus supposed to be enabled
@@ -324,7 +326,12 @@ export default class CharacterSettings extends Vue {
         let model = this.models.find(model => model.config.id === id);
 
         if (model) {
-            model.subtitleLanguages = languages.map(({ locale, name, description }) => ({ locale, name, description }));
+            model.subtitleLanguages = languages.map(({ locale, name, author, description }) => ({
+                locale,
+                name,
+                authors: author ? author.split('\n') : undefined,
+                description,
+            }));
         }
     }
 
@@ -539,6 +546,7 @@ $selectableCard
 
 .language
     padding 8px
+    color #999
     font-size 14px
     transition background-color .15s ease-out
 
@@ -550,8 +558,27 @@ $selectableCard
 
     .title
         margin-bottom 4px
-        font-size 16px
+        color #333
         font-weight bold
+
+        span
+            margin-left 4px
+            vertical-align middle
+            padding 2px
+            background #999
+            color #FFF
+            font-size 12px
+            font-weight normal
+
+    .authors
+        margin-bottom 4
+        font-size 12px
+        font-style italic
+
+        span:not(:first-child)
+            margin-left 8px
+            padding-left 4px
+            border-left 1px solid #CCC
 
 // animation
 

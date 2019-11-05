@@ -6,6 +6,7 @@ export type SubtitleJSON = Language[];
 export interface Language {
     locale: string;
     name: string;
+    author?: string;
     description?: string;
     font?: string;
     style?: string;
