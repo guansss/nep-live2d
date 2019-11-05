@@ -21,9 +21,9 @@
         <table class="table">
             <tr v-for="(log, i) in logs" :key="i" :class="['row', { error: log.error }]">
                 <td v-if="log.rowSpan" :rowspan="log.rowSpan" class="tag" :style="{ backgroundColor: log.color }">
-                    {{ log.count > 1 ? `${log.tag} (x${log.count})` : log.tag }}
+                    {{ log.tag }}
                 </td>
-                <td class="message">{{ log.message }}</td>
+                <td class="message">{{ log.count > 1 ? `${log.message} (x${log.count})` : log.message }}</td>
             </tr>
         </table>
     </div>
@@ -124,7 +124,7 @@ export default class ConsoleSettings extends Vue {
 
     dumpStorage() {
         // print to console
-        Object.entries(localStorage).forEach(([key, value]) => log(`Storage(${key})`, value));
+        Object.entries(localStorage).forEach(([key, value]) => log(`Storage[${key}]`, value));
 
         prompt(
             'Dump result',
