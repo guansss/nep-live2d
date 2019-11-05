@@ -79,8 +79,8 @@
                                     @click="localeChanged(language.locale)"
                                 >
                                     <div class="title">
-                                        {{ language.name}}
-                                        <span v-if="language.locale.includes('default')">Default</span>
+                                        {{ language.name }}
+                                        <span v-if="language.locale.includes(fallbackLocale)">Default</span>
                                     </div>
                                     <div v-if="language.authors" class="authors">
                                         <span v-for="author in language.authors" :key="author">{{ author }}</span>
@@ -108,7 +108,11 @@ import FileInput from '@/module/config/reusable/FileInput.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
 import Live2DMotionModule from '@/module/live2d-motion/Live2DMotionModule';
-import { Language, SubtitleJSON } from '@/module/live2d-motion/SubtitleManager';
+import {
+    FALLBACK_LOCALE as SUBTITLE_FALLBACK_LOCALE,
+    Language,
+    SubtitleJSON,
+} from '@/module/live2d-motion/SubtitleManager';
 import Live2DModule from '@/module/live2d/Live2DModule';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import { makeModelPath, ModelConfig, toActualValues, toStorageValues } from '@/module/live2d/ModelConfig';
@@ -188,6 +192,7 @@ export default class CharacterSettings extends Vue {
     focusTimeoutMax = FOCUS_TIMEOUT_MAX / 1000;
 
     defaultLocale = this.configModule.getConfig('locale', LOCALE);
+    fallbackLocale!: string; // non-reactive
     showLanguages = false;
 
     get selectedModel() {
@@ -201,7 +206,9 @@ export default class CharacterSettings extends Vue {
         if (!model) return '';
 
         const locale = model.config.locale || defaultLocale;
-        const language = model.subtitleLanguages!.find(language => language.locale.includes(locale));
+        const language =
+            model.subtitleLanguages!.find(language => language.locale.includes(locale)) ||
+            model.subtitleLanguages!.find(language => language.locale.includes(this.fallbackLocale));
         return language ? language.name : '';
     }
 
@@ -237,6 +244,8 @@ export default class CharacterSettings extends Vue {
     }
 
     created() {
+        this.fallbackLocale = SUBTITLE_FALLBACK_LOCALE;
+
         this.configModule.app
             .on('live2dLoaded', this.modelLoaded, this)
             .on('live2dError', this.modelError, this)

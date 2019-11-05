@@ -22,7 +22,7 @@ export interface Subtitle {
 
 const TAG = 'SubtitleManager';
 
-const FALLBACK_LOCALE = 'default';
+export const FALLBACK_LOCALE = 'default';
 
 export default class SubtitleManager {
     defaultLocale = FALLBACK_LOCALE;
