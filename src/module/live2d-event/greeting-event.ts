@@ -1,16 +1,18 @@
-import { THEMES } from '@/defaults';
+import { SEASONS } from '@/defaults';
 import { Config } from '../config/ConfigModule';
 import Live2DSprite from '../live2d/Live2DSprite';
+
+const activeSeason = SEASONS.find(season => season.active);
+const activeSeasonValue = activeSeason && activeSeason.value;
 
 export default function greet(sprite: Live2DSprite, config: Config) {
     const definitions = sprite.model.motionManager.definitions['greet'];
 
     if (definitions && definitions.length !== 0) {
-        const theme = THEMES[config.get('theme.selected', -1)];
         let index = -1;
 
-        if (theme && theme.season) {
-            index = definitions.findIndex(def => def.season === theme.season);
+        if (activeSeasonValue) {
+            index = definitions.findIndex(def => def.season === activeSeasonValue);
         }
 
         if (index === -1) {

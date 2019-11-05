@@ -11,7 +11,7 @@
                     {{ $t(theme.name) }}
                 </div>
             </div>
-            <ToggleSwitch v-model="themeAuto">{{ $t('seasonal_theming') }}</ToggleSwitch>
+            <ToggleSwitch v-model="seasonal">{{ $t('seasonal_theming') }}</ToggleSwitch>
         </div>
         <div class="section" :data-title="$t('misc')">
             <Slider progress v-model="volume">{{ $t('volume') }}</Slider>
@@ -42,7 +42,7 @@ export default class GeneralSettings extends Vue {
 
     themes: Theme[] = THEMES;
     themeSelected = this.configModule.getConfig('theme.selected', -1);
-    themeAuto = this.configModule.getConfig('theme.auto', true);
+    seasonal = this.configModule.getConfig('theme.seasonal', true);
 
     volume = this.configModule.getConfig('volume', 0);
 
@@ -51,13 +51,13 @@ export default class GeneralSettings extends Vue {
 
     @Watch('themeSelected')
     themeChanged(value: number) {
-        this.themeAuto = false;
+        this.seasonal = false;
         this.configModule.setConfig('theme.selected', value);
     }
 
-    @Watch('themeAuto')
-    themeAutoChanged(value: boolean) {
-        this.configModule.setConfig('theme.auto', value);
+    @Watch('seasonal')
+    seasonalChanged(value: boolean) {
+        this.configModule.setConfig('theme.seasonal', value);
     }
 
     @Watch('volume')
@@ -66,8 +66,8 @@ export default class GeneralSettings extends Vue {
     }
 
     @Watch('locale')
-    localeChanged(locale: string) {
-        this.configModule.setConfig('locale', locale);
+    localeChanged(value: string) {
+        this.configModule.setConfig('locale', value);
     }
 
     created() {

@@ -1,6 +1,18 @@
+import { isInRange } from '@/core/utils/date';
 import { Theme } from '@/module/theme/ThemeModule';
 
 export const LOCALE = 'en-us';
+
+interface Season {
+    active: boolean;
+    value: string;
+}
+
+export const HALLOWEEN = { value: 'Halloween', active: isInRange('10-25', '11-5') };
+export const CHRISTMAS = { value: 'Christmas', active: isInRange('12-20', '12-31') };
+export const NEW_YEAR = { value: 'NewYear', active: isInRange('1-1', '1-10') };
+
+export const SEASONS: Season[] = [HALLOWEEN, CHRISTMAS, NEW_YEAR];
 
 export const THEMES: Theme[] = [
     {
@@ -25,7 +37,7 @@ export const THEMES: Theme[] = [
     {
         v: 1,
         name: 'Halloween',
-        season: 'Halloween',
+        season: HALLOWEEN.value,
         bg: 'img/bg_halloween.jpg',
         snow: true,
         leaves: false,
@@ -45,7 +57,7 @@ export const THEMES: Theme[] = [
     {
         v: 1,
         name: 'Christmas',
-        season: 'Christmas',
+        season: CHRISTMAS.value,
         bg: 'img/bg_lowee.jpg',
         snow: true,
         leaves: false,
@@ -63,9 +75,6 @@ export const THEMES: Theme[] = [
         ],
     },
 ];
-
-export const THEME_HALLOWEEN = 1;
-export const THEME_CHRISTMAS = 2;
 
 export const BACKGROUNDS = THEMES.map(theme => theme.bg);
 

@@ -1,7 +1,6 @@
 import { App, Module } from '@/App';
-import { CHRISTMAS, HALLOWEEN } from '@/core/utils/date';
 import { screenAspectRatio } from '@/core/utils/misc';
-import { THEME_CHRISTMAS, THEME_HALLOWEEN, THEMES } from '@/defaults';
+import { SEASONS, THEMES } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import { ModelConfig } from '@/module/live2d/ModelConfig';
 
@@ -48,12 +47,18 @@ export default class ThemeModule implements Module {
     }
 
     setupInitialTheme(config: Config) {
-        this.app.emit('config', 'theme.auto', true, true);
+        this.app.emit('config', 'theme.seasonal', true, true);
 
-        const autoHolidayTheme = config.get('theme.auto', true);
+        const seasonal = config.get('theme.seasonal', true);
 
-        if (autoHolidayTheme) {
-            const index = HALLOWEEN ? THEME_HALLOWEEN : CHRISTMAS ? THEME_CHRISTMAS : 0;
+        if (seasonal) {
+            let index = -1;
+
+            const season = SEASONS.find(season => season.active);
+            if (season) index = THEMES.findIndex(theme => theme.season === season.value);
+
+            if (index === -1) index = 0;
+
             const shouldOverride = index !== config.get('theme.selected', -1);
 
             this.app.emit('config', 'theme.selected', index);
