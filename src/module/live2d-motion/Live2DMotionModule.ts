@@ -47,10 +47,10 @@ export default class Live2DMotionModule implements Module {
         (sprite as EventEmitter).on('motion', async (group: string, index: number) => {
             const motionDefinition = sprite.model.modelSettings.motions[group][index];
 
-            let audio: HTMLAudioElement | undefined;
+            let audioPromise: Promise<void> | undefined;
 
             if (motionDefinition.sound) {
-                audio = this.soundManager.playSound(motionDefinition.sound);
+                audioPromise = this.soundManager.playSound(motionDefinition.sound);
             }
 
             if (subtitleFile && motionDefinition.subtitle) {
@@ -59,9 +59,7 @@ export default class Live2DMotionModule implements Module {
                     this.config.get<ModelConfig[]>('live2d.models', []).find(model => model.id === sprite.id);
                 const locale = modelConfig && modelConfig.locale;
 
-                const timingPromise = audio && new Promise(resolve => audio!.addEventListener('ended', resolve));
-
-                this.subtitleManager.showSubtitle(subtitleFile, motionDefinition.subtitle, locale, timingPromise);
+                this.subtitleManager.showSubtitle(subtitleFile, motionDefinition.subtitle, locale, audioPromise).then();
             }
         });
     }

@@ -93,13 +93,13 @@ export default class SubtitleManager {
         const subtitle = await this.getSubtitle(file, name, locale);
 
         if (subtitle) {
-            const id = this.show(subtitle);
-
             if (!isNaN(subtitle.duration!)) {
+                const id = this.show(subtitle);
                 const remains = subtitle.duration! - (Date.now() - start);
                 setTimeout(() => this.dismiss(id), remains);
             } else if (timingPromise) {
-                timingPromise.then(() => this.dismiss(id));
+                const id = this.show(subtitle);
+                timingPromise.then(() => this.dismiss(id)).catch(() => this.dismiss(id));
             }
 
             return subtitle;
