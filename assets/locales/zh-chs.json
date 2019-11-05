@@ -1,12 +1,41 @@
 {
   "ui_info": "Neptune Live2D {VERSION}",
-  "ui_background_directory": "背景图",
+  "ui_bg_dir": "背景图",
 
-  "name": "中文",
-  "language": "语言",
+  "language_name": "中文",
+
+  "Default": "默认",
+  "Halloween": "万圣节",
+  "Christmas": "圣诞节",
+  "New Year": "新年",
+
   "general": "通用",
   "character": "人物",
   "background": "背景",
   "effect": "特效",
-  "console": "控制台"
+  "console": "控制台",
+
+  "theme": "主题",
+  "misc": "杂项",
+  "leaves": "树叶",
+  "snow": "雪花",
+
+  "enabled": "启用",
+  "seasonal_theming": "季节主题",
+  "volume": "音量",
+  "language": "语言",
+
+  "dragging": "拖拽",
+  "focus_on_press": "按下鼠标跟随",
+  "focus_timeout": "跟随持续时间",
+  "bottom_subtitle": "底部字幕",
+  "details": "详情",
+  "model_loading": "加载中...\n\n如果无限加载的话，可以通过控制台里的日志来查看详情",
+  "scale": "缩放",
+
+  "amount": "数量",
+
+  "dump_logs": "导出日志",
+  "dump_storage": "导出内部存储",
+  "reset": "重置"
 }

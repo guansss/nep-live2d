@@ -1,12 +1,41 @@
 {
   "ui_info": "Neptune Live2D {VERSION}",
-  "ui_background_directory": "Background Images",
+  "ui_bg_dir": "Background Images",
 
-  "name": "English",
-  "language": "Language",
+  "language_name": "English",
+
+  "Default": "Default",
+  "Halloween": "Halloween",
+  "Christmas": "Christmas",
+  "New Year": "New Year",
+
   "general": "General",
   "character": "Character",
   "background": "Background",
   "effect": "Effect",
-  "console": "Console"
+  "console": "Console",
+
+  "theme": "Theme",
+  "misc": "Miscellaneous",
+  "leaves": "Leaves",
+  "snow": "Snow",
+
+  "enabled": "Enabled",
+  "seasonal_theming": "Seasonal Theming",
+  "volume": "Volume",
+  "language": "Language",
+
+  "dragging": "Dragging",
+  "focus_on_press": "Focus on Press",
+  "focus_timeout": "Focus Timeout",
+  "bottom_subtitle": "Bottom Subtitle",
+  "details": "Details",
+  "model_loading": "Loading...\n\nIf loading never finishes, you can check the logs in console for details.",
+  "scale": "Scale",
+
+  "amount": "Amount",
+
+  "dump_logs": "Dump Logs",
+  "dump_storage": "Dump Storage",
+  "reset": "Reset"
 }

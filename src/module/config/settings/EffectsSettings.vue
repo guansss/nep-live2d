@@ -1,12 +1,12 @@
 <template>
     <div>
-        <div class="section" data-title="Leaves">
-            <ToggleSwitch v-model="leavesEnabled">Enabled</ToggleSwitch>
-            <Slider :min="leavesNumberMin" :max="leavesNumberMax" v-model="leavesNumber">Amount</Slider>
+        <div class="section" :data-title="$t('leaves')">
+            <ToggleSwitch v-model="leavesEnabled">{{ $t('enabled') }}</ToggleSwitch>
+            <Slider :min="leavesNumberMin" :max="leavesNumberMax" v-model="leavesNumber">{{ $t('amount') }}</Slider>
         </div>
-        <div class="section" data-title="Snow">
-            <ToggleSwitch v-model="snowEnabled">Enabled</ToggleSwitch>
-            <Slider :min="snowNumberMin" :max="snowNumberMax" v-model="snowNumber">Amount</Slider>
+        <div class="section" :data-title="$t('snow')">
+            <ToggleSwitch v-model="snowEnabled">{{ $t('enabled') }}</ToggleSwitch>
+            <Slider :min="snowNumberMin" :max="snowNumberMax" v-model="snowNumber">{{ $t('amount') }}</Slider>
         </div>
     </div>
 </template>

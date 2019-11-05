@@ -17,7 +17,7 @@
       },
       "bgDirectory": {
         "order": 2,
-        "text": "ui_background_directory",
+        "text": "ui_bg_dir",
         "type": "directory",
         "mode": "fetchall"
       }

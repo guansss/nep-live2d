@@ -1,15 +1,15 @@
 <template>
     <div class="log">
         <div class="buttons">
-            <div class="button" @click="dumpLogs">Dump Logs</div>
-            <div class="button" @click="dumpStorage">Dump Storage</div>
+            <div class="button" @click="dumpLogs">{{ $t('dump_logs') }}</div>
+            <div class="button" @click="dumpStorage">{{ $t('dump_storage') }}</div>
             <div
                 class="button reset"
                 @mousedown.stop="resetStart"
                 @mouseup.stop="resetCancel"
                 @mouseleave="resetCancel"
             >
-                Reset
+                {{ $t('reset') }}
                 <div
                     v-if="resetProgress > 0"
                     class="cover"

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="section" data-title="Theme">
+        <div class="section" :data-title="$t('theme')">
             <div class="themes">
                 <div
                     v-for="(theme, i) in themes"
@@ -8,13 +8,13 @@
                     :class="['theme button', { selected: i === themeSelected }]"
                     @click="themeSelected = i"
                 >
-                    {{ theme.name }}
+                    {{ $t(theme.name) }}
                 </div>
             </div>
-            <ToggleSwitch v-model="themeAuto">Seasonal Theming</ToggleSwitch>
+            <ToggleSwitch v-model="themeAuto">{{ $t('seasonal_theming') }}</ToggleSwitch>
         </div>
-        <div class="section" data-title="Miscellaneous">
-            <Slider progress v-model="volume">Volume</Slider>
+        <div class="section" :data-title="$t('misc')">
+            <Slider progress v-model="volume">{{ $t('volume') }}</Slider>
             <Select v-model="locale" :options="localeOptions">{{ $t('language') }}</Select>
         </div>
     </div>
@@ -71,10 +71,10 @@ export default class GeneralSettings extends Vue {
     }
 
     created() {
-        const locales = (process.env.I18N as any) as Record<string, { name: string }>;
+        const locales = (process.env.I18N as any) as Record<string, { language_name: string }>;
 
         this.localeOptions = Object.entries(locales).map(([locale, language]) => ({
-            text: `${language.name} (${locale})`,
+            text: `${language.language_name} (${locale})`,
             value: locale,
         }));
     }

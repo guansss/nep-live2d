@@ -34,16 +34,16 @@
         </div>
 
         <div v-if="!selectedModel">
-            <ToggleSwitch key="s1" v-model="draggable">Dragging</ToggleSwitch>
-            <ToggleSwitch key="s2" v-model="focusOnPress">Focus on Press</ToggleSwitch>
+            <ToggleSwitch key="s1" v-model="draggable">{{ $t('dragging') }}</ToggleSwitch>
+            <ToggleSwitch key="s2" v-model="focusOnPress">{{ $t('focus_on_press') }}</ToggleSwitch>
             <Slider v-if="!focusOnPress" overlay :min="0" :max="focusTimeoutMax" v-model="focusTimeout"
-            >Focus Timeout
+            >{{ $t('focus_timeout') }}
             </Slider>
-            <ToggleSwitch key="s3" v-model="bottomSubtitle">Bottom Subtitle</ToggleSwitch>
+            <ToggleSwitch key="s3" v-model="bottomSubtitle">{{ $t('bottom_subtitle') }}</ToggleSwitch>
         </div>
         <div v-else>
             <details class="details button" :open="detailsExpanded" @click.prevent="detailsExpanded = !detailsExpanded">
-                <summary>Details</summary>
+                <summary>{{ $t('details') }}</summary>
                 <template v-if="detailsExpanded">
                     <div>File: {{ selectedModel.path }}</div>
                     <div>Name: {{ selectedModel.name }}</div>
@@ -52,18 +52,18 @@
             </details>
 
             <div v-if="selectedModel.error" class="error">{{ selectedModel.error }}</div>
-            <div v-else-if="selectedModel.loading">
-                Loading...<br /><br />If loading never finishes, you can check the logs for details.
-            </div>
+            <div v-else-if="selectedModel.loading">{{ $t('details') }}</div>
 
             <template v-else>
-                <ToggleSwitch :value="selectedModel.config.enabled" @change="enableChanged">Enabled</ToggleSwitch>
+                <ToggleSwitch :value="selectedModel.config.enabled" @change="enableChanged">{{
+                    $t('enabled')
+                }}</ToggleSwitch>
                 <Slider :value="selectedModel.config.scale" overlay :min="0.01" :max="scaleMax" @change="scaleChanged"
-                >Scale
+                >{{ $t('scale') }}
                 </Slider>
 
                 <div v-if="selectedModel.subtitleLanguages" class="sub-language">
-                    <div class="label">Locale</div>
+                    <div class="label">{{ $t('language') }}</div>
                     <div class="button" @click.stop="showLanguages = true">{{ selectedLanguage }}</div>
 
                     <transition name="fade">
@@ -80,7 +80,7 @@
                                 >
                                     <div class="title">
                                         {{ language.name }}
-                                        <span v-if="language.locale.includes(fallbackLocale)">Default</span>
+                                        <span v-if="language.locale.includes(fallbackLocale)">{{ $t('Default') }}</span>
                                     </div>
                                     <div v-if="language.authors" class="authors">
                                         <span v-for="author in language.authors" :key="author">{{ author }}</span>
