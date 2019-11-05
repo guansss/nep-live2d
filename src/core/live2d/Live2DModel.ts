@@ -137,9 +137,7 @@ export default class Live2DModel {
         return [];
     }
 
-    update(transform: Float32Array) {
-        const dt = 16; // TODO: calculate dt
-
+    update(dt: DOMHighResTimeStamp, transform: Float32Array) {
         const model = this.internalModel;
 
         model.loadParam();

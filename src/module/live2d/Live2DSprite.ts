@@ -1,4 +1,5 @@
 import Live2DModel from '@/core/live2d/Live2DModel';
+import Mka from '@/core/mka/Mka';
 import { Renderer, Texture } from '@pixi/core';
 import { Container } from '@pixi/display';
 
@@ -129,7 +130,7 @@ class Live2DSprite extends Container {
         transform[12] = wt.tx * this.drawingScaleX;
         transform[13] = wt.ty * this.drawingScaleY;
 
-        this.model.update(transform);
+        this.model.update(Mka.ticker.delta, transform);
 
         // maybe do `renderer.reset()` again?
     }

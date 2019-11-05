@@ -1,4 +1,5 @@
 import Player, { InternalPlayer } from '@/core/mka/Player';
+import Ticker from '@/core/mka/Ticker';
 import { error, log } from '@/core/utils/log';
 import { Application as PIXIApplication } from '@pixi/app';
 import autobind from 'autobind-decorator';
@@ -6,6 +7,8 @@ import autobind from 'autobind-decorator';
 const TAG = 'Mka';
 
 export default class Mka {
+    static ticker = new Ticker();
+
     private _paused = false;
 
     get paused() {
@@ -20,8 +23,6 @@ export default class Mka {
     }
 
     private readonly players: { [name: string]: InternalPlayer } = {};
-
-    private lastUpdated = performance.now();
 
     /**
      * ID returned by `requestAnimationFrame()`
@@ -80,17 +81,16 @@ export default class Mka {
     @autobind
     private tick(now: number) {
         if (!this._paused) {
-            const delta = now - this.lastUpdated;
+            Mka.ticker.tick();
 
             this.forEachPlayer(player => {
                 if (player.enabled && !player.paused) {
-                    player.update();
+                    player.update(Mka.ticker);
                 }
             });
 
             this.pixiApp.render();
 
-            this.lastUpdated = performance.now();
             this.rafId = requestAnimationFrame(this.tick);
         }
     }

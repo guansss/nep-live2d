@@ -1,4 +1,5 @@
 import Player from '@/core/mka/Player';
+import Ticker from '@/core/mka/Ticker';
 import Leaves from '@/module/leaves/Leaves';
 
 // TODO: Import the JSON and copy related image
@@ -76,10 +77,9 @@ export default class LeavesPlayer extends Player {
         this.leaves && this.leaves.hit(x, y);
     }
 
-    update(): boolean {
+    update(ticker: Ticker): boolean {
         if (this.leaves) {
-            // TODO: calculate dt and now
-            this.leaves.update(16, performance.now());
+            this.leaves.update(ticker.delta, ticker.now);
 
             return true;
         }

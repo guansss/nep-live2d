@@ -1,4 +1,5 @@
 import Mka from '@/core/mka/Mka';
+import Ticker from '@/core/mka/Ticker';
 
 export default abstract class Player {
     readonly mka?: Mka;
@@ -9,7 +10,9 @@ export default abstract class Player {
     /**
      * @returns True if the content is actually updated.
      */
-    abstract update(): boolean;
+    update(ticker: Ticker): boolean {
+        return false;
+    }
 
     attach() {}
 

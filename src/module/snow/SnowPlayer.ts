@@ -1,5 +1,6 @@
 import snowflake from '@/assets/img/snowflake.png';
 import Player from '@/core/mka/Player';
+import Ticker from '@/core/mka/Ticker';
 import Snow from '@/module/snow/pixi-snow/Snow';
 
 export interface Loader {
@@ -65,10 +66,9 @@ export default class SnowPlayer extends Player {
         this.destroy();
     }
 
-    update(): boolean {
+    update(ticker: Ticker): boolean {
         if (this.snow) {
-            // TODO: calculate dt and now
-            this.snow.update(16, performance.now());
+            this.snow.update(ticker.delta, ticker.now);
 
             return true;
         }
