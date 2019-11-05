@@ -38,6 +38,9 @@ export default class FloatingPanelMixin extends Vue {
     panelHeight = PANEL_HEIGHT;
     panelBorderRadius = '0';
 
+    // a flag to tell the children if they should display its content
+    contentVisible = false;
+
     transformAnimDuration = 300;
 
     // when will the state change between switch and panel during animation
@@ -235,7 +238,7 @@ export default class FloatingPanelMixin extends Vue {
                         duration: this.transformAnimDuration,
                         easing: TRANSFORM_EASING,
                     },
-                ).onfinish = () => this.afterOpen(); // do some lazy loads!
+                ).onfinish = () => this.contentVisible = true;
             });
         }
     }
@@ -252,8 +255,7 @@ export default class FloatingPanelMixin extends Vue {
 
             this.panel.style.borderRadius = this.switchBorderRadius;
 
-            // do some cleanup!
-            this.beforeClose();
+            this.contentVisible = false;
 
             this.$nextTick(() => {
                 this.panel.animate(
@@ -291,8 +293,4 @@ export default class FloatingPanelMixin extends Vue {
     protected panelMoveEnded() {}
 
     protected panelResizeEnded() {}
-
-    protected afterOpen() {}
-
-    protected beforeClose() {}
 }

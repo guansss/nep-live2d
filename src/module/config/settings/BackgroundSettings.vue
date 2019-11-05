@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="showImage" class="bg-list">
+        <div v-if="contentVisible" class="bg-list">
             <div
                 v-for="image in images"
                 :key="image"
@@ -35,11 +35,13 @@ export default class BackgroundSettings extends Vue {
 
     @Prop() readonly configModule!: ConfigModule;
 
+    // transforming images is a heavy job and will cause stuttering animation, especially when images here are
+    //  super high resolution background images, so we should hide them before transformation
+    @Prop({ type: Boolean }) readonly contentVisible!: boolean;
+
     images: string[] = BACKGROUNDS.slice();
 
     selected = '';
-
-    showImage = false;
 
     private created() {
         this.configModule.app
@@ -70,16 +72,6 @@ export default class BackgroundSettings extends Vue {
         this.configModule.setConfig('bg.img', image);
 
         this.selected = image;
-    }
-
-    beforeClose() {
-        // transforming images is a heavy job and will cause stuttering animation, especially when images here are
-        //  super high resolution background images, so we should hide them before transformation
-        this.showImage = false;
-    }
-
-    afterOpen() {
-        this.showImage = true;
     }
 }
 </script>

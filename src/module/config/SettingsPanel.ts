@@ -48,10 +48,6 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
 
     async selectPage(index: number) {
         this.selectedPage = index;
-
-        // notify selected child to load stuffs, this is probably not a good design...
-        await this.$nextTick();
-        this.afterOpen();
     }
 
     switchMoveEnded() {
@@ -67,15 +63,5 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     panelResizeEnded() {
         this._configModule.setConfig('settings.panelWidth', this.panelWidth);
         this._configModule.setConfig('settings.panelHeight', this.panelHeight);
-    }
-
-    afterOpen() {
-        const component = this.pageComponent as any;
-        component && component.afterOpen && component.afterOpen();
-    }
-
-    beforeClose() {
-        const component = this.pageComponent as any;
-        component && component.beforeClose && component.beforeClose();
     }
 }
