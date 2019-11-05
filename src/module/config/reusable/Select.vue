@@ -114,6 +114,8 @@ export default class Select extends Vue {
 </script>
 
 <style scoped lang="stylus">
+@require './vars'
+
 $height = 32px
 $padding = 8px
 
@@ -143,7 +145,7 @@ $padding = 8px
         position absolute
         top $padding + 5px
         right ($padding / 2)
-        border-top solid 5px #333
+        border-top solid 5px #EEE
         border-right solid 4px transparent
         border-left solid 4px transparent
         transition transform .15s ease-out
@@ -164,15 +166,17 @@ $padding = 8px
     width 100%
     height $height
     padding $padding ($padding * 2) $padding $padding
-    line-height $height - $padding * 2
     overflow hidden
+    background $themeColor
+    color #EEE
+    line-height $height - $padding * 2
     white-space nowrap
     text-overflow ellipsis
     border-bottom 1px solid transparent
     transition background-color .15s ease-out, border-bottom-color .15s ease-out
 
     &:hover
-        background #CCC
+        background darken($themeColor, 30%)
 
 .dropdown
     position relative

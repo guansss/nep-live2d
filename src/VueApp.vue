@@ -57,23 +57,4 @@ ul
     font-family: 'Avenir', Helvetica, Arial, sans-serif
     -webkit-font-smoothing: antialiased
     -moz-osx-font-smoothing: grayscale
-
-.button
-    position relative
-    display inline-block
-    margin-bottom 8px
-    padding 8px 16px
-    background-color #555
-    color white
-    font-size 14px
-    cursor pointer
-    box-shadow 0 1px 2px #0004
-    transition box-shadow .15s ease-out
-
-    &:hover
-        background #222
-        box-shadow 0 2px 4px #0006
-
-    &:active
-        box-shadow 0 1px 2px #0002
 </style>
