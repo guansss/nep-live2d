@@ -130,7 +130,7 @@ class Live2DSprite extends Container {
         transform[12] = wt.tx * this.drawingScaleX;
         transform[13] = wt.ty * this.drawingScaleY;
 
-        this.model.update(Mka.ticker.delta, transform);
+        this.model.update(Mka.ticker.delta, Mka.ticker.now, transform);
 
         // maybe do `renderer.reset()` again?
     }

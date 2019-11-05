@@ -137,7 +137,7 @@ export default class Live2DModel {
         return [];
     }
 
-    update(dt: DOMHighResTimeStamp, transform: Float32Array) {
+    update(dt: DOMHighResTimeStamp, now: DOMHighResTimeStamp, transform: Float32Array) {
         const model = this.internalModel;
 
         model.loadParam();
@@ -153,7 +153,7 @@ export default class Live2DModel {
         this.focusController.update(dt);
         const focusX = this.focusController.x;
         const focusY = this.focusController.y;
-        const t = (performance.now() / 1000) * 2 * Math.PI;
+        const t = (now / 1000) * 2 * Math.PI;
         model.addToParamFloat('PARAM_EYE_BALL_X', focusX);
         model.addToParamFloat('PARAM_EYE_BALL_Y', focusY);
         model.addToParamFloat('PARAM_ANGLE_X', focusX * 30 + 15 * Math.sin(t / 6.5345) * 0.5);

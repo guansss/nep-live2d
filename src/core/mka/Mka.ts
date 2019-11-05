@@ -79,18 +79,17 @@ export default class Mka {
     }
 
     @autobind
-    private tick(now: number) {
+    private tick(now: DOMHighResTimeStamp) {
         if (!this._paused) {
-            Mka.ticker.tick();
+            if (Mka.ticker.tick(now)) {
+                this.forEachPlayer(player => {
+                    if (player.enabled && !player.paused) {
+                        player.update(Mka.ticker);
+                    }
+                });
 
-            this.forEachPlayer(player => {
-                if (player.enabled && !player.paused) {
-                    player.update(Mka.ticker);
-                }
-            });
-
-            this.pixiApp.render();
-
+                this.pixiApp.render();
+            }
             this.rafId = requestAnimationFrame(this.tick);
         }
     }
