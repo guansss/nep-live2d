@@ -21,9 +21,7 @@
             <Scrollable class="page">
                 <transition name="slide" mode="out-in">
                     <keep-alive>
-                        <component :is="currentPage"
-                            ref="page"
-                            v-bind="{ contentVisible, configModule: _configModule }" />
+                        <component :is="currentPage" ref="page" v-bind="{ configModule, contentVisible }" />
                     </keep-alive>
                 </transition>
             </Scrollable>

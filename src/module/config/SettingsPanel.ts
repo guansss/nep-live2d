@@ -14,8 +14,7 @@ import { Vue } from 'vue/types/vue';
     components: { CloseSVG, Scrollable },
 })
 export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
-    // use getter function to prevent Vue's observation on ConfigModule instance
-    @Prop() readonly configModule!: () => ConfigModule;
+    @Prop() readonly configModule!: ConfigModule;
 
     @Ref('settings') readonly panel!: HTMLDivElement;
     @Ref('content') readonly content!: HTMLDivElement;
@@ -31,19 +30,14 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
         return this.pages[this.selectedPage];
     }
 
-    get _configModule() {
-        // cache ConfigModule so we don't need to call the getter function every time
-        return this.configModule();
-    }
-
     created() {
-        this.switchTop = this._configModule.getConfig('settings.switchTop', this.switchTop);
-        this.switchLeft = this._configModule.getConfig('settings.switchLeft', this.switchLeft);
+        this.switchTop = this.configModule.getConfig('settings.switchTop', this.switchTop);
+        this.switchLeft = this.configModule.getConfig('settings.switchLeft', this.switchLeft);
 
-        this.panelTop = this._configModule.getConfig('settings.panelTop', this.panelTop);
-        this.panelLeft = this._configModule.getConfig('settings.panelLeft', this.panelLeft);
-        this.panelWidth = this._configModule.getConfig('settings.panelWidth', this.panelWidth);
-        this.panelHeight = this._configModule.getConfig('settings.panelHeight', this.panelHeight);
+        this.panelTop = this.configModule.getConfig('settings.panelTop', this.panelTop);
+        this.panelLeft = this.configModule.getConfig('settings.panelLeft', this.panelLeft);
+        this.panelWidth = this.configModule.getConfig('settings.panelWidth', this.panelWidth);
+        this.panelHeight = this.configModule.getConfig('settings.panelHeight', this.panelHeight);
     }
 
     async selectPage(index: number) {
@@ -51,17 +45,17 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     }
 
     switchMoveEnded() {
-        this._configModule.setConfig('settings.switchTop', this.switchTop);
-        this._configModule.setConfig('settings.switchLeft', this.switchLeft);
+        this.configModule.setConfig('settings.switchTop', this.switchTop);
+        this.configModule.setConfig('settings.switchLeft', this.switchLeft);
     }
 
     panelMoveEnded() {
-        this._configModule.setConfig('settings.panelTop', this.panelTop);
-        this._configModule.setConfig('settings.panelLeft', this.panelLeft);
+        this.configModule.setConfig('settings.panelTop', this.panelTop);
+        this.configModule.setConfig('settings.panelLeft', this.panelLeft);
     }
 
     panelResizeEnded() {
-        this._configModule.setConfig('settings.panelWidth', this.panelWidth);
-        this._configModule.setConfig('settings.panelHeight', this.panelHeight);
+        this.configModule.setConfig('settings.panelWidth', this.panelWidth);
+        this.configModule.setConfig('settings.panelHeight', this.panelHeight);
     }
 }
