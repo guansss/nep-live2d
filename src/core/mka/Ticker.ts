@@ -1,36 +1,50 @@
-export default class Ticker {
-    start = performance.now();
+const FILTER_STRENGTH = 20;
 
-    now = this.start;
-    then = this.start;
-    elapsed = this.now - this.start;
-    delta = this.now - this.then;
+namespace Ticker {
+    const start = performance.now();
 
-    _fps = 60;
-    frameInterval = 1000 / this._fps;
+    export let now = start;
+    export let then = start;
+    export let elapsed = now - start;
+    export let delta = now - then;
 
-    get fps() {
-        return this._fps;
+    let maxFps = 60;
+    let frameInterval = 1000 / maxFps;
+    let actualFrameInterval = frameInterval;
+
+    export function getMaxFPS() {
+        return maxFps;
     }
 
-    set fps(value: number) {
-        this._fps = value;
-        this.frameInterval = 1000 / value;
+    // see https://stackoverflow.com/a/19772220
+    export function setMaxFPS(fps: number) {
+        maxFps = fps;
+        frameInterval = 1000 / fps;
+    }
+
+    export function getFPS() {
+        return ~~(1000 / actualFrameInterval);
     }
 
     /**
      * @returns True if this tick is available for animation.
      */
-    tick(now: DOMHighResTimeStamp): boolean {
-        this.now = now;
-        this.elapsed = this.now - this.start;
-        this.delta = this.now - this.then;
+    export function tick(time: DOMHighResTimeStamp): boolean {
+        now = time;
+        elapsed = now - start;
+        delta = now - then;
 
-        if (this.delta > this.frameInterval) {
-            this.then = this.now - (this.elapsed % this.frameInterval);
+        if (delta > frameInterval) {
+            // for calculating actual FPS, see https://stackoverflow.com/a/5111475
+            actualFrameInterval += (delta - actualFrameInterval) / FILTER_STRENGTH;
+
+            then = now - (elapsed % frameInterval);
+
             return true;
         }
 
         return false;
     }
 }
+
+export default Ticker;

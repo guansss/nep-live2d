@@ -1,5 +1,6 @@
 import { App, Module } from '@/App';
 import { error } from '@/core/utils/log';
+import Overlay from '@/module/config/Overlay.vue';
 import SettingsPanel from '@/module/config/SettingsPanel.vue';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
@@ -65,6 +66,7 @@ export default class ConfigModule implements Module {
         app.sticky('configReady', this.config);
 
         app.addComponent(SettingsPanel, { configModule: this }).then();
+        app.addComponent(Overlay, { configModule: this }).then();
 
         if (localStorage.v !== process.env.VERSION) {
             app.sticky('init', localStorage.v);

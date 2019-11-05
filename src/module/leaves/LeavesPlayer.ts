@@ -77,9 +77,9 @@ export default class LeavesPlayer extends Player {
         this.leaves && this.leaves.hit(x, y);
     }
 
-    update(ticker: Ticker): boolean {
+    update(): boolean {
         if (this.leaves) {
-            this.leaves.update(ticker.delta, ticker.now);
+            this.leaves.update(Ticker.delta, Ticker.now);
 
             return true;
         }

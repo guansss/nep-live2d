@@ -7,8 +7,6 @@ import autobind from 'autobind-decorator';
 const TAG = 'Mka';
 
 export default class Mka {
-    static ticker = new Ticker();
-
     private _paused = false;
 
     get paused() {
@@ -81,10 +79,10 @@ export default class Mka {
     @autobind
     private tick(now: DOMHighResTimeStamp) {
         if (!this._paused) {
-            if (Mka.ticker.tick(now)) {
+            if (Ticker.tick(now)) {
                 this.forEachPlayer(player => {
                     if (player.enabled && !player.paused) {
-                        player.update(Mka.ticker);
+                        player.update(Ticker);
                     }
                 });
 

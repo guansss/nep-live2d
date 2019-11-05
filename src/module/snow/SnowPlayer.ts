@@ -66,9 +66,9 @@ export default class SnowPlayer extends Player {
         this.destroy();
     }
 
-    update(ticker: Ticker): boolean {
+    update(): boolean {
         if (this.snow) {
-            this.snow.update(ticker.delta, ticker.now);
+            this.snow.update(Ticker.delta, Ticker.now);
 
             return true;
         }

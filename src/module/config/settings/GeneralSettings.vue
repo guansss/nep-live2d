@@ -15,6 +15,7 @@
         </div>
         <div class="section" :data-title="$t('misc')">
             <Slider progress v-model="volume">{{ $t('volume') }}</Slider>
+            <ToggleSwitch v-model="showFPS">{{ $t('show_fps') }}</ToggleSwitch>
             <Select v-model="locale" :options="localeOptions">{{ $t('language') }}</Select>
         </div>
     </div>
@@ -45,6 +46,7 @@ export default class GeneralSettings extends Vue {
     seasonal = this.configModule.getConfig('theme.seasonal', true);
 
     volume = this.configModule.getConfig('volume', 0);
+    showFPS = this.configModule.getConfig('fps', false);
 
     locale = this.configModule.getConfig('locale', LOCALE);
     localeOptions!: Option[]; // non-reactive
@@ -63,6 +65,11 @@ export default class GeneralSettings extends Vue {
     @Watch('volume')
     volumeChanged(value: number) {
         this.configModule.setConfig('volume', value);
+    }
+
+    @Watch('showFPS')
+    showFPSChanged(value: boolean) {
+        this.configModule.setConfig('fps', value);
     }
 
     @Watch('locale')
