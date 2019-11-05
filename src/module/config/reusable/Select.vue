@@ -121,7 +121,7 @@ $padding = 8px
 
 .select
     width 240px
-    padding 16px
+    padding 6px 16px
     display flex
     align-items center
 
@@ -137,7 +137,7 @@ $padding = 8px
     flex-grow 1
     max-width 240px
     height $height
-    font-size $height - $padding * 2 - 2
+    font-size 14px
     cursor pointer
 
     &:after

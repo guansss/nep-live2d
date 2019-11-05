@@ -84,7 +84,7 @@ export default class GeneralSettings extends Vue {
 <style scoped lang="stylus">
 .themes
     display flex
-    padding 16px 16px 8px
+    padding 6px 16px 0
 
 .theme
     background #EEE

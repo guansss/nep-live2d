@@ -195,7 +195,7 @@ $toolbarHeight = 36px
     &:before
         content attr(data-title)
         display inline-block
-        margin-top 8px
+        margin 8px 0
         padding 4px 8px 4px 16px
         background lighten($themeColor, 40%)
         color #FFF

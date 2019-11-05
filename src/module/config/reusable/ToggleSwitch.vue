@@ -31,7 +31,7 @@ $height = 20px
 .switch
     display flex
     width 240px
-    padding 16px
+    padding 12px 16px
     align-items center
 
 .track

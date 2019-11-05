@@ -521,7 +521,7 @@ $selectableCard
 
 .sub-language
     display flex
-    padding 8px 16px
+    padding 6px 16px
     align-items center
 
     .button

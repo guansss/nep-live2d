@@ -112,7 +112,7 @@ $height = 20px
 .slider
     display flex
     width 240px
-    padding 16px
+    padding 12px 16px
     align-items center
 
 .slider-wrapper
