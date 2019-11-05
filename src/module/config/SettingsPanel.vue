@@ -19,9 +19,11 @@
             </div>
 
             <Scrollable class="page">
-                <keep-alive>
-                    <component :is="currentPage" ref="page" v-bind="{ configModule: _configModule }" />
-                </keep-alive>
+                <transition name="slide" mode="out-in">
+                    <keep-alive>
+                        <component :is="currentPage" ref="page" v-bind="{ configModule: _configModule }" />
+                    </keep-alive>
+                </transition>
             </Scrollable>
 
             <div ref="resizer" class="resizer"></div>
@@ -208,6 +210,17 @@ $toolbarHeight = 36px
         display block
         height 1px
         background #0001
+
+// animation
+
+.slide-enter-active
+    transition opacity .15s
+
+.slide-leave-active
+    transition opacity .05s
+
+.slide-enter, .slide-leave-to
+    opacity 0
 </style>
 
 <style lang="stylus">
