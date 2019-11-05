@@ -9,13 +9,13 @@
                 <div ref="dropdown" class="dropdown">
                     <ul v-if="opened" ref="options" class="options">
                         <li v-for="option in options" :key="option.text"
-                            :class="['option', { selected: option.value === (value && value.value) }]"
+                            :class="['option', { selected: option.value === value }]"
                             @click="select(option)">{{ option.text }}
                         </li>
                     </ul>
                 </div>
             </div>
-            <div class="selection" @click="toggleOpen">{{ value ? value.text : '' }}</div>
+            <div class="selection" @click="toggleOpen">{{ selection }}</div>
         </div>
     </div>
 </template>
@@ -36,7 +36,7 @@ export interface Option {
 export default class Select extends Vue {
     @Prop({ type: Array, default: [] }) readonly options!: readonly Option[];
 
-    @Model('change', { default: null }) value!: Option;
+    @Model('change', { default: null }) value!: any;
 
     @Ref('dropdown') readonly dropdownEl!: HTMLDivElement;
     @Ref('options') readonly optionsEl!: HTMLUListElement;
@@ -44,8 +44,13 @@ export default class Select extends Vue {
     opened = false;
     animating = false;
 
+    get selection() {
+        const selected = this.options.find(option => option.value === this.value);
+        return selected ? selected.text : '';
+    }
+
     select(option: Option) {
-        this.$emit('change', option);
+        this.$emit('change', option.value);
         this.close();
     }
 

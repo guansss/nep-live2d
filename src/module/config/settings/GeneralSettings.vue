@@ -46,7 +46,7 @@ export default class GeneralSettings extends Vue {
 
     volume = this.configModule.getConfig('volume', 0);
 
-    locale: Option = null; // reactive
+    locale = this.configModule.getConfig('locale', LOCALE);
     localeOptions!: Option[]; // non-reactive
 
     @Watch('themeSelected')
@@ -66,8 +66,8 @@ export default class GeneralSettings extends Vue {
     }
 
     @Watch('locale')
-    localeChanged(locale?: Option) {
-        locale && this.configModule.setConfig('locale', locale.value);
+    localeChanged(locale: string) {
+        this.configModule.setConfig('locale', locale);
     }
 
     created() {
@@ -77,9 +77,6 @@ export default class GeneralSettings extends Vue {
             text: `${language.name} (${locale})`,
             value: locale,
         }));
-
-        const locale = this.configModule.getConfig('locale', LOCALE);
-        this.locale = this.localeOptions.find(option => option.value === locale);
     }
 }
 </script>
