@@ -185,13 +185,29 @@ $toolbarHeight = 36px
     width 100%
 
 .settings >>> .section
+    position relative
+    margin-bottom 16px
 
     &:before
         content attr(data-title)
-        display block
-        padding 2px 16px
+        display inline-block
+        margin-top 8px
+        padding 4px 8px 4px 16px
         background lighten($themeColor, 40%)
-        color white
+        color #FFF
+        font-size 12px
+        line-height 1.2
+
+    &:after
+        content ''
+        position absolute
+        z-index -1
+        top 18px
+        right 0
+        left 0
+        display block
+        height 1px
+        background #0001
 </style>
 
 <style lang="stylus">
