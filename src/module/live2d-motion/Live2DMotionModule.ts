@@ -5,6 +5,7 @@ import SubtitleManager from '@/module/live2d-motion/SubtitleManager';
 import VueLive2DMotion from '@/module/live2d-motion/VueLive2DMotion.vue';
 import Live2DModule from '@/module/live2d/Live2DModule';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
+import { ModelConfig } from '@/module/live2d/ModelConfig';
 import { EventEmitter } from '@pixi/utils';
 
 /**
@@ -12,6 +13,8 @@ import { EventEmitter } from '@pixi/utils';
  */
 export default class Live2DMotionModule implements Module {
     name = 'Live2DMotion';
+
+    config?: Config;
 
     soundManager = new SoundManager();
     subtitleManager = new SubtitleManager();
@@ -21,15 +24,13 @@ export default class Live2DMotionModule implements Module {
 
         if (!live2dModule) return;
 
-        app.on('configReady', (config: Config) => {
-                if (config.volume) {
-                    this.soundManager.volume = config.volume;
-                }
-            })
-            .on('config:volume', (value: number) => (this.soundManager.volume = value))
-            .on('live2dLoaded', (id: number, sprite: Live2DSprite) => this.processSprite(sprite));
-
-        app.emit('config', 'volume', this.soundManager.volume, true);
+        app.on('config:volume', (volume: number) => (this.soundManager.volume = volume))
+            .on('config:locale', (locale: string) => (this.subtitleManager.defaultLocale = locale))
+            .on('live2dLoaded', (id: number, sprite: Live2DSprite) => this.processSprite(sprite))
+            .on('configReady', (config: Config) => {
+                this.config = config;
+                app.emit('config', 'volume', this.soundManager.volume, true);
+            });
 
         app.addComponent(VueLive2DMotion, { module: () => this }).then();
     }
@@ -38,7 +39,9 @@ export default class Live2DMotionModule implements Module {
         const subtitleFile = sprite.model.modelSettings.subtitle;
 
         if (subtitleFile) {
-            this.subtitleManager.loadSubtitle(subtitleFile).then();
+            this.subtitleManager.loadSubtitle(subtitleFile).then(languages => {
+                languages && this.app.emit('live2dSubtitleLoaded', sprite.id, languages);
+            });
         }
 
         (sprite as EventEmitter).on('motion', async (group: string, index: number) => {
@@ -51,9 +54,14 @@ export default class Live2DMotionModule implements Module {
             }
 
             if (subtitleFile && motionDefinition.subtitle) {
+                const modelConfig =
+                    this.config &&
+                    this.config.get<ModelConfig[]>('live2d.models', []).find(model => model.id === sprite.id);
+                const locale = modelConfig && modelConfig.locale;
+
                 const timingPromise = audio && new Promise(resolve => audio!.addEventListener('ended', resolve));
 
-                this.subtitleManager.showSubtitle(subtitleFile, motionDefinition.subtitle, timingPromise);
+                this.subtitleManager.showSubtitle(subtitleFile, motionDefinition.subtitle, locale, timingPromise);
             }
         });
     }

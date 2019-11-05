@@ -36,7 +36,8 @@
         <div v-if="!selectedModel">
             <ToggleSwitch key="s1" v-model="draggable">Dragging</ToggleSwitch>
             <ToggleSwitch key="s2" v-model="focusOnPress">Focus on Press</ToggleSwitch>
-            <Slider v-if="!focusOnPress" overlay :min="0" :max="focusTimeoutMax" v-model="focusTimeout">Focus Timeout
+            <Slider v-if="!focusOnPress" overlay :min="0" :max="focusTimeoutMax" v-model="focusTimeout"
+            >Focus Timeout
             </Slider>
             <ToggleSwitch key="s3" v-model="bottomSubtitle">Bottom Subtitle</ToggleSwitch>
         </div>
@@ -60,6 +61,30 @@
                 <Slider :value="selectedModel.config.scale" overlay :min="0.01" :max="scaleMax" @change="scaleChanged"
                 >Scale
                 </Slider>
+
+                <div v-if="selectedModel.subtitleLanguages" class="sub-language">
+                    <div class="label">Locale</div>
+                    <div class="button" @click.stop="showLanguages = true">{{ selectedLanguage }}</div>
+
+                    <transition name="fade">
+                        <div v-if="showLanguages" class="overlay" @click.stop="showLanguages = false">
+                            <ul class="languages">
+                                <li
+                                    v-for="language in selectedModel.subtitleLanguages"
+                                    :key="language.locale"
+                                    :class="[
+                                        'language',
+                                        { selected: language.locale.includes(selectedModel.config.locale) },
+                                    ]"
+                                    @click="localeChanged(language.locale)"
+                                >
+                                    <div class="title">{{ language.name }}</div>
+                                    <div>{{ language.description }}</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </transition>
+                </div>
             </template>
         </div>
     </div>
@@ -71,11 +96,13 @@ import TShirtSVG from '@/assets/img/tshirt.svg';
 import TuneSVG from '@/assets/img/tune.svg';
 import Live2DModel from '@/core/live2d/Live2DModel';
 import { clamp } from '@/core/utils/math';
-import { FOCUS_TIMEOUT_MAX, LIVE2D_SCALE_MAX } from '@/defaults';
+import { FOCUS_TIMEOUT_MAX, LIVE2D_SCALE_MAX, LOCALE } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
+import Live2DMotionModule from '@/module/live2d-motion/Live2DMotionModule';
+import { SubtitleJSON } from '@/module/live2d-motion/SubtitleManager';
 import Live2DModule from '@/module/live2d/Live2DModule';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import { makeModelPath, ModelConfig, toActualValues, toStorageValues } from '@/module/live2d/ModelConfig';
@@ -95,6 +122,12 @@ class ModelEntity {
     loaded = false;
     error?: string;
 
+    subtitleLanguages?: {
+        locale: string;
+        name: string;
+        description?: string;
+    }[];
+
     get loading() {
         // missing config means the model is newly added and thus supposed to be enabled
         const enabled = this.config ? this.config.enabled : true;
@@ -102,7 +135,9 @@ class ModelEntity {
     }
 
     constructor(config: ModelConfig) {
-        this.name = basename(config.path).replace('.model.json', '').replace('.json', '');
+        this.name = basename(config.path)
+            .replace('.model.json', '')
+            .replace('.json', '');
         this.path = config.path;
 
         this.updateConfig(config);
@@ -150,8 +185,22 @@ export default class CharacterSettings extends Vue {
     scaleMax = LIVE2D_SCALE_MAX;
     focusTimeoutMax = FOCUS_TIMEOUT_MAX / 1000;
 
+    defaultLocale = this.configModule.getConfig('locale', LOCALE);
+    showLanguages = false;
+
     get selectedModel() {
         return this.models[this.selectedIndex];
+    }
+
+    get selectedLanguage() {
+        const model = this.selectedModel;
+        const defaultLocale = this.defaultLocale;
+
+        if (!model) return '';
+
+        const locale = model.config.locale || defaultLocale;
+        const language = model.subtitleLanguages!.find(language => language.locale.includes(locale));
+        return language ? language.name : '';
     }
 
     @Watch('modelFile')
@@ -189,13 +238,26 @@ export default class CharacterSettings extends Vue {
         this.configModule.app
             .on('live2dLoaded', this.modelLoaded, this)
             .on('live2dError', this.modelError, this)
+            .on('live2dSubtitleLoaded', this.subtitleLoaded, this)
             .on('config:live2d.internalModels', this.updateModels, this)
-            .on('config:live2d.models', this.updateModels, this);
+            .on('config:live2d.models', this.updateModels, this)
+            .on('config:locale', (locale: string) => (this.defaultLocale = locale));
 
-        // fetch existing models from Live2DModule
+        let subtitles: Live2DMotionModule['subtitleManager']['subtitles'] = {};
+
+        // fetch existing subtitles
+        const live2dMotionModule = this.configModule.app.modules['Live2DMotion'] as Live2DMotionModule;
+        if (live2dMotionModule) subtitles = live2dMotionModule.subtitleManager.subtitles;
+
+        // fetch existing models and match subtitles
         const live2dModule = this.configModule.app.modules['Live2D'] as Live2DModule;
         if (live2dModule) {
-            live2dModule.player.sprites.forEach(sprite => this.modelLoaded(sprite.id, sprite));
+            live2dModule.player.sprites.forEach(sprite => {
+                this.modelLoaded(sprite.id, sprite);
+
+                const subtitle = subtitles[sprite.model.modelSettings.subtitle || ''];
+                subtitle && this.subtitleLoaded(sprite.id, subtitle);
+            });
         }
     }
 
@@ -241,7 +303,7 @@ export default class CharacterSettings extends Vue {
     }
 
     modelLoaded(id: number, sprite: Live2DSprite) {
-        let model = this.models.find(model => model.config.id === sprite.id);
+        let model = this.models.find(model => model.config.id === id);
         model && model.attach(sprite.model);
     }
 
@@ -255,6 +317,14 @@ export default class CharacterSettings extends Vue {
                     ? 'Failed to load model file. Have you put files in "live2d" folder of this wallpaper?'
                     : error.toString()
                     : error;
+        }
+    }
+
+    subtitleLoaded(id: number, languages: SubtitleJSON) {
+        let model = this.models.find(model => model.config.id === id);
+
+        if (model) {
+            model.subtitleLanguages = languages.map(({ locale, name, description }) => ({ locale, name, description }));
         }
     }
 
@@ -312,6 +382,10 @@ export default class CharacterSettings extends Vue {
 
     scaleChanged(value: number) {
         this.configModule.app.emit('live2dConfig', this.selectedModel.config.id, toStorageValues({ scale: value }));
+    }
+
+    localeChanged(value: string) {
+        this.configModule.app.emit('live2dConfig', this.selectedModel.config.id, toStorageValues({ locale: value }));
     }
 }
 </script>
@@ -428,4 +502,62 @@ $selectableCard
 
     >>> summary
         outline none
+
+.sub-language
+    display flex
+    padding 8px 16px
+    align-items center
+
+    .button
+        margin-bottom 0
+        padding-right 8px
+        line-height 1.3
+
+        &:after
+            content '...'
+            margin-left 8px
+            padding-left 8px
+            font-weight bold
+            border-left 1px solid #888
+
+.overlay
+    position fixed
+    z-index 1000
+    top 0
+    right 0
+    bottom 0
+    left 0
+    display flex
+    justify-content center
+    align-items center
+    background #0002
+
+.languages
+    @extend $card
+    width 400px
+    background #FFF
+
+.language
+    padding 8px
+    font-size 14px
+    transition background-color .15s ease-out
+
+    &.selected
+        background #EEE
+
+    &:hover
+        background #E6E6E6
+
+    .title
+        margin-bottom 4px
+        font-size 16px
+        font-weight bold
+
+// animation
+
+.fade-enter-active, .fade-leave-active
+    transition opacity .15s ease-out
+
+.fade-enter, .fade-leave-to
+    opacity 0
 </style>

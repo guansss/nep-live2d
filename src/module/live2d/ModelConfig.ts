@@ -9,6 +9,7 @@ export interface ModelConfig {
     scale?: number;
     x?: number;
     y?: number;
+    locale?: string;
     preview?: string;
 }
 

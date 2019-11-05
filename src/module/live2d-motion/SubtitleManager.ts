@@ -1,9 +1,9 @@
 import { error } from '@/core/utils/log';
 import { getJSON } from '@/core/utils/net';
 
-type SubtitleJSON = Language[];
+export type SubtitleJSON = Language[];
 
-interface Language {
+export interface Language {
     locale: string;
     name: string;
     description?: string;
@@ -21,23 +21,25 @@ export interface Subtitle {
 
 const TAG = 'SubtitleManager';
 
-const DEFAULT_LOCALE = 'default';
+const FALLBACK_LOCALE = 'default';
 
 export default class SubtitleManager {
-    locale = DEFAULT_LOCALE;
+    defaultLocale = FALLBACK_LOCALE;
 
     subtitles: { [file: string]: SubtitleJSON } = {};
 
     tasks: { [file: string]: Promise<any> } = {};
 
-    async loadSubtitle(file: string) {
-        if (this.subtitles[file]) return;
+    async loadSubtitle(file: string): Promise<SubtitleJSON | undefined> {
+        if (this.subtitles[file]) return this.subtitles[file];
 
         this.tasks[file] = (async () => {
             try {
                 const languages = (await getJSON(file)) as SubtitleJSON;
 
                 languages.forEach(language => {
+                    language.locale = language.locale.toLowerCase();
+
                     language.style = (language.style || '') + ';';
 
                     // append `font` to `style`
@@ -50,15 +52,19 @@ export default class SubtitleManager {
                 });
 
                 this.subtitles[file] = languages;
+
+                return languages;
             } catch (e) {
                 error(TAG, `Failed to load subtitles from ${file}`, e);
             } finally {
                 delete this.tasks[file];
             }
         })();
+
+        return this.tasks[file];
     }
 
-    async getSubtitle(file: string, name: string) {
+    async getSubtitle(file: string, name: string, locale?: string): Promise<Subtitle | undefined> {
         if (this.tasks[file]) {
             await this.tasks[file];
         }
@@ -66,27 +72,25 @@ export default class SubtitleManager {
         const json = this.subtitles[file];
         if (!json) return;
 
-        const getFromLocale = (locale: string) => {
-            const lowerCaseLocale = locale.toLowerCase();
-
-            for (const language of json) {
-                if (language.locale.toLowerCase().includes(lowerCaseLocale)) {
-                    for (const subtitle of language.subtitles) {
-                        if (subtitle.name === name) {
-                            return subtitle;
+        for (const loc of [locale, this.defaultLocale, FALLBACK_LOCALE]) {
+            if (loc) {
+                for (const language of json) {
+                    if (language.locale.includes(loc)) {
+                        for (const subtitle of language.subtitles) {
+                            if (subtitle.name === name) {
+                                return subtitle;
+                            }
                         }
                     }
                 }
             }
-        };
-
-        return getFromLocale(this.locale) || getFromLocale(DEFAULT_LOCALE);
+        }
     }
 
-    async showSubtitle(file: string, name: string, timingPromise?: Promise<any>) {
+    async showSubtitle(file: string, name: string, locale?: string, timingPromise?: Promise<any>) {
         const start = Date.now();
 
-        const subtitle = await this.getSubtitle(file, name);
+        const subtitle = await this.getSubtitle(file, name, locale);
 
         if (subtitle) {
             const id = this.show(subtitle);

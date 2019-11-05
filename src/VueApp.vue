@@ -43,6 +43,9 @@ body
     background-color #333
     overflow hidden
 
+ul
+    list-style none
+
 #canvas
     position absolute
     width 100vw
