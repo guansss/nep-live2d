@@ -1,4 +1,5 @@
 import Mka from '@/core/mka/Mka';
+import Ticker from '@/core/mka/Ticker';
 import EventEmitter from '@/core/utils/EventEmitter';
 import { error } from '@/core/utils/log';
 import { Config } from '@/module/config/ConfigModule';
@@ -6,11 +7,7 @@ import VueApp from '@/VueApp.vue';
 import { Vue, VueConstructor } from 'vue/types/vue';
 
 export interface ModuleConstructor {
-    // @formatter:off
-
     new(app: App): Module;
-
-    // @formatter:on
 }
 
 export interface Module {
@@ -41,13 +38,12 @@ export class App extends EventEmitter {
                     .join(',');
                 document.documentElement.style.setProperty('--accentColor', `rgb(${rgb})`);
             })
-            .on('config:locale', (locale: string) => {
-                vueApp.$i18n.locale = locale;
-            })
+            .on('config:locale', (locale: string) => (vueApp.$i18n.locale = locale))
+            .on('config:fpsMax', (maxFPS: number) => Ticker.setMaxFPS(maxFPS))
             .on('configReady', (config: Config) => {
-                this.on('we:language', (locale: string) => {
-                    this.emit('config', 'locale', locale, true);
-                });
+                this.on('we:language', (locale: string) => this.emit('config', 'locale', locale, true));
+
+                this.emit('config', 'fpsMax', Ticker.getMaxFPS(), true);
             });
     }
 

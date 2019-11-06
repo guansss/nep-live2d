@@ -15,6 +15,7 @@
         </div>
         <div class="section" :data-title="$t('misc')">
             <Slider progress v-model="volume">{{ $t('volume') }}</Slider>
+            <Slider overlay :min="1" :max="maxFPSLimit" :step="1" v-model="maxFPS">{{ $t('max_fps') }}</Slider>
             <ToggleSwitch v-model="showFPS">{{ $t('show_fps') }}</ToggleSwitch>
             <Select v-model="locale" :options="localeOptions">{{ $t('language') }}</Select>
         </div>
@@ -23,7 +24,7 @@
 
 <script lang="ts">
 import ShapeSVG from '@/assets/img/shape.svg';
-import { LOCALE, THEMES } from '@/defaults';
+import { FPS_MAX, FPS_MAX_LIMIT, LOCALE, THEMES } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import Select, { Option } from '@/module/config/reusable/Select.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
@@ -46,7 +47,10 @@ export default class GeneralSettings extends Vue {
     seasonal = this.configModule.getConfig('theme.seasonal', true);
 
     volume = this.configModule.getConfig('volume', 0);
+
     showFPS = this.configModule.getConfig('fps', false);
+    maxFPS = this.configModule.getConfig('fpsMax', FPS_MAX);
+    maxFPSLimit!: number; // non-reactive
 
     locale = this.configModule.getConfig('locale', LOCALE);
     localeOptions!: Option[]; // non-reactive
@@ -72,12 +76,19 @@ export default class GeneralSettings extends Vue {
         this.configModule.setConfig('fps', value);
     }
 
+    @Watch('maxFPS')
+    maxFPSChanged(value: number) {
+        this.configModule.setConfig('fpsMax', value);
+    }
+
     @Watch('locale')
     localeChanged(value: string) {
         this.configModule.setConfig('locale', value);
     }
 
     created() {
+        this.maxFPSLimit = FPS_MAX_LIMIT;
+
         const locales = (process.env.I18N as any) as Record<string, { language_name: string }>;
 
         this.localeOptions = Object.entries(locales).map(([locale, language]) => ({

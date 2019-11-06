@@ -82,7 +82,7 @@ export default class Mka {
             if (Ticker.tick(now)) {
                 this.forEachPlayer(player => {
                     if (player.enabled && !player.paused) {
-                        player.update(Ticker);
+                        player.update();
                     }
                 });
 

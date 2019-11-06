@@ -1,3 +1,5 @@
+import { FPS_MAX } from '@/defaults';
+
 const FILTER_STRENGTH = 20;
 
 namespace Ticker {
@@ -8,7 +10,7 @@ namespace Ticker {
     export let elapsed = now - start;
     export let delta = now - then;
 
-    let maxFps = 60;
+    let maxFps = FPS_MAX;
     let frameInterval = 1000 / maxFps;
     let actualFrameInterval = frameInterval;
 
