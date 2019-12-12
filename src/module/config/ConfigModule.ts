@@ -85,8 +85,8 @@ export default class ConfigModule implements Module {
 
         const newValue = this.config.get(path, undefined);
 
-        this.app.sticky('config:' + path, newValue, oldValue, this.config);
-        this.app.sticky('config:*', path, newValue, oldValue, this.config);
+        this.app.sticky('config:' + path, newValue, oldValue, runtime, this.config);
+        this.app.sticky('config:*', path, newValue, oldValue, runtime, this.config);
     }
 
     getConfig<T>(path: string, defaultValue: T): Readonly<T> {
