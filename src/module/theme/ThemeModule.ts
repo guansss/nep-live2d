@@ -1,8 +1,17 @@
 import { App, Module } from '@/App';
+import { error } from '@/core/utils/log';
 import { screenAspectRatio } from '@/core/utils/misc';
 import { SEASONS, THEMES } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import { ModelConfig } from '@/module/live2d/ModelConfig';
+
+export interface Config {
+    theme?: {
+        custom: Theme[];
+        selected?: string;
+        seasonal?: boolean;
+    };
+}
 
 export interface Theme {
     v: number;
@@ -13,99 +22,120 @@ export interface Theme {
     leaves: boolean;
     models: {
         file: string;
-        profiles: {
-            // target describes the screen aspect ratio, e.g. 4:3, 16:9, 21:9
-            [target: string]: {
-                scale: number;
-                x: number;
-                y: number;
-            };
-        };
+        scale: number;
+        x: number;
+        y: number;
     }[];
+    profiles?: {
+        // target describes the screen aspect ratio, e.g. 4:3, 16:9, 21:9
+        [target: string]: Partial<Theme>;
+    };
 }
+
+export const THEME_VERSION = 1;
+
+const TAG = 'THEME';
 
 export default class ThemeModule implements Module {
     readonly name = 'Theme';
 
     config?: Config;
 
-    // THIS MUST NOT BE EMPTY
     themes = THEMES.slice();
 
     selected = -1;
 
     constructor(readonly app: App) {
-        app.on('configReady', this.init, this);
+        app.on('themeSave', this.saveTheme, this)
+            .on('configReady', this.init, this)
+            .on('config:theme.selected', (selected: number) => this.changeTheme(selected))
+            .on('config:theme.custom', (custom: Theme[]) => (this.themes = [...THEMES, ...custom]));
     }
 
     init(config: Config) {
         this.config = config;
 
-        this.setupInitialTheme(config);
+        this.themes = [...THEMES, ...config.get<Theme[]>('theme.custom', [])];
 
-        this.app.on('config:theme.selected', (index: number) => this.changeTheme(index, true));
+        this.setupInitialTheme(config);
     }
 
     setupInitialTheme(config: Config) {
         this.app.emit('config', 'theme.seasonal', true, true);
 
+        let index = -1;
+
         const seasonal = config.get('theme.seasonal', true);
 
         if (seasonal) {
-            let index = -1;
+            const activeSeason = SEASONS.find(season => season.active);
 
-            const season = SEASONS.find(season => season.active);
-            if (season) index = THEMES.findIndex(theme => theme.season === season.value);
+            if (activeSeason) {
+                index = THEMES.findIndex(theme => theme.season === activeSeason.value);
+            }
+        }
 
-            if (index === -1) index = 0;
+        // defaults to first theme in list
+        if (index === -1) index = 0;
 
-            const shouldOverride = index !== config.get('theme.selected', -1);
-
+        // change theme only when the index does not match the selected one
+        if (index !== config.get('theme.selected', -1)) {
             this.app.emit('config', 'theme.selected', index);
-            this.changeTheme(index, shouldOverride);
+        }
+    }
+
+    changeTheme(index: number) {
+        if (index === this.selected) return;
+
+        let theme = this.themes[index];
+
+        if (theme) {
+            this.selected = index;
+
+            if (theme.profiles) {
+                const profile = theme.profiles[screenAspectRatio] || theme.profiles['16:9']; // fall back to 16:9
+
+                if (profile) {
+                    // override the theme by profile
+                    theme = { ...theme, ...profile };
+                }
+            }
+
+            // overwrite user configs if the theme is changed by user
+            this.app.emit('config', 'bg.img', theme.bg);
+            this.app.emit('config', 'leaves.enabled', theme.leaves);
+            this.app.emit('config', 'snow.enabled', theme.snow);
+
+            this.app.emit('live2dRemoveAll');
+
+            theme.models.forEach(model => this.app.emit('live2dAdd', model.file, model));
         } else {
-            this.app.emit('config', 'theme.selected', 0, true);
-            this.changeTheme(config.get('theme.selected', 0), false);
+            error(TAG, 'Theme not found at index ' + index);
         }
     }
 
-    changeTheme(index: number, byUser: boolean) {
-        if (index !== this.selected) {
-            const theme = this.themes[index];
-
-            if (theme) {
-                this.selected = index;
-
-                // overwrite user configs if the theme is changed by user
-                this.app.emit('config', 'bg.img', theme.bg, !byUser);
-                this.app.emit('config', 'leaves.enabled', theme.leaves, !byUser);
-                this.app.emit('config', 'snow.enabled', theme.snow, !byUser);
-
-                this.updateModels(theme, byUser);
-            }
-        }
-    }
-
-    updateModels(theme: Theme, byUser: boolean) {
+    saveTheme(name: string) {
         if (this.config) {
-            // remove all internal models
-            this.config.get<ModelConfig[]>('live2d.internalModels', []).forEach(config => {
-                this.app.emit('live2dRemove', config.id);
-            });
+            const bg = this.config.get('bg.img', '');
+            const leaves = this.config.get('leaves.enabled', false);
+            const snow = this.config.get('snow.enabled', false);
 
-            if (byUser) {
-                this.config.get<ModelConfig[]>('live2d.models', []).forEach(config => {
-                    // disable all existing models
-                    this.app.emit('live2dConfig', config.id, { enabled: false });
-                });
-            }
+            const models = this.config.get<ModelConfig[]>('live2d.models', []) as {
+                [P in keyof ModelConfig]-?: ModelConfig[P]
+            }[];
+
+            const theme: Theme = {
+                name,
+                bg,
+                snow,
+                leaves,
+                v: THEME_VERSION,
+                models: models.map(({ path, scale, x, y }) => ({ file: path, scale, x, y })),
+            };
+
+            const customThemes = this.config.get<Theme[]>('theme.custom', []);
+
+            this.app.emit('config:theme.custom', [...customThemes, theme]);
         }
-
-        theme.models.forEach(model => {
-            const profile = model.profiles[screenAspectRatio] || model.profiles['16:9']; // fall back to 16:9
-
-            // at lease pass an empty object to let this model be considered an internal model
-            this.app.emit('live2dAdd', model.file, profile || {});
-        });
     }
 }
