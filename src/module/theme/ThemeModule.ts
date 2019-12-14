@@ -63,7 +63,10 @@ export default class ThemeModule implements Module {
     setupInitialTheme(config: Config) {
         this.app.emit('config', 'theme.seasonal', true, true);
 
-        let index = -1;
+        const selected = config.get('theme.selected', -1);
+
+        // defaults to first theme in list
+        let index = selected === -1 ? 0 : selected;
 
         const seasonal = config.get('theme.seasonal', true);
 
@@ -71,15 +74,14 @@ export default class ThemeModule implements Module {
             const activeSeason = SEASONS.find(season => season.active);
 
             if (activeSeason) {
-                index = THEMES.findIndex(theme => theme.season === activeSeason.value);
+                const seasonalThemeIndex = THEMES.findIndex(theme => theme.season === activeSeason.value);
+
+                if (seasonalThemeIndex !== -1) index = seasonalThemeIndex;
             }
         }
 
-        // defaults to first theme in list
-        if (index === -1) index = 0;
-
         // change theme only when the index does not match the selected one
-        if (index !== config.get('theme.selected', -1)) {
+        if (index !== selected) {
             this.app.emit('config', 'theme.selected', index);
         }
     }
@@ -130,7 +132,7 @@ export default class ThemeModule implements Module {
                 snow,
                 leaves,
                 v: THEME_VERSION,
-                models: models.map(({ path, scale, x, y }) => ({ file: path, scale, x, y })),
+                models: models.map(({ file, scale, x, y }) => ({ file, scale, x, y })),
             };
 
             const customThemes = this.config.get<Theme[]>('theme.custom', []);
