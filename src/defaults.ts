@@ -1,5 +1,5 @@
 import { isInRange } from '@/core/utils/date';
-import { Theme } from '@/module/theme/ThemeModule';
+import { Theme, THEME_VERSION } from '@/module/theme/ThemeModule';
 
 export const LOCALE = 'en-us';
 
@@ -16,7 +16,7 @@ export const SEASONS: Season[] = [HALLOWEEN, CHRISTMAS, NEW_YEAR];
 
 export const THEMES: Theme[] = [
     {
-        v: 1,
+        v: THEME_VERSION,
         name: 'Default',
         bg: 'img/bg_forest.jpg',
         snow: false,
@@ -24,18 +24,14 @@ export const THEMES: Theme[] = [
         models: [
             {
                 file: 'live2d/neptune/neptune.model.json',
-                profiles: {
-                    '16:9': {
-                        scale: 0.0004141,
-                        x: 0.75,
-                        y: 0.6,
-                    },
-                },
+                scale: 0.0004141,
+                x: 0.75,
+                y: 0.6,
             },
         ],
     },
     {
-        v: 1,
+        v: THEME_VERSION,
         name: 'Halloween',
         season: HALLOWEEN.value,
         bg: 'img/bg_halloween.jpg',
@@ -44,18 +40,14 @@ export const THEMES: Theme[] = [
         models: [
             {
                 file: 'live2d/neptune/neptune.model.json',
-                profiles: {
-                    '16:9': {
-                        scale: 0.0004141,
-                        x: 0.75,
-                        y: 0.6,
-                    },
-                },
+                scale: 0.0004141,
+                x: 0.75,
+                y: 0.6,
             },
         ],
     },
     {
-        v: 1,
+        v: THEME_VERSION,
         name: 'Christmas',
         season: CHRISTMAS.value,
         bg: 'img/bg_lowee.jpg',
@@ -64,13 +56,9 @@ export const THEMES: Theme[] = [
         models: [
             {
                 file: 'live2d/nepsanta/nepsanta.model.json',
-                profiles: {
-                    '16:9': {
-                        scale: 0.0004141,
-                        x: 0.75,
-                        y: 0.6,
-                    },
-                },
+                scale: 0.0004141,
+                x: 0.75,
+                y: 0.6,
             },
         ],
     },

@@ -2,18 +2,17 @@ import { LIVE2D_DIRECTORY } from '@/defaults';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 
 export interface ModelConfig {
-    readonly id: number;
-    readonly path: string;
-    readonly internal?: boolean;
+    readonly file: string;
+    id: number;
     enabled?: boolean;
     scale?: number;
     x?: number;
     y?: number;
-    locale?: string;
-    preview?: string;
+    locale?: string; // the subtitle locale
+    preview?: string; // image file
 }
 
-export const DEFAULT_MODEL_CONFIG: Omit<ModelConfig, 'id' | 'path'> = {
+export const DEFAULT_MODEL_CONFIG: Omit<ModelConfig, 'id' | 'file'> = {
     enabled: true,
     scale: 1 / innerHeight,
     x: 0.5,
@@ -63,7 +62,7 @@ export function configureSprite(sprite: Live2DSprite, config: Partial<ModelConfi
  * @example
  * // while LIVE2D_DIRECTORY = 'live2d'
  * makeModelPath('neptune.model.json')
- * => 'live2d/neptune/neptune.model.json'
+ * // => 'live2d/neptune/neptune.model.json'
  */
 export function makeModelPath(fileName: string) {
     const separatorIndex = fileName.indexOf('.');

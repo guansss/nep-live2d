@@ -51,8 +51,8 @@
                 </template>
             </details>
 
-            <div v-if="selectedModel.error" class="error">{{ selectedModel.error }}</div>
-            <div v-else-if="selectedModel.loading">{{ $t('details') }}</div>
+            <div v-if="selectedModel.error" class="info error">{{ selectedModel.error }}</div>
+            <div v-else-if="selectedModel.loading" class="info">{{ $t('model_loading') }}</div>
 
             <template v-else>
                 <ToggleSwitch :value="selectedModel.config.enabled" @change="enableChanged">{{
@@ -141,10 +141,10 @@ class ModelEntity {
     }
 
     constructor(config: ModelConfig) {
-        this.name = basename(config.path)
+        this.name = basename(config.file)
             .replace('.model.json', '')
             .replace('.json', '');
-        this.path = config.path;
+        this.path = config.file;
 
         this.updateConfig(config);
     }
@@ -250,7 +250,6 @@ export default class CharacterSettings extends Vue {
             .on('live2dLoaded', this.modelLoaded, this)
             .on('live2dError', this.modelError, this)
             .on('live2dSubtitleLoaded', this.subtitleLoaded, this)
-            .on('config:live2d.internalModels', this.updateModels, this)
             .on('config:live2d.models', this.updateModels, this)
             .on('config:locale', (locale: string) => (this.defaultLocale = locale));
 
@@ -273,37 +272,32 @@ export default class CharacterSettings extends Vue {
     }
 
     updateModels() {
-        const internalConfigs = this.configModule.getConfig<ModelConfig[]>('live2d.internalModels', []);
-        const savedConfigs = this.configModule.getConfig<ModelConfig[]>('live2d.models', []);
+        const models = this.models;
+        const modelConfigs = this.configModule.getConfig<ModelConfig[]>('live2d.models', []);
 
-        const models: ModelEntity[] = [];
+        // a temporary array to save IDs during first loop
+        const modelIDs: number[] = [];
 
-        internalConfigs.forEach(config => {
-            let model = this.models.find(model => model.config.id === config.id);
+        modelConfigs.forEach(config => {
+            modelIDs.push(config.id);
 
-            if (model) {
-                model.updateConfig(config);
-            } else {
-                model = new ModelEntity(config);
-            }
-            models.push(model);
-        });
-
-        savedConfigs.forEach(config => {
-            let model = this.models.find(model => model.config.id === config.id);
+            let model = models.find(model => model.config.id === config.id);
 
             if (model) {
                 model.updateConfig(config);
-
-                if (!models.includes(model)) models.push(model);
             } else {
                 model = new ModelEntity(config);
                 models.push(model);
             }
         });
 
-        this.models = models;
+        for (let i = models.length - 1; i >= 0; i--) {
+            if (!modelIDs.includes(models[i].config.id)) {
+                models.splice(i, 1);
+            }
+        }
 
+        // check the index to prevent index overflow
         if (this.selectedIndex !== -1) {
             this.selectedIndex = models.length === 0 ? -1 : clamp(this.selectedIndex, 0, models.length - 1);
         }
@@ -314,12 +308,12 @@ export default class CharacterSettings extends Vue {
     }
 
     modelLoaded(id: number, sprite: Live2DSprite) {
-        let model = this.models.find(model => model.config.id === id);
+        const model = this.models.find(model => model.config.id === id);
         model && model.attach(sprite.model);
     }
 
     modelError(id: number, error: Error | string) {
-        let model = this.models.find(model => model.config.id === id);
+        const model = this.models.find(model => model.config.id === id);
 
         if (model) {
             model.error =
@@ -518,6 +512,13 @@ $selectableCard
 
     >>> summary
         outline none
+
+.info
+    margin 8px 16px
+    font-style italic
+
+.error
+    color #e74c3c
 
 .sub-language
     display flex
