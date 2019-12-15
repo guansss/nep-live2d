@@ -3,19 +3,10 @@
         <div class="buttons">
             <div class="button" @click="dumpLogs">{{ $t('dump_logs') }}</div>
             <div class="button" @click="dumpStorage">{{ $t('dump_storage') }}</div>
-            <div
-                class="button reset"
-                @mousedown.stop="resetStart"
-                @mouseup.stop="resetCancel"
-                @mouseleave="resetCancel"
-            >
-                {{ $t('reset') }}
-                <div
-                    v-if="resetProgress > 0"
-                    class="cover"
-                    :style="{ transform: `translateX(${(resetProgress - 1) * 100}%)` }"
-                ></div>
-            </div>
+
+            <LongClickAction class="button reset"
+                :duration="1500"
+                @long-click="reset">{{ $t('reset') }}</LongClickAction>
         </div>
 
         <table class="table">
@@ -34,6 +25,7 @@ import ConsoleSVG from '@/assets/img/console.svg';
 import { log, LogRecord, logs as _logs } from '@/core/utils/log';
 import { randomHSLColor } from '@/core/utils/string';
 import ConfigModule from '@/module/config/ConfigModule';
+import LongClickAction from '@/module/config/reusable/LongClickAction.vue';
 import Scrollable from '@/module/config/reusable/Scrollable.vue';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
@@ -56,7 +48,7 @@ function setColor(log: ExtendedLogRecord) {
 
 const cachedColors: { [key: string]: string } = {};
 @Component({
-    components: { Scrollable },
+    components: { LongClickAction, Scrollable },
 })
 export default class ConsoleSettings extends Vue {
     static readonly ICON = ConsoleSVG;
@@ -65,10 +57,6 @@ export default class ConsoleSettings extends Vue {
     @Prop() readonly configModule!: ConfigModule;
 
     logs: ExtendedLogRecord[] = [];
-
-    resetTime = 2000; // time required to press and hold the button to reset
-    resetProgress = 0; // 0 ~ 1
-    resetRafID = -1; // ID returned by requestAnimationFrame()
 
     created() {
         // initialize logs for displaying
@@ -134,41 +122,8 @@ export default class ConsoleSettings extends Vue {
         );
     }
 
-    resetStart() {
-        // ensure there is no active animation
-        if (this.resetRafID === -1) {
-            this.resetProgress = 0;
-
-            const startTime = performance.now();
-
-            // make animation
-            const tick = (now: DOMHighResTimeStamp) => {
-                this.resetProgress = (now - startTime) / this.resetTime;
-
-                if (this.resetProgress > 1) {
-                    this.resetRafID = -1;
-                    this.reset();
-                } else {
-                    this.resetRafID = requestAnimationFrame(tick);
-                }
-            };
-
-            tick(startTime);
-        }
-    }
-
-    private resetCancel() {
-        this.resetProgress = 0;
-
-        if (this.resetRafID != -1) cancelAnimationFrame(this.resetRafID);
-        this.resetRafID = -1;
-    }
-
     reset() {
         this.configModule.app.emit('reset');
-
-        // this method can also be used to clean up
-        this.resetCancel();
     }
 
     beforeDestroy() {
@@ -196,12 +151,7 @@ export default class ConsoleSettings extends Vue {
     &:hover
         background #cf1100
 
-    .cover
-        position absolute
-        top 0
-        right 0
-        bottom 0
-        left 0
+    >>> .progress
         background #FFF8
 
 .table

@@ -8,29 +8,19 @@
                 <FileInput class="action" accept=".json" v-model="modelFile" />
             </div>
 
-            <div
+            <LongClickAction
                 v-for="(model, i) in models"
                 :key="model.config.id"
                 :class="['item', { selected: selectedIndex === i }]"
-                @click="selectedIndex = i"
+                :duration="600"
+                @click.native="selectedIndex = i"
+                @long-click="deleteModel(i)"
             >
                 <img v-if="model.config && model.config.preview" :src="model.config.preview" class="preview" />
                 <div v-else class="preview-alt">{{ model.name }}</div>
 
-                <div
-                    v-if="deletingIndex === i && deletingProgress > 0"
-                    class="delete-cover"
-                    :style="{ transform: `translateY(${(1 - deletingProgress) * 100}%)` }"
-                ></div>
-                <CloseSVG
-                    v-if="!(model.config && model.config.internal)"
-                    class="delete"
-                    @click.stop=""
-                    @mousedown.stop="deleteStart(i)"
-                    @mouseup.stop="deleteCancel"
-                    @mouseleave="deleteCancel"
-                />
-            </div>
+                <CloseSVG slot="control" class="delete" />
+            </LongClickAction>
         </div>
 
         <div v-if="!selectedModel">
@@ -105,6 +95,7 @@ import { clamp } from '@/core/utils/math';
 import { FOCUS_TIMEOUT_MAX, LIVE2D_SCALE_MAX, LOCALE } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
+import LongClickAction from '@/module/config/reusable/LongClickAction.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
 import Live2DMotionModule from '@/module/live2d-motion/Live2DMotionModule';
@@ -162,7 +153,7 @@ class ModelEntity {
 }
 
 @Component({
-    components: { CloseSVG, TuneSVG, ToggleSwitch, FileInput, Slider },
+    components: { LongClickAction, CloseSVG, TuneSVG, ToggleSwitch, FileInput, Slider },
 })
 export default class CharacterSettings extends Vue {
     static readonly ICON = TShirtSVG;
@@ -175,11 +166,6 @@ export default class CharacterSettings extends Vue {
     modelFile: File | null = null;
 
     selectedIndex = -1;
-
-    deletingIndex = -1; // the index of model that will be deleted when progress goes to 1
-    deletingHoldTime = 800; // time required to press and hold the delete button
-    deletingProgress = 0; // 0 ~ 1
-    deletingRafID = -1;
 
     detailsExpanded = false;
 
@@ -338,48 +324,12 @@ export default class CharacterSettings extends Vue {
         }
     }
 
-    deleteStart(index: number) {
-        this.deletingIndex = index;
+    deleteModel(index: number) {
 
-        // ensure there is no active animation
-        if (this.deletingRafID === -1) {
-            this.deletingProgress = 0;
+        console.warn('deleteModel', index);
+        const model = this.models[index];
 
-            const startTime = performance.now();
-
-            // make deleting animation
-            const tick = (now: DOMHighResTimeStamp) => {
-                this.deletingProgress = (now - startTime) / this.deletingHoldTime;
-
-                if (this.deletingProgress > 1) {
-                    this.deletingRafID = -1;
-                    this.delete();
-                } else {
-                    this.deletingRafID = requestAnimationFrame(tick);
-                }
-            };
-
-            tick(startTime);
-        }
-    }
-
-    deleteCancel() {
-        this.deletingProgress = 0;
-        this.deletingIndex = -1;
-
-        if (this.deletingRafID != -1) cancelAnimationFrame(this.deletingRafID);
-        this.deletingRafID = -1;
-    }
-
-    delete() {
-        const model = this.models[this.deletingIndex];
-
-        if (model) {
-            this.configModule.app.emit('live2dRemove', model.config.id);
-        }
-
-        // this method can also be used to clean up
-        this.deleteCancel();
+        if (model) this.configModule.app.emit('live2dRemove', model.config.id);
     }
 
     enableChanged(value: boolean) {
@@ -454,6 +404,9 @@ $selectableCard
     height $itemSize
     border 2px solid transparent
 
+    >>> .progress
+        background #C0392BAA !important
+
     &:hover .delete
         opacity 1
 
@@ -469,14 +422,6 @@ $selectableCard
     padding: 8px;
     font-size: 120%;
     font-weight: bold;
-
-.delete-cover
-    position absolute
-    top 0
-    left 0
-    width 100%
-    height 100%
-    background #C0392BAA
 
 .delete
     position absolute
