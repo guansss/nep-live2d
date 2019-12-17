@@ -4,6 +4,9 @@
 
   "language_name": "English",
 
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+
   "Default": "Default",
   "Halloween": "Halloween",
   "Christmas": "Christmas",

@@ -1,4 +1,5 @@
 import CloseSVG from '@/assets/img/close.svg';
+import { nop } from '@/core/utils/misc';
 import ConfigModule from '@/module/config/ConfigModule';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
 import Scrollable from '@/module/config/reusable/Scrollable.vue';
@@ -30,6 +31,14 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
         return this.pages[this.selectedPage];
     }
 
+    dialog = {
+        visible: false,
+        message: '',
+        confirm: '',
+        cancel: '',
+        onFinish: nop as (confirmed: boolean) => boolean | undefined,
+    };
+
     created() {
         this.switchTop = this.configModule.getConfig('settings.switchTop', this.switchTop);
         this.switchLeft = this.configModule.getConfig('settings.switchLeft', this.switchLeft);
@@ -42,6 +51,27 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
 
     async selectPage(index: number) {
         this.selectedPage = index;
+    }
+
+    showDialog(
+        message: string,
+        confirm?: string,
+        cancel?: string,
+        onFinish?: (confirmed: boolean) => boolean | undefined,
+    ) {
+        this.dialog.visible = true;
+        this.dialog.message = message;
+        this.dialog.confirm = confirm || (this.$t('confirm') as string);
+        this.dialog.cancel = cancel || (this.$t('cancel') as string);
+        this.dialog.onFinish = onFinish || nop;
+    }
+
+    dialogConfirm() {
+        this.dialog.onFinish(true) || (this.dialog.visible = false);
+    }
+
+    dialogCancel() {
+        this.dialog.onFinish(false) || (this.dialog.visible = false);
     }
 
     switchMoveEnded() {

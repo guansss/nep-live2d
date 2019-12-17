@@ -42,3 +42,5 @@ export function cloneWithCamelCase(value: any): any {
 
     return value;
 }
+
+export function nop(): any {}

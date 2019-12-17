@@ -19,10 +19,25 @@
             </div>
 
             <Scrollable class="page">
-                <transition name="slide" mode="out-in">
+                <transition name="fade" mode="out-in">
                     <keep-alive>
-                        <component :is="currentPage" ref="page" v-bind="{ configModule, contentVisible }" />
+                        <component
+                            :is="currentPage"
+                            ref="page"
+                            v-bind="{ configModule, contentVisible }"
+                            @dialog="showDialog"
+                        />
                     </keep-alive>
+                </transition>
+
+                <transition name="fade">
+                    <div v-if="dialog.visible" class="dialog-bg" @click="dialogCancel">
+                        <div class="dialog" @click.stop="">
+                            <div class="msg">{{ dialog.message }}</div>
+                            <div class="cancel" @click="dialogCancel">{{ dialog.cancel }}</div>
+                            <div class="confirm" @click="dialogConfirm">{{ dialog.confirm }}</div>
+                        </div>
+                    </div>
                 </transition>
             </Scrollable>
 
@@ -180,6 +195,69 @@ $toolbarHeight = 36px
     &:hover
         border-left solid $size #999
 
+// dialog
+
+.dialog-bg
+    position absolute
+    z-index 1000
+    top 0
+    right 0
+    bottom 0
+    left 0
+    background #0004
+
+.dialog
+    position absolute
+    top 50%
+    right 0
+    left 0
+    background #F0F0F0
+    box-shadow 0 3px 10px #0008, 0 1px 3px #0004
+    transform translateY(-50%)
+
+.msg
+    padding 16px
+    text-align center
+    white-space pre-wrap
+    line-height 20px
+
+.confirm
+.cancel
+    position relative
+    display inline-block
+    width 50%
+    padding 0 16px
+    color #FFF
+    font-size 14px
+    text-transform uppercase
+    line-height 36px
+    cursor pointer
+    transition background-color .15s ease-out
+
+    &:before
+        content ''
+        position absolute
+        top 0
+        right 0
+        bottom 0
+        left 0
+        background transparent
+        will-change background-color
+        transition background-color .15s ease-out
+
+    &:hover:before
+        background #0002
+
+.cancel
+    left 0
+    background #666
+    text-align right
+
+.confirm
+    right 0
+    background var(--accentColor)
+    text-align left
+
 // page content
 
 .page
@@ -213,13 +291,13 @@ $toolbarHeight = 36px
 
 // animation
 
-.slide-enter-active
+.fade-enter-active
     transition opacity .15s
 
-.slide-leave-active
+.fade-leave-active
     transition opacity .05s
 
-.slide-enter, .slide-leave-to
+.fade-enter, .fade-leave-to
     opacity 0
 </style>
 
