@@ -170,9 +170,7 @@ export default class ThemeModule implements Module {
         const theme = this.collectTheme(name);
 
         if (theme) {
-            const index = this.customThemes.length;
             this.app.emit('config', 'theme.custom', [...this.customThemes, theme]);
-            this.app.emit('config', 'theme.selected', index + THEME_CUSTOM_OFFSET);
         }
     }
 }

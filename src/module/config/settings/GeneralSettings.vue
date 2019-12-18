@@ -26,7 +26,7 @@
             <div :class="['action theme button', { selected: themeEdit }]" @click="themeEdit = !themeEdit">
                 <SettingsSVG class="svg" />
             </div>
-            <div class="theme button" @click="saveTheme"><PlusSVG class="svg" /></div>
+            <div class="theme button" @click="saveTheme(true)"><PlusSVG class="svg" /></div>
             <ToggleSwitch :value="seasonal" @change="setSeasonal">{{ $t('seasonal_theming') }}</ToggleSwitch>
         </div>
         <div class="section" :data-title="$t('misc')">
@@ -174,7 +174,7 @@ export default class GeneralSettings extends Vue {
                         this.$t('discard'),
                         (confirmed: boolean, canceled: boolean) => {
                             if (confirmed) {
-                                if (!this.saveTheme()) {
+                                if (!this.saveTheme(false)) {
                                     resolve(false);
 
                                     // prevent closing the dialog when failed to save
@@ -197,13 +197,19 @@ export default class GeneralSettings extends Vue {
     /**
      * @returns True if succeeded
      */
-    saveTheme(): boolean {
+    saveTheme(thenSelect: boolean): boolean {
         const name = prompt(this.$t('save_theme') as string, this.$t('my_theme') as string);
 
         if (name) {
             const handled = this.configModule.app.emit('themeSave', name);
 
-            if (handled) return true;
+            if (handled) {
+                if (thenSelect) {
+                    this.configModule.setConfig('theme.selected', this.customThemes.length - 1 + THEME_CUSTOM_OFFSET);
+                }
+
+                return true;
+            }
 
             error(TAG, 'Failed to save custom theme because "themeSave" event has no handler');
         }
