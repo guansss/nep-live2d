@@ -36,7 +36,7 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
         message: '',
         confirm: '',
         cancel: '',
-        onFinish: nop as (confirmed: boolean) => boolean | undefined,
+        onFinish: nop as (confirmed: boolean, canceled: boolean) => boolean | undefined,
     };
 
     created() {
@@ -57,21 +57,13 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
         message: string,
         confirm?: string,
         cancel?: string,
-        onFinish?: (confirmed: boolean) => boolean | undefined,
+        onFinish?: (confirmed: boolean, canceled: boolean) => boolean | undefined,
     ) {
         this.dialog.visible = true;
         this.dialog.message = message;
         this.dialog.confirm = confirm || (this.$t('confirm') as string);
         this.dialog.cancel = cancel || (this.$t('cancel') as string);
         this.dialog.onFinish = onFinish || nop;
-    }
-
-    dialogConfirm() {
-        this.dialog.onFinish(true) || (this.dialog.visible = false);
-    }
-
-    dialogCancel() {
-        this.dialog.onFinish(false) || (this.dialog.visible = false);
     }
 
     switchMoveEnded() {

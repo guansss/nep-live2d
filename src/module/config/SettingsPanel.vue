@@ -31,11 +31,19 @@
                 </transition>
 
                 <transition name="fade">
-                    <div v-if="dialog.visible" class="dialog-bg" @click="dialogCancel">
+                    <div
+                        v-if="dialog.visible"
+                        class="dialog-bg"
+                        @click="dialog.onFinish(false, false) || (dialog.visible = false)"
+                    >
                         <div class="dialog" @click.stop="">
                             <div class="msg">{{ dialog.message }}</div>
-                            <div class="cancel" @click="dialogCancel">{{ dialog.cancel }}</div>
-                            <div class="confirm" @click="dialogConfirm">{{ dialog.confirm }}</div>
+                            <div class="cancel" @click="dialog.onFinish(false, true) || (dialog.visible = false)">
+                                {{ dialog.cancel }}
+                            </div>
+                            <div class="confirm" @click="dialog.onFinish(true, false) || (dialog.visible = false)">
+                                {{ dialog.confirm }}
+                            </div>
                         </div>
                     </div>
                 </transition>
