@@ -64,6 +64,10 @@ export const THEMES: Theme[] = [
     },
 ];
 
+// A basis to divide the saved index of selected theme between built-in themes and custom themes. Avoid using a unified
+//  index for both built-in and custom themes because the amount of built-in themes may increase in future updates.
+export const THEME_CUSTOM_OFFSET = 100;
+
 export const BACKGROUNDS = THEMES.map(theme => theme.bg);
 
 export const FPS_MAX = 60;

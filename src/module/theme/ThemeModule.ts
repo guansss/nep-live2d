@@ -1,9 +1,11 @@
 import { App, Module } from '@/App';
 import { error } from '@/core/utils/log';
 import { screenAspectRatio } from '@/core/utils/misc';
-import { SEASONS, THEMES } from '@/defaults';
+import { SEASONS, THEME_CUSTOM_OFFSET, THEMES } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import { ModelConfig } from '@/module/live2d/ModelConfig';
+import isEqual from 'lodash/isEqual';
+import omit from 'lodash/omit';
 
 export interface Config {
     theme?: {
@@ -41,66 +43,74 @@ export default class ThemeModule implements Module {
 
     config?: Config;
 
-    themes = THEMES.slice();
+    customThemes: Theme[] = [];
 
+    // built-in themes: 0 <= index < THEME_INDEX_BASIS
+    // custom themes: index > THEME_INDEX_BASIS
     selected = -1;
 
     constructor(readonly app: App) {
-        app.on('themeSave', this.saveTheme, this)
-            .on('configReady', this.init, this)
-            .on('config:theme.selected', (selected: number) => this.changeTheme(selected))
-            .on('config:theme.custom', (custom: Theme[]) => (this.themes = [...THEMES, ...custom]));
+        app.on('themeCheck', this.checkThemeUnsaved, this)
+            .on('themeSave', this.saveTheme, this)
+            .on('config:theme.selected', (selected: number) => this.setTheme(selected))
+            .on('config:theme.custom', (custom: Theme[]) => (this.customThemes = custom))
+            .on('configReady', (config: Config) => {
+                this.config = config;
+
+                this.customThemes = config.get<Theme[]>('theme.custom', []).slice();
+
+                this.app.emit('config', 'theme.seasonal', true, true);
+
+                const seasonalIndex = this.getSeasonalThemeIndex();
+
+                if (seasonalIndex !== -1) {
+                    this.app.emit('config', 'theme.selected', seasonalIndex);
+                }
+            })
+            .on('init', () => {
+                // apply default theme if there is no applicable seasonal theme
+                if (this.getSeasonalThemeIndex() === -1) {
+                    this.app.emit('config', 'theme.selected', 0);
+                }
+            });
     }
 
-    init(config: Config) {
-        this.config = config;
+    getSeasonalThemeIndex() {
+        if (this.config) {
+            const seasonal = this.config.get('theme.seasonal', true);
 
-        this.themes = [...THEMES, ...config.get<Theme[]>('theme.custom', [])];
+            if (seasonal) {
+                const activeSeason = SEASONS.find(season => season.active);
 
-        this.setupInitialTheme(config);
-    }
+                if (activeSeason) {
+                    // custom themes have a higher priority than built-in ones
+                    const index = this.customThemes.findIndex(theme => theme.season === activeSeason.value);
 
-    setupInitialTheme(config: Config) {
-        this.app.emit('config', 'theme.seasonal', true, true);
+                    if (index !== -1) return index + THEME_CUSTOM_OFFSET;
 
-        const selected = config.get('theme.selected', -1);
-
-        // defaults to first theme in list
-        let index = selected === -1 ? 0 : selected;
-
-        const seasonal = config.get('theme.seasonal', true);
-
-        if (seasonal) {
-            const activeSeason = SEASONS.find(season => season.active);
-
-            if (activeSeason) {
-                const seasonalThemeIndex = THEMES.findIndex(theme => theme.season === activeSeason.value);
-
-                if (seasonalThemeIndex !== -1) index = seasonalThemeIndex;
+                    return THEMES.findIndex(theme => theme.season === activeSeason.value);
+                }
             }
         }
-
-        // change theme only when the index does not match the selected one
-        if (index !== selected) {
-            this.app.emit('config', 'theme.selected', index);
-        }
+        return -1;
     }
 
-    changeTheme(index: number) {
+    setTheme(index: number) {
         if (index === this.selected) return;
 
-        let theme = this.themes[index];
+        const theme = index < THEME_CUSTOM_OFFSET ? THEMES[index] : this.customThemes[index - THEME_CUSTOM_OFFSET];
 
         if (theme) {
             this.selected = index;
 
+            // skip when this theme is exactly the same with current one
+            if (isEqual(omit(theme, 'season'), this.collectTheme(theme.name))) return;
+
             if (theme.profiles) {
                 const profile = theme.profiles[screenAspectRatio] || theme.profiles['16:9']; // fall back to 16:9
 
-                if (profile) {
-                    // override the theme by profile
-                    theme = { ...theme, ...profile };
-                }
+                // override the theme by profile
+                Object.assign(theme, profile);
             }
 
             // overwrite user configs if the theme is changed by user
@@ -116,7 +126,7 @@ export default class ThemeModule implements Module {
         }
     }
 
-    saveTheme(name: string) {
+    collectTheme(name: string) {
         if (this.config) {
             const bg = this.config.get('bg.img', '');
             const leaves = this.config.get('leaves.enabled', false);
@@ -135,9 +145,34 @@ export default class ThemeModule implements Module {
                 models: models.map(({ file, scale, x, y }) => ({ file, scale, x, y })),
             };
 
-            const customThemes = this.config.get<Theme[]>('theme.custom', []);
+            return theme;
+        }
+    }
 
-            this.app.emit('config:theme.custom', [...customThemes, theme]);
+    checkThemeUnsaved(callback: (unsaved: boolean) => void) {
+        const theme = this.collectTheme('');
+
+        if (theme) {
+            for (const _theme of THEMES.concat(this.customThemes)) {
+                if (isEqual(omit(_theme, ['name', 'season']), omit(theme, ['name']))) {
+                    callback(false);
+                    return;
+                }
+            }
+
+            callback(true);
+        }
+
+        // don't callback if failed to collect current theme
+    }
+
+    saveTheme(name: string) {
+        const theme = this.collectTheme(name);
+
+        if (theme) {
+            const index = this.customThemes.length;
+            this.app.emit('config', 'theme.custom', [...this.customThemes, theme]);
+            this.app.emit('config', 'theme.selected', index + THEME_CUSTOM_OFFSET);
         }
     }
 }

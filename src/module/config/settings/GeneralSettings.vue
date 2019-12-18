@@ -3,15 +3,31 @@
         <div class="section" :data-title="$t('theme')">
             <div class="themes">
                 <div
-                    v-for="(theme, i) in themes"
+                    v-for="(theme, i) in builtInThemes"
                     :key="i"
-                    :class="['theme button', { selected: i === themeSelected }]"
-                    @click="themeSelected = i"
+                    :class="['theme button', { selected: theme === selectedTheme }]"
+                    @click="selectTheme(i)"
                 >
                     {{ $t(theme.name) }}
                 </div>
+                <LongClickAction
+                    v-for="(theme, i) in customThemes"
+                    :key="-i - 1"
+                    :class="['theme button', { selected: theme === selectedTheme }]"
+                    :duration="1000"
+                    @click.native="selectTheme(i, true)"
+                    @long-click="deleteTheme(i)"
+                >
+                    {{ theme.name }}
+                    <CloseSVG slot="control" class="delete svg" :style="{ opacity: themeEdit ? 1 : 0 }" />
+                </LongClickAction>
+                <br />
             </div>
-            <ToggleSwitch v-model="seasonal">{{ $t('seasonal_theming') }}</ToggleSwitch>
+            <div :class="['action theme button', { selected: themeEdit }]" @click="themeEdit = !themeEdit">
+                <SettingsSVG class="svg" />
+            </div>
+            <div class="theme button" @click="saveTheme"><PlusSVG class="svg" /></div>
+            <ToggleSwitch :value="seasonal" @change="setSeasonal">{{ $t('seasonal_theming') }}</ToggleSwitch>
         </div>
         <div class="section" :data-title="$t('misc')">
             <Slider progress v-model="volume">{{ $t('volume') }}</Slider>
@@ -23,9 +39,14 @@
 </template>
 
 <script lang="ts">
+import CloseSVG from '@/assets/img/close.svg';
+import PlusSVG from '@/assets/img/plus.svg';
+import SettingsSVG from '@/assets/img/settings.svg';
 import ShapeSVG from '@/assets/img/shape.svg';
-import { FPS_MAX, FPS_MAX_LIMIT, LOCALE, THEMES } from '@/defaults';
+import { error } from '@/core/utils/log';
+import { FPS_MAX, FPS_MAX_LIMIT, LOCALE, THEME_CUSTOM_OFFSET, THEMES } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
+import LongClickAction from '@/module/config/reusable/LongClickAction.vue';
 import Select, { Option } from '@/module/config/reusable/Select.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
@@ -33,8 +54,10 @@ import { Theme } from '@/module/theme/ThemeModule';
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
+const TAG = 'GeneralSettings';
+
 @Component({
-    components: { Select, ToggleSwitch, Slider },
+    components: { LongClickAction, SettingsSVG, CloseSVG, PlusSVG, Select, ToggleSwitch, Slider },
 })
 export default class GeneralSettings extends Vue {
     static readonly ICON = ShapeSVG;
@@ -42,8 +65,11 @@ export default class GeneralSettings extends Vue {
 
     @Prop() readonly configModule!: ConfigModule;
 
-    themes: Theme[] = THEMES;
-    themeSelected = this.configModule.getConfig('theme.selected', -1);
+    builtInThemes = THEMES;
+    customThemes = this.configModule.getConfig<Theme[]>('theme.custom', []).slice();
+
+    selectedThemeIndex = this.configModule.getConfig('theme.selected', -1);
+    themeEdit = false;
     seasonal = this.configModule.getConfig('theme.seasonal', true);
 
     volume = this.configModule.getConfig('volume', 0);
@@ -55,15 +81,10 @@ export default class GeneralSettings extends Vue {
     locale = this.configModule.getConfig('locale', LOCALE);
     localeOptions!: Option[]; // non-reactive
 
-    @Watch('themeSelected')
-    themeChanged(value: number) {
-        this.seasonal = false;
-        this.configModule.setConfig('theme.selected', value);
-    }
-
-    @Watch('seasonal')
-    seasonalChanged(value: boolean) {
-        this.configModule.setConfig('theme.seasonal', value);
+    get selectedTheme() {
+        return this.selectedThemeIndex < THEME_CUSTOM_OFFSET
+            ? this.builtInThemes[this.selectedThemeIndex]
+            : this.customThemes[this.selectedThemeIndex - THEME_CUSTOM_OFFSET];
     }
 
     @Watch('volume')
@@ -95,6 +116,103 @@ export default class GeneralSettings extends Vue {
             text: `${language.language_name} (${locale})`,
             value: locale,
         }));
+
+        this.configModule.app
+            .on('config:theme.custom', (custom: Theme[]) => (this.customThemes = custom.slice()))
+            .on('config:theme.selected', (index: number) => (this.selectedThemeIndex = index));
+    }
+
+    async selectTheme(index: number, custom = false) {
+        if (this.themeEdit) return;
+
+        if (await this.ensureThemeSaved()) {
+            this.setSeasonal(false);
+
+            this.selectedThemeIndex = custom ? index + THEME_CUSTOM_OFFSET : index;
+            this.configModule.setConfig('theme.selected', this.selectedThemeIndex);
+        }
+    }
+
+    deleteTheme(customIndex: number) {
+        const selectedCustomTheme = this.customThemes[this.selectedThemeIndex - THEME_CUSTOM_OFFSET];
+
+        // only custom themes can be deleted!
+        this.customThemes.splice(customIndex, 1);
+        this.configModule.setConfig('theme.custom', this.customThemes.slice());
+
+        if (selectedCustomTheme) {
+            // reset the selected index, it will be -1 when selected one was deleted
+            const selectedIndex = this.customThemes.indexOf(selectedCustomTheme);
+
+            this.configModule.setConfig(
+                'theme.selected',
+                selectedIndex === -1 ? -1 : selectedIndex + THEME_CUSTOM_OFFSET,
+            );
+        }
+    }
+
+    async setSeasonal(value: boolean) {
+        if (!this.seasonal && value) {
+            if (await this.ensureThemeSaved()) {
+                this.seasonal = true;
+                this.configModule.setConfig('theme.seasonal', true);
+            }
+        } else {
+            this.seasonal = value;
+            this.configModule.setConfig('theme.seasonal', value);
+        }
+    }
+
+    async ensureThemeSaved() {
+        return new Promise(resolve =>
+            this.configModule.app.emit('themeCheck', (unsaved: boolean) => {
+                if (unsaved) {
+                    this.$emit(
+                        'dialog',
+                        this.$t('unsaved_theme'),
+                        this.$t('save'),
+                        this.$t('discard'),
+                        (confirmed: boolean, canceled: boolean) => {
+                            if (confirmed) {
+                                if (!this.saveTheme()) {
+                                    resolve(false);
+
+                                    // prevent closing the dialog when failed to save
+                                    return true;
+                                }
+                                resolve(true);
+                            } else {
+                                // continue only if "discard" is selected, don't do anything if user simply closes the dialog
+                                resolve(canceled);
+                            }
+                        },
+                    );
+                } else {
+                    resolve(true);
+                }
+            }),
+        );
+    }
+
+    /**
+     * @returns True if succeeded
+     */
+    saveTheme(): boolean {
+        const name = prompt(this.$t('save_theme') as string, this.$t('my_theme') as string);
+
+        if (name) {
+            const handled = this.configModule.app.emit('themeSave', name);
+
+            if (handled) return true;
+
+            error(TAG, 'Failed to save custom theme because "themeSave" event has no handler');
+        }
+
+        return false;
+    }
+
+    beforeDestroy() {
+        this.configModule.app.off('config:theme.custom').off('config:theme.selected');
     }
 }
 </script>
@@ -102,6 +220,7 @@ export default class GeneralSettings extends Vue {
 <style scoped lang="stylus">
 .themes
     display flex
+    flex-wrap wrap
     padding 6px 16px 0
 
 .theme
@@ -115,4 +234,30 @@ export default class GeneralSettings extends Vue {
     &.selected
         background #555
         color white
+
+    .svg
+        width 16px
+        height 16px
+        vertical-align middle
+
+        path
+            fill currentColor
+
+    >>> .progress
+        background #C0392BAA !important
+
+.action
+    margin-left 16px
+
+.delete
+    position absolute
+    display block
+    top 0
+    right 0
+    background #0004
+    color #FFF
+    transition opacity .15s ease-out, background-color .15s ease-out, color .15s ease-out
+
+    &:hover
+        background #E74C3C
 </style>

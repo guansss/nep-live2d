@@ -6,6 +6,8 @@
 
   "confirm": "确定",
   "cancel": "取消",
+  "save": "保存",
+  "discard": "放弃",
 
   "Default": "默认",
   "Halloween": "万圣节",
@@ -19,6 +21,9 @@
   "console": "控制台",
 
   "theme": "主题",
+  "save_theme": "保存当前主题为：",
+  "unsaved_theme": "当前的自定义主题尚未保存，是否保存？",
+  "my_theme": "我的主题",
   "misc": "杂项",
   "leaves": "树叶",
   "snow": "雪花",

@@ -6,6 +6,8 @@
 
   "confirm": "Confirm",
   "cancel": "Cancel",
+  "save": "Save",
+  "discard": "Discard",
 
   "Default": "Default",
   "Halloween": "Halloween",
@@ -19,6 +21,9 @@
   "console": "Console",
 
   "theme": "Theme",
+  "save_theme": "Save current theme as:",
+  "unsaved_theme": "Your custom theme is unsaved, do you want to save it?",
+  "my_theme": "My Theme",
   "misc": "Miscellaneous",
   "leaves": "Leaves",
   "snow": "Snow",
