@@ -71,6 +71,7 @@ export default class LongClickAction extends Vue {
 <style scoped lang="stylus">
 .long-click
     position relative
+    overflow hidden
 
 .cover
 .progress
@@ -82,4 +83,5 @@ export default class LongClickAction extends Vue {
 
 .progress
     background #0002
+    pointer-events none
 </style>
