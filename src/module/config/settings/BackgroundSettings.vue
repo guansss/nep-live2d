@@ -1,6 +1,6 @@
 <template>
     <div class="bg">
-        <div class="options">
+        <div class="options section">
             <Select
                 :value="fillType"
                 :options="[{ text: $t('cover'), value: 'cover' }, { text: $t('fill'), value: 'fill' }]"
@@ -181,14 +181,6 @@ export default class BackgroundSettings extends Vue {
 
 .options
     padding-top 8px
-
-    &:after
-        content ''
-        display block
-        margin-top 8px
-        height 8px
-        background #0001
-        box-shadow inset 0 0 4px #000000 16
 
 .tabs
     margin-top 8px

@@ -315,29 +315,23 @@ $toolbarHeight = 36px
     width 100%
 
 .settings >>> .section
-    position relative
-    margin-bottom 16px
-
-    &:before
+    &[data-title]:before
         content attr(data-title)
         display inline-block
         margin 8px 0
         padding 4px 8px 4px 16px
-        background lighten($themeColor, 40%)
+        background lighten($themeColor, 30%)
         color #FFF
         font-size 12px
         line-height 1.2
 
-    &:after
+    &:not(:last-child):after
         content ''
-        position absolute
-        z-index -1
-        top 18px
-        right 0
-        left 0
         display block
-        height 1px
+        margin-top 8px
+        height 8px
         background #0001
+        box-shadow inset 0 0 4px #0001
 
 // animation
 
