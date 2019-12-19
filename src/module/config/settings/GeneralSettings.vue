@@ -1,11 +1,11 @@
 <template>
     <div>
         <div class="section" :data-title="$t('theme')">
-            <div class="themes">
+            <div class="themes button-group">
                 <div
                     v-for="(theme, i) in builtInThemes"
                     :key="i"
-                    :class="['theme button', { selected: theme === selectedTheme }]"
+                    :class="['button', { active: theme === selectedTheme }]"
                     @click="selectTheme(i)"
                 >
                     {{ $t(theme.name) }}
@@ -13,7 +13,7 @@
                 <LongClickAction
                     v-for="(theme, i) in customThemes"
                     :key="-i - 1"
-                    :class="['theme button', { selected: theme === selectedTheme }]"
+                    :class="['button', { active: theme === selectedTheme }]"
                     :duration="1000"
                     @click.native="selectTheme(i, true)"
                     @long-click="deleteTheme(i)"
@@ -23,10 +23,14 @@
                 </LongClickAction>
                 <br />
             </div>
-            <div :class="['action theme button', { selected: themeEdit }]" @click="themeEdit = !themeEdit">
-                <SettingsSVG class="svg" />
+
+            <div class="themes button-group">
+                <div :class="['button', { active: themeEdit }]" @click="themeEdit = !themeEdit">
+                    <SettingsSVG class="svg" />
+                </div>
+                <div class="button" @click="saveTheme(true)"><PlusSVG class="svg" /></div>
             </div>
-            <div class="theme button" @click="saveTheme(true)"><PlusSVG class="svg" /></div>
+
             <ToggleSwitch :value="seasonal" @change="setSeasonal">{{ $t('seasonal_theming') }}</ToggleSwitch>
         </div>
         <div class="section" :data-title="$t('misc')">
@@ -225,29 +229,7 @@ export default class GeneralSettings extends Vue {
 
 <style scoped lang="stylus">
 .themes
-    display flex
-    flex-wrap wrap
     padding 6px 16px 0
-
-.theme
-    background #EEE
-    color #333
-    transition background-color .15s ease-out, color .15s, box-shadow .15s ease-out
-
-    &:hover
-        background #CCC
-
-    &.selected
-        background #555
-        color white
-
-    .svg
-        width 16px
-        height 16px
-        vertical-align middle
-
-        path
-            fill currentColor
 
     >>> .progress
         background #C0392BAA !important

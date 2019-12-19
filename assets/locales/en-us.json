@@ -1,6 +1,7 @@
 {
   "ui_info": "Neptune Live2D {VERSION}",
-  "ui_bg_dir": "Background Images",
+  "ui_img_dir": "Background Images",
+  "ui_vid_dir": "Background Videos",
 
   "language_name": "English",
 
@@ -42,6 +43,10 @@
   "details": "Details",
   "model_loading": "Loading...\n\nIf loading never finishes, you can check the logs in console for details.",
   "scale": "Scale",
+
+  "fill_type": "Fill Type",
+  "fill": "Fill",
+  "cover": "Cover",
 
   "amount": "Amount",
 

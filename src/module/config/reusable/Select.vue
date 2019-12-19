@@ -180,6 +180,7 @@ $padding = 8px
 
 .dropdown
     position relative
+    z-index 100
     top 100%
     right 0
     left 0

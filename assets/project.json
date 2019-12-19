@@ -15,9 +15,16 @@
         "order": 1,
         "text": "ui_info"
       },
-      "bgDirectory": {
+      "imgDir": {
         "order": 2,
-        "text": "ui_bg_dir",
+        "text": "ui_img_dir",
+        "type": "directory",
+        "mode": "fetchall"
+      },
+      "vidDir": {
+        "order": 3,
+        "fileType": "video",
+        "text": "ui_vid_dir",
         "type": "directory",
         "mode": "fetchall"
       }

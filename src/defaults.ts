@@ -14,13 +14,17 @@ export const NEW_YEAR = { value: 'NewYear', active: isInRange('1-1', '1-10') };
 
 export const SEASONS: Season[] = [HALLOWEEN, CHRISTMAS, NEW_YEAR];
 
+export const BG_DIRECTORY = 'img';
+
 export const THEMES: Theme[] = [
     {
         v: THEME_VERSION,
         name: 'Default',
-        bg: 'img/bg_forest.jpg',
         snow: false,
         leaves: true,
+        bg: {
+            src: BG_DIRECTORY + '/bg_forest.jpg',
+        },
         models: [
             {
                 file: 'live2d/neptune/neptune.model.json',
@@ -34,9 +38,11 @@ export const THEMES: Theme[] = [
         v: THEME_VERSION,
         name: 'Halloween',
         season: HALLOWEEN.value,
-        bg: 'img/bg_halloween.jpg',
         snow: true,
         leaves: false,
+        bg: {
+            src: BG_DIRECTORY + '/bg_halloween.jpg',
+        },
         models: [
             {
                 file: 'live2d/neptune/neptune.model.json',
@@ -50,9 +56,11 @@ export const THEMES: Theme[] = [
         v: THEME_VERSION,
         name: 'Christmas',
         season: CHRISTMAS.value,
-        bg: 'img/bg_lowee.jpg',
         snow: true,
         leaves: false,
+        bg: {
+            src: BG_DIRECTORY + '/bg_lowee.jpg',
+        },
         models: [
             {
                 file: 'live2d/nepsanta/nepsanta.model.json',
@@ -68,7 +76,7 @@ export const THEMES: Theme[] = [
 //  index for both built-in and custom themes because the amount of built-in themes may increase in future updates.
 export const THEME_CUSTOM_OFFSET = 100;
 
-export const BACKGROUNDS = THEMES.map(theme => theme.bg);
+export const BACKGROUNDS = THEMES.map(theme => theme.bg.src);
 
 export const FPS_MAX = 60;
 export const FPS_MAX_LIMIT = 300;

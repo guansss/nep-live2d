@@ -1,5 +1,5 @@
 // make sure user properties are included in "/assets/project-json/base.json"
-type WEUserPropertyNames = 'schemecolor' | 'bgDirectory';
+type WEUserPropertyNames = 'schemecolor' | WEFilePropertyNames;
 type WEGeneralPropertyNames = 'language';
 
 type WEUserProperties = Partial<Record<WEUserPropertyNames, { value: string }>>;
@@ -8,7 +8,7 @@ type WEGeneralProperties = Partial<Record<WEGeneralPropertyNames, string>>;
 // merged user properties and general properties
 type WEProperties = WEUserProperties & WEGeneralProperties;
 
-type WEFilePropertyNames = WEUserPropertyNames & 'bgDirectory';
+type WEFilePropertyNames = 'imgDir' | 'vidDir';
 type WEFiles = Partial<Record<WEFilePropertyNames, string[]>>;
 
 declare interface Window {

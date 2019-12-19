@@ -6,6 +6,7 @@ import { Config } from '@/module/config/ConfigModule';
 import { ModelConfig } from '@/module/live2d/ModelConfig';
 import isEqual from 'lodash/isEqual';
 import omit from 'lodash/omit';
+import omitBy from 'lodash/omitBy';
 
 export interface Config {
     theme?: {
@@ -19,9 +20,13 @@ export interface Theme {
     v: number;
     name: string;
     season?: string;
-    bg: string;
     snow: boolean;
     leaves: boolean;
+    bg: {
+        src: string;
+        volume?: number;
+        fill?: boolean;
+    };
     models: {
         file: string;
         scale: number;
@@ -114,7 +119,9 @@ export default class ThemeModule implements Module {
             }
 
             // overwrite user configs if the theme is changed by user
-            this.app.emit('config', 'bg.img', theme.bg);
+            this.app.emit('config', 'bg.fill', theme.bg.fill);
+            this.app.emit('config', 'bg.volume', theme.bg.volume);
+            this.app.emit('config', 'bg.src', theme.bg.src);
             this.app.emit('config', 'leaves.enabled', theme.leaves);
             this.app.emit('config', 'snow.enabled', theme.snow);
 
@@ -128,7 +135,15 @@ export default class ThemeModule implements Module {
 
     collectTheme(name: string) {
         if (this.config) {
-            const bg = this.config.get('bg.img', '');
+            const bg = omitBy(
+                {
+                    src: this.config.get('bg.src', ''),
+                    volume: this.config.get('bg.volume', undefined),
+                    fill: this.config.get('bg.fill', undefined),
+                },
+                val => val === undefined,
+            ) as Theme['bg'];
+
             const leaves = this.config.get('leaves.enabled', false);
             const snow = this.config.get('snow.enabled', false);
 

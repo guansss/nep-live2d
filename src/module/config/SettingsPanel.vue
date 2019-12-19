@@ -73,6 +73,48 @@ $toolbarHeight = 36px
     font-size 16px
     background-color $backgroundColor
 
+    >>> .button
+        position relative
+        display inline-block
+        margin-bottom 8px
+        padding 8px 16px
+        background $themeColor
+        color #FFF
+        font-size 14px
+        cursor pointer
+        box-shadow 0 1px 2px #0004
+        transition background-color .15s ease-out, color .15s ease-out, box-shadow .15s ease-out
+
+        &:hover
+            background darken($themeColor, 30%)
+            box-shadow 0 2px 4px #0006
+
+        &:active
+            box-shadow 0 1px 2px #0002
+
+        .svg
+            width 16px
+            height 16px
+            vertical-align middle
+
+            path
+                fill currentColor
+
+    >>> .button-group
+        display flex
+        flex-wrap wrap
+
+        .button
+            background #EEE
+            color #333
+
+            &:hover
+                background #CCC
+
+            &.active
+                background $themeColor
+                color #FFF
+
 .switch
     transition transform .2s ease-out, opacity .2s ease-out
     transition-delay .8s
@@ -307,27 +349,4 @@ $toolbarHeight = 36px
 
 .fade-enter, .fade-leave-to
     opacity 0
-</style>
-
-<style lang="stylus">
-@require './reusable/vars'
-
-.button
-    position relative
-    display inline-block
-    margin-bottom 8px
-    padding 8px 16px
-    background $themeColor
-    color white
-    font-size 14px
-    cursor pointer
-    box-shadow 0 1px 2px #0004
-    transition background-color .15s ease-out, box-shadow .15s ease-out
-
-    &:hover
-        background darken($themeColor, 30%)
-        box-shadow 0 2px 4px #0006
-
-    &:active
-        box-shadow 0 1px 2px #0002
 </style>

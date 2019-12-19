@@ -1,6 +1,7 @@
 {
   "ui_info": "Neptune Live2D {VERSION}",
-  "ui_bg_dir": "背景图",
+  "ui_img_dir": "背景图片",
+  "ui_vid_dir": "背景视频",
 
   "language_name": "中文",
 
@@ -42,6 +43,10 @@
   "details": "详情",
   "model_loading": "加载中...\n\n如果无限加载的话，可以通过控制台里的日志来查看详情",
   "scale": "缩放",
+
+  "fill_type": "填充类型",
+  "fill": "填充",
+  "cover": "覆盖",
 
   "amount": "数量",
 
