@@ -39,7 +39,7 @@ export default class MotionManager extends MotionQueueManager {
     ) {
         super();
 
-        this.tag = `MotionManager(${name})`;
+        this.tag = `MotionManager\n(${name})`;
         this.internalModel = model;
         this.definitions = motionDefinitions;
 

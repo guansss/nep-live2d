@@ -4,17 +4,15 @@
             <div class="button" @click="dumpLogs">{{ $t('dump_logs') }}</div>
             <div class="button" @click="dumpStorage">{{ $t('dump_storage') }}</div>
 
-            <LongClickAction class="button reset"
-                :duration="1500"
-                @long-click="reset">{{ $t('reset') }}</LongClickAction>
+            <LongClickAction class="button reset" :duration="1500" @long-click="reset">{{
+                $t('reset')
+            }}</LongClickAction>
         </div>
 
         <table class="table">
             <tr v-for="(log, i) in logs" :key="i" :class="['row', { error: log.error }]">
-                <td v-if="log.rowSpan" :rowspan="log.rowSpan" class="tag" :style="{ backgroundColor: log.color }">
-                    {{ log.tag }}
-                </td>
-                <td class="message">{{ log.count > 1 ? `${log.message} (x${log.count})` : log.message }}</td>
+                <th v-if="log.rowSpan" :rowspan="log.rowSpan" :style="{ backgroundColor: log.color }">{{ log.tag }}</th>
+                <td>{{ log.count > 1 ? `${log.message} (x${log.count})` : log.message }}</td>
             </tr>
         </table>
     </div>
@@ -161,15 +159,20 @@ export default class ConsoleSettings extends Vue {
     border-collapse collapse
     box-shadow inset 0 0 4px #666
 
-.tag
-    color #FFF
-    border-bottom 1px solid #FFF1
+    th
+        width 80px
+        padding 0 2px
+        color #FFF
+        font-weight normal
+        text-align right
+        white-space pre-wrap
+        border-bottom 1px solid #FFF1
 
-.message
-    flex-grow 1
-    white-space pre-wrap
-    word-break break-word
-    border-bottom 1px solid #0001
+    td
+        padding 0 2px
+        white-space pre-wrap
+        word-break break-word
+        border-bottom 1px solid #0001
 
 .error
     .message

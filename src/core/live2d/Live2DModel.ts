@@ -42,7 +42,7 @@ export default class Live2DModel {
 
     private constructor(readonly internalModel: Live2DModelWebGL, public modelSettings: ModelSettings) {
         this.name = modelSettings.name || randomID();
-        this.tag = `Live2DModel(${this.name})`;
+        this.tag = `Live2DModel\n(${this.name})`;
 
         this.motionManager = new MotionManager(
             this.name,

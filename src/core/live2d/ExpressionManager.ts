@@ -18,7 +18,7 @@ export default class ExpressionManager extends MotionQueueManager {
     constructor(name: string, model: Live2DModelWebGL, definitions: ExpressionDefinition[]) {
         super();
 
-        this.tag = `ExpressionManager(${name})`;
+        this.tag = `ExpressionManager\n(${name})`;
         this.internalModel = model;
         this.definitions = definitions;
 
