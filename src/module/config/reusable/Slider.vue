@@ -39,6 +39,7 @@ export default class Slider extends Vue {
     @Ref('overlay') overlayRef!: HTMLDivElement;
 
     domReady = false;
+    reactFlag = false;
 
     pressed = false;
 
@@ -46,6 +47,10 @@ export default class Slider extends Vue {
         // must access dependencies explicitly
         // @see http://optimizely.github.io/vuejs.org/guide/computed.html
         const fraction = (this.value - this.min) / (this.max - this.min);
+
+        // a flag to force re-computation of the computed property
+        // noinspection BadExpressionStatementJS
+        this.reactFlag;
 
         return this.domReady ? fraction * (this.track.offsetWidth - this.thumb.offsetWidth) + 'px' : '0px';
     }
@@ -55,12 +60,17 @@ export default class Slider extends Vue {
         return Math.round(this.value * 100) / 100;
     }
 
-    private mounted() {
+    mounted() {
         this.domReady = true;
         this.setupMovement();
     }
 
-    private setupMovement() {
+    activated() {
+        // force update
+        this.reactFlag = !this.reactFlag;
+    }
+
+    setupMovement() {
         let mouseOffsetX = 0;
 
         const draggableTrack = new Draggable(this.track);
