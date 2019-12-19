@@ -146,13 +146,13 @@ export default class ConsoleSettings extends Vue {
     margin-right 0
     margin-left auto
     overflow hidden
-    background #e72917
+    background #e72917 !important
 
     &:hover
-        background #cf1100
+        background #cf1100 !important
 
     >>> .progress
-        background #FFF8
+        background #FFF8 !important
 
 .table
     width 100%
