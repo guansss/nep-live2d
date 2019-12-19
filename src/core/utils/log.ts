@@ -9,7 +9,7 @@ export interface LogRecord {
 
 export const logs = (() => {
     const arr: any = [];
-    arr.limit = 100;
+    arr.limit = 200;
     return arr;
 })() as LogRecord[] & { limit: number };
 
