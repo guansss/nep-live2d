@@ -33,7 +33,7 @@
 
             <ToggleSwitch :value="seasonal" @change="setSeasonal">{{ $t('seasonal_theming') }}</ToggleSwitch>
         </div>
-        <div class="section" :data-title="$t('misc')">
+        <div class="misc section" :data-title="$t('misc')">
             <Slider progress v-model="volume">{{ $t('volume') }}</Slider>
             <Slider overlay :min="1" :max="maxFPSLimit" :step="1" v-model="maxFPS">{{ $t('max_fps') }}</Slider>
             <ToggleSwitch v-model="showFPS">{{ $t('show_fps') }}</ToggleSwitch>
@@ -248,4 +248,8 @@ export default class GeneralSettings extends Vue {
 
     &:hover
         background #E74C3C
+
+.misc
+    // extra padding to prevent the dropdown of last Select component from overflowing from panel
+    padding-bottom 80px
 </style>
