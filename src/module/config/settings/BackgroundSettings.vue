@@ -17,29 +17,41 @@
         </div>
 
         <template v-if="contentVisible">
-            <div v-if="tab < 2" class="bg-list">
-                <div
-                    v-for="img in displayImages"
-                    :key="img"
-                    :class="['bg-item', { selected: img === selected }]"
-                    @click="select(img)"
-                >
-                    <img class="bg-item-img" :title="img" :src="img" />
-                    <CheckSVG class="check" />
+            <template v-if="tab < 2">
+                <i18n v-if="tab === 1 && !imgDir" class="info" tag="div" path="no_bg_dir">
+                    <b>{{ $t('ui_img_dir') }}</b>
+                </i18n>
+                <div v-else class="info">{{ tab === 1 ? imgDir : $t('built_in') }}&nbsp;</div>
+                <div class="bg-list">
+                    <div
+                        v-for="img in displayImages"
+                        :key="img"
+                        :class="['bg-item', { selected: img === selected }]"
+                        @click="select(img)"
+                    >
+                        <img class="bg-item-img" :title="img" :src="img" />
+                        <CheckSVG class="check" />
+                    </div>
                 </div>
-            </div>
+            </template>
 
-            <div v-else class="bg-list">
-                <div
-                    v-for="vid in videos"
-                    :key="vid"
-                    :class="['bg-item', { selected: vid === selected }]"
-                    @click="select(vid)"
-                >
-                    <video class="bg-item-vid" :title="vid" :src="vid" preload="metadata"></video>
-                    <CheckSVG class="check" />
+            <template v-else>
+                <i18n v-if="!vidDir" class="info" path="no_bg_dir">
+                    <b>{{ $t('ui_vid_dir') }}</b>
+                </i18n>
+                <div v-else class="info">{{ vidDir }}&nbsp;</div>
+                <div class="bg-list">
+                    <div
+                        v-for="vid in videos"
+                        :key="vid"
+                        :class="['bg-item', { selected: vid === selected }]"
+                        @click="select(vid)"
+                    >
+                        <video class="bg-item-vid" :title="vid" :src="vid" preload="metadata"></video>
+                        <CheckSVG class="check" />
+                    </div>
                 </div>
-            </div>
+            </template>
         </template>
     </div>
 </template>
@@ -82,6 +94,9 @@ export default class BackgroundSettings extends Vue {
     tabs = [StarSVG, ImageListSVG, VideoListSVG];
     tab = TAB.BUILT_IN;
 
+    imgDir = '';
+    vidDir = '';
+
     images: string[] = [];
     videos: string[] = [];
 
@@ -103,6 +118,8 @@ export default class BackgroundSettings extends Vue {
             .on('config:bg.src', this.srcChanged, this)
             .on('config:bg.fill', this.fillChanged, this)
             .on('config:bg.volume', this.volumeChanged, this)
+            .on('we:imgDir', this.imgDirChanged, this)
+            .on('we:vidDir', this.vidDirChanged, this)
             .on('weFilesUpdate:imgDir', this.imageUpdated, this)
             .on('weFilesRemove:imgDir', this.imageUpdated, this)
             .on('weFilesUpdate:vidDir', this.videoUpdated, this)
@@ -133,6 +150,14 @@ export default class BackgroundSettings extends Vue {
 
     select(src: string) {
         this.configModule.setConfig('bg.src', src);
+    }
+
+    imgDirChanged(imgDir: string) {
+        this.imgDir = imgDir;
+    }
+
+    vidDirChanged(vidDir: string) {
+        this.vidDir = vidDir;
     }
 
     fillChanged(fill?: boolean) {
@@ -186,6 +211,15 @@ export default class BackgroundSettings extends Vue {
     margin-top 8px
     padding 6px 16px 0
     justify-content center
+
+.info
+    margin 8px 16px 0 16px
+    padding 4px
+    background #0002
+    color #666
+    font 14px Consolas, monospace
+    word-break break-all
+    box-shadow inset 0 0 3px #0001
 
 .bg-list
     display grid

@@ -47,6 +47,8 @@
   "fill_type": "Fill Type",
   "fill": "Fill",
   "cover": "Cover",
+  "built_in": "Built-in",
+  "no_bg_dir": "No directory. Please specify {0} in Wallpaper Engine",
 
   "amount": "Amount",
 

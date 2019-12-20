@@ -47,6 +47,8 @@
   "fill_type": "填充类型",
   "fill": "填充",
   "cover": "覆盖",
+  "built_in": "内置",
+  "no_bg_dir": "未选择目录，请在 Wallpaper Engine 中设置{0}",
 
   "amount": "数量",
 

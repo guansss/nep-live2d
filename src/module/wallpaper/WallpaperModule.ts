@@ -40,9 +40,12 @@ async function setupDefault() {
     try {
         // actually loading "wallpaper/project.json", but "wallpaper" is the content root of DevServer,
         //  so we need to call "project.json"
-        const project = await getJSON('project.json');
+        const project = (await getJSON('project.json')) as { general: { properties: WEUserProperties } };
 
         if (project) {
+            project.general.properties.imgDir.value = 'C:\\fakepath\\img';
+            project.general.properties.vidDir.value = 'C:\\fakepath\\vid';
+
             window.wallpaperPropertyListener.applyUserProperties(project.general.properties);
         } else {
             // noinspection ExceptionCaughtLocallyJS

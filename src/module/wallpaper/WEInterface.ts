@@ -24,7 +24,7 @@ export namespace WEInterface {
     export const PREFIX_FILES_UPDATE = 'weFilesUpdate:';
     export const PREFIX_FILES_REMOVE = 'weFilesRemove:';
 
-    export const props: WEProperties = {};
+    export const props: Partial<WEProperties> = {};
 
     export const propFiles: WEFiles = {};
 
@@ -48,7 +48,7 @@ export namespace WEInterface {
         }
     }
 
-    function updateProps(_props: WEProperties) {
+    function updateProps(_props: Partial<WEProperties>) {
         Object.assign(props, _props);
         (Object.keys(_props) as (keyof WEProperties)[]).forEach(emitProp);
     }

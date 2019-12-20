@@ -2,8 +2,8 @@
 type WEUserPropertyNames = 'schemecolor' | WEFilePropertyNames;
 type WEGeneralPropertyNames = 'language';
 
-type WEUserProperties = Partial<Record<WEUserPropertyNames, { value: string }>>;
-type WEGeneralProperties = Partial<Record<WEGeneralPropertyNames, string>>;
+type WEUserProperties = Record<WEUserPropertyNames, { value: string }>;
+type WEGeneralProperties = Record<WEGeneralPropertyNames, string>;
 
 // merged user properties and general properties
 type WEProperties = WEUserProperties & WEGeneralProperties;
