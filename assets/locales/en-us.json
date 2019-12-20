@@ -22,6 +22,7 @@
   "background": "Background",
   "effect": "Effect",
   "console": "Console",
+  "about": "About",
 
   "theme": "Theme",
   "save_theme": "Save current theme as:",
@@ -56,5 +57,8 @@
 
   "dump_logs": "Dump Logs",
   "dump_storage": "Dump Storage",
-  "reset": "Reset"
+  "reset": "Reset",
+
+  "subtitle": "The Ultimate Live2D Wallpaper",
+  "desc": "For tutorial and more information, please visit the Workshop page."
 }
