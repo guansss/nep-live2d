@@ -87,6 +87,7 @@ export default class Live2DPlayer extends Player {
             }
         }(MOUSE_HANDLING_ELEMENT);
 
+        this.container.sortableChildren = true;
         mka.pixiApp.stage.addChild(this.container);
     }
 

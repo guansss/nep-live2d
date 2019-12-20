@@ -52,6 +52,7 @@ export default class Live2DModule implements Module {
             .on('live2dAdd', this.addModel, this)
             .on('live2dRemove', this.removeModel, this)
             .on('live2dRemoveAll', this.removeAllModels, this)
+            .on('live2dShift', this.shiftModel, this)
             .on('configReady', (config: Config) => {
                 this.config = config;
 
@@ -112,7 +113,15 @@ export default class Live2DModule implements Module {
 
     private async addModel(file: string, config?: ModelConfig) {
         const id = generateID();
-        const modelConfig: ModelConfig = Object.assign({ id, file }, DEFAULT_MODEL_CONFIG, config);
+        const modelConfig: ModelConfig = Object.assign(
+            {
+                id,
+                file,
+                order: this.modelConfigs.length,
+            },
+            DEFAULT_MODEL_CONFIG,
+            config,
+        );
 
         this.app.emit('config', 'live2d.models', [...this.modelConfigs, modelConfig]);
 
@@ -136,11 +145,21 @@ export default class Live2DModule implements Module {
     }
 
     private removeModel(id: number) {
-        const modelConfigs = this.modelConfigs;
-        const excluded = modelConfigs.filter(config => config.id !== id);
+        const modelConfigs = this.modelConfigs.slice();
 
-        if (modelConfigs.length !== excluded.length) {
-            this.app.emit('config', 'live2d.models', excluded);
+        const removed = modelConfigs.find(config => config.id === id);
+
+        if (removed) {
+            modelConfigs.splice(modelConfigs.indexOf(removed), 1);
+
+            // reorder models
+            modelConfigs.forEach(config => {
+                if (config.order > removed.order) {
+                    this.configureModel(config.id, { order: config.order - 1 }).then();
+                }
+            });
+
+            this.app.emit('config', 'live2d.models', modelConfigs);
         }
 
         this.player.sprites.forEach(sprite => {
@@ -154,13 +173,32 @@ export default class Live2DModule implements Module {
         }
     }
 
+    private shiftModel(id: number, direction: number) {
+        const modelConfigs = this.modelConfigs;
+
+        const config = modelConfigs.find(config => config.id === id);
+
+        if (config) {
+            const order = config.order;
+            const targetConfig = modelConfigs.find(config => config.order === order + direction);
+
+            if (targetConfig) {
+                config.order = targetConfig.order;
+                targetConfig.order = order;
+
+                this.configureModel(id, { order: config.order }).then();
+                this.configureModel(targetConfig.id, { order }).then();
+            }
+        }
+    }
+
     private async configureModel(id: number, config: Partial<ModelConfig>) {
         const updatedConfig = this.modifyModel(id, config);
 
         if (updatedConfig) {
             const sprite = this.player.sprites.find(sprite => sprite.id === id);
 
-            if (updatedConfig.enabled !== false) {
+            if (updatedConfig.enabled) {
                 if (sprite) {
                     configureSprite(sprite, config);
                 } else if (!this.loadingIDs.includes(id)) {

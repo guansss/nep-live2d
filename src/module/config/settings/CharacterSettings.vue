@@ -1,7 +1,7 @@
 <template>
     <div class="model">
-        <div class="list">
-            <div class="actions">
+        <transition-group class="list" name="move">
+            <div class="actions" key="??">
                 <div :class="['action general', { selected: selectedIndex === -1 }]" @click="selectedIndex = -1">
                     <TuneSVG class="icon" />
                 </div>
@@ -14,14 +14,25 @@
                 :class="['item', { selected: selectedIndex === i }]"
                 :duration="600"
                 @click.native="selectedIndex = i"
-                @long-click="deleteModel(i)"
+                @long-click="deleteModel(model)"
             >
                 <img v-if="model.config && model.config.preview" :src="model.config.preview" class="preview" />
                 <div v-else class="preview-alt">{{ model.name }}</div>
 
-                <CloseSVG slot="control" class="delete" />
+                <div v-if="model.config && model.config.order > 0" class="left action" @click.stop="shift(model, -1)">
+                    &lt;
+                </div>
+                <div
+                    v-if="model.config && model.config.order < models.length - 1"
+                    class="right action"
+                    @click.stop="shift(model, 1)"
+                >
+                    &gt;
+                </div>
+
+                <CloseSVG slot="control" class="delete action" />
             </LongClickAction>
-        </div>
+        </transition-group>
 
         <div v-if="!selectedModel">
             <ToggleSwitch key="s1" v-model="draggable">{{ $t('dragging') }}</ToggleSwitch>
@@ -283,10 +294,17 @@ export default class CharacterSettings extends Vue {
             }
         }
 
-        // check the index to prevent index overflow
         if (this.selectedIndex !== -1) {
+            // check the index to prevent index overflow
             this.selectedIndex = models.length === 0 ? -1 : clamp(this.selectedIndex, 0, models.length - 1);
         }
+
+        const selectedModel = models[this.selectedIndex];
+        // sort the list by order config
+        models.sort(
+            (a, b) => (a.config ? a.config.order : Number.MAX_VALUE) - (b.config ? b.config.order : Number.MAX_VALUE),
+        );
+        this.selectedIndex = models.indexOf(selectedModel);
     }
 
     addModel(path: string) {
@@ -312,7 +330,7 @@ export default class CharacterSettings extends Vue {
     }
 
     subtitleLoaded(id: number, languages: SubtitleJSON) {
-        let model = this.models.find(model => model.config.id === id);
+        const model = this.models.find(model => model.config.id === id);
 
         if (model) {
             model.subtitleLanguages = languages.map(({ locale, name, author, description }) => ({
@@ -324,12 +342,12 @@ export default class CharacterSettings extends Vue {
         }
     }
 
-    deleteModel(index: number) {
+    shift(model: ModelEntity, direction: number) {
+        this.configModule.app.emit('live2dShift', model.config.id, direction);
+    }
 
-        console.warn('deleteModel', index);
-        const model = this.models[index];
-
-        if (model) this.configModule.app.emit('live2dRemove', model.config.id);
+    deleteModel(model: ModelEntity) {
+        this.configModule.app.emit('live2dRemove', model.config.id);
     }
 
     enableChanged(value: boolean) {
@@ -377,18 +395,18 @@ $selectableCard
     height $itemSize
     flex-flow column
 
-.action
-    @extend $selectableCard
-    flex 1 0 0
-    padding 8px
+    .action
+        @extend $selectableCard
+        flex 1 0 0
+        padding 8px
 
-    &.general
-        margin-bottom 8px
-        border 2px solid transparent
+        &.general
+            margin-bottom 8px
+            border 2px solid transparent
 
-    .icon
-        width 100%
-        height 100%
+        .icon
+            width 100%
+            height 100%
 
 .list
     display flex
@@ -404,11 +422,44 @@ $selectableCard
     height $itemSize
     border 2px solid transparent
 
+    .action
+        position absolute
+        background #0003
+        color #FFF
+        opacity 0
+        transition opacity .15s ease-out, background-color .15s ease-out, color .15s ease-out
+
+    .left
+    .right
+        top 50%
+        padding 6px
+        font bold 22px monospace
+        transform translateY(-50%)
+
+        &:hover
+            background #0008
+
+    .right
+        right 0
+
     >>> .progress
         background #C0392BAA !important
 
-    &:hover .delete
+    &:hover .action
         opacity 1
+
+.delete
+    display block
+    top 0
+    right 0
+    width 24px
+    height 24px
+
+    path
+        fill currentColor
+
+    &:hover
+        background #E74C3C
 
 .preview
 .preview-alt
@@ -422,25 +473,6 @@ $selectableCard
     padding: 8px;
     font-size: 120%;
     font-weight: bold;
-
-.delete
-    position absolute
-    display block
-    top 0
-    right 0
-    width 24px
-    height 24px
-    background #0002
-    color #333
-    opacity 0
-    transition opacity .15s ease-out, background-color .15s ease-out, color .15s ease-out
-
-    &:hover
-        background #E74C3C
-        color #FFF
-
-        path
-            fill currentColor
 
 .details
     display inline-block
@@ -539,6 +571,9 @@ $selectableCard
             border-left 1px solid #CCC
 
 // animation
+
+.move-move
+    transition transform .2s
 
 .fade-enter-active, .fade-leave-active
     transition opacity .15s ease-out

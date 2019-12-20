@@ -32,6 +32,7 @@ export interface Theme {
         scale: number;
         x: number;
         y: number;
+        order: number;
         locale?: string;
     }[];
     profiles?: {
@@ -158,11 +159,12 @@ export default class ThemeModule implements Module {
                 snow,
                 leaves,
                 v: THEME_VERSION,
-                models: models.map(({ file, scale, x, y, locale }) => ({
+                models: models.map(({ file, scale, x, y, order, locale }) => ({
                     file,
                     scale,
                     x,
                     y,
+                    order,
                     ...(locale ? { locale } : {}),
                 })),
             };

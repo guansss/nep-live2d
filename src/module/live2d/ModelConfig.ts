@@ -4,15 +4,16 @@ import Live2DSprite from '@/module/live2d/Live2DSprite';
 export interface ModelConfig {
     readonly file: string;
     id: number;
-    enabled?: boolean;
-    scale?: number;
-    x?: number;
-    y?: number;
+    enabled: boolean;
+    scale: number;
+    x: number;
+    y: number;
+    order: number;
     locale?: string; // the subtitle locale
     preview?: string; // image file
 }
 
-export const DEFAULT_MODEL_CONFIG: Omit<ModelConfig, 'id' | 'file'> = {
+export const DEFAULT_MODEL_CONFIG: Omit<ModelConfig, 'id' | 'file' | 'order'> = {
     enabled: true,
     scale: 1 / innerHeight,
     x: 0.5,
@@ -54,6 +55,7 @@ export function configureSprite(sprite: Live2DSprite, config: Partial<ModelConfi
 
     if (!isNaN(_config.x!)) sprite.x = _config.x! - sprite.width / 2;
     if (!isNaN(_config.y!)) sprite.y = _config.y! - sprite.height / 2;
+    if (!isNaN(_config.order!)) sprite.zIndex = _config.order!;
 }
 
 /**
