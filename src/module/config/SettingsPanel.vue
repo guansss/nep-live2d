@@ -1,5 +1,6 @@
 <template>
     <div ref="settings" :class="['settings', stateClass, { snapped }]" :style="panelStyle" @mousedown.stop="">
+        <div v-if="title" class="tip" :data-title="title">{{ $t('v2_note') }}</div>
         <div v-if="expanded" ref="content" class="content">
             <div class="toolbar">
                 <div class="tabs" ref="tabs">
@@ -126,6 +127,37 @@ $toolbarHeight = 36px
         opacity 1
         transform none !important
         transition-delay 0s
+
+.tip
+    $arrowSize = 16px
+    position absolute
+    left 50%
+    bottom 'calc(100% + %s)' % ($arrowSize + 8px)
+    padding 16px 32px
+    background $backgroundColor
+    color #666
+    text-align center
+    white-space nowrap
+    filter drop-shadow(0px 2px 2px #0004)
+    transform translateX(-50%)
+
+    &:before
+        content attr(data-title)
+        display block
+        margin-bottom 8px
+        color var(--accentColor)
+        font-size 28px
+
+    &:after
+        content ''
+        position absolute
+        bottom - $arrowSize
+        left 50%
+        border-left $arrowSize solid transparent
+        border-right $arrowSize solid transparent
+        border-top $arrowSize solid $backgroundColor
+        transform translateX(-50%)
+        transition opacity .15s ease-out
 
 .content
     position relative

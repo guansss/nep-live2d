@@ -20,6 +20,9 @@ export default class FloatingPanelMixin extends Vue {
     readonly handle!: HTMLElement;
     readonly resizer!: HTMLElement;
 
+    /** @abstract */
+    title?: string;
+
     expanded = false;
 
     stateClass = 'switch';
@@ -200,6 +203,9 @@ export default class FloatingPanelMixin extends Vue {
     }
 
     open() {
+        // dismiss the tip
+        this.title = undefined;
+
         if (!this.expanded) {
             // FLIP animation.
             // First set to end state, then animate from start state to end state.

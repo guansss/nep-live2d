@@ -27,6 +27,8 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
 
     selectedPage = 0;
 
+    title? = '';
+
     get currentPage() {
         return this.pages[this.selectedPage];
     }
@@ -40,6 +42,11 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     };
 
     created() {
+        this.configModule.app.once('init', (version?: string) => {
+            // show tip at first launch
+            if (!version) this.title = process.env.NAME;
+        });
+
         this.switchTop = this.configModule.getConfig('settings.switchTop', this.switchTop);
         this.switchLeft = this.configModule.getConfig('settings.switchLeft', this.switchLeft);
 
