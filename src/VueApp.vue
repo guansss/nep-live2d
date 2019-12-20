@@ -54,7 +54,7 @@ ul
 #app
     height: 100vh
     color: #333
-    font-family: 'Avenir', Helvetica, Arial, sans-serif
+    font-family: 'Microsoft Yahei UI', 'Avenir', Helvetica, Arial
     -webkit-font-smoothing: antialiased
     -moz-osx-font-smoothing: grayscale
 </style>
