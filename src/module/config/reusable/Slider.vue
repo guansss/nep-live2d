@@ -31,6 +31,7 @@ export default class Slider extends Vue {
     @Prop({ default: 1, type: Number }) readonly max!: number;
     @Prop({ default: 0, type: Number }) readonly min!: number;
     @Prop({ default: 0, type: Number }) readonly step!: number;
+    @Prop({ default: false, type: Boolean }) readonly int!: boolean;
     @Prop({ default: false, type: Boolean }) readonly progress!: boolean;
     @Prop({ default: false, type: Boolean }) readonly overlay!: boolean;
 
@@ -103,7 +104,7 @@ export default class Slider extends Vue {
                 this.step === 0 || value === this.max ? value : value - ((value - this.min) % this.step);
 
             if (snappedValue !== this.value) {
-                this.$emit('change', snappedValue);
+                this.updateValue(this.int ? ~~snappedValue : snappedValue);
             }
 
             return true;
