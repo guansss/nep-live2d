@@ -58,6 +58,7 @@ export default class VueLive2DMotion extends Vue {
 <style scoped lang="stylus">
 .container
     position absolute
+    z-index 100
     right 0
     left 0
     margin 8px
@@ -75,7 +76,6 @@ export default class VueLive2DMotion extends Vue {
 
 .subtitle
     position relative
-    z-index 100
     display inline-block
 
     &.bordered

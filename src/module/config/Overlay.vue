@@ -51,6 +51,7 @@ export default class Overlay extends Vue {
 <style scoped lang="stylus">
 .fps
     position absolute
+    z-index 100
     top 0
     right 0
     color #FFF
