@@ -1,5 +1,6 @@
 const path = require('path');
 const merge = require('lodash/merge');
+const projectJSON = require('./assets/project.json');
 const { readLocales } = require('./scripts/project-json-generator');
 
 module.exports = {
@@ -50,10 +51,11 @@ module.exports = {
     },
 
     chainWebpack(config) {
-        // embed the version number in package.json
+        // inject some properties
         // see https://github.com/webpack/webpack/issues/237
         // and https://stackoverflow.com/questions/53076540/vue-js-webpack-problem-cant-add-plugin-to-vue-config-js-with-configurewebpack
         config.plugin('define').tap(args => {
+            args[0]['process.env'].NAME = JSON.stringify(projectJSON.title);
             args[0]['process.env'].VERSION = JSON.stringify(process.env.npm_package_version);
             args[0]['process.env'].I18N = JSON.stringify(readLocales());
             return args;

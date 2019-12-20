@@ -1,5 +1,5 @@
 {
-  "ui_info": "Neptune Live2D {VERSION}",
+  "ui_info": "{NAME} {VERSION}",
   "ui_img_dir": "Background Images",
   "ui_vid_dir": "Background Videos",
 

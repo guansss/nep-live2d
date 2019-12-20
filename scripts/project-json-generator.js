@@ -1,9 +1,8 @@
 const fs = require('fs');
 const pickBy = require('lodash/pickBy');
+const projectJSON = require('../assets/project.json');
 
 function generate(devMode) {
-    const project = require('../assets/project.json');
-
     const locales = readLocales();
 
     // accept only the properties start with "ui_"
@@ -11,16 +10,16 @@ function generate(devMode) {
         locales[locale] = pickBy(locales[locale], (value, key) => key.startsWith('ui_'));
     });
 
-    project.general.localization = locales;
+    projectJSON.general.localization = locales;
 
     if (process.env.npm_package_version.includes('beta')) {
-        project.title = '[BETA] ' + project.title;
+        projectJSON.title = '[BETA] ' + projectJSON.title;
     }
     if (devMode) {
-        project.title = '[DEV] ' + project.title;
+        projectJSON.title = '[DEV] ' + projectJSON.title;
     }
 
-    return JSON.stringify(project);
+    return JSON.stringify(projectJSON);
 }
 
 function readLocales() {
@@ -38,6 +37,7 @@ function readLocales() {
 }
 
 function populate(text) {
+    text = text.replace(/{NAME}/g, projectJSON.title);
     text = text.replace(/{VERSION}/g, process.env.npm_package_version);
 
     return text;
