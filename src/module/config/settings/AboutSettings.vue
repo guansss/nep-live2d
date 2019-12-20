@@ -14,7 +14,9 @@
             <div class="title">Programming</div>
             <div class="list">Take it Easy!</div>
             <div class="title">Translation</div>
-            <div class="list">Shiro<br />R3M11X（ΦωΦ）<br />afs<br />星空月之夜<br />JaviHunt</div>
+            <div class="list">
+                Shiro<br />R3M11X（ΦωΦ）<br />afs<br />星空月之夜<br />JaviHunt<br />小莫<br />Raul<br />MrPortal
+            </div>
             <div class="title">Special Thanks</div>
             <div class="list">Eisa</div>
         </div>
