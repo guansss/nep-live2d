@@ -26,7 +26,8 @@
 
   "theme": "Theme",
   "save_theme": "Save current theme as:",
-  "unsaved_theme": "Your custom theme is unsaved, do you want to save it?",
+  "unsaved_theme": "Unsaved Theme",
+  "has_unsaved_theme": "Your custom theme is unsaved, do you want to save it?",
   "my_theme": "My Theme",
   "misc": "Miscellaneous",
   "leaves": "Leaves",

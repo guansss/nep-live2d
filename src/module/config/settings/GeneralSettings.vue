@@ -156,24 +156,17 @@ export default class GeneralSettings extends Vue {
     }
 
     async setSeasonal(value: boolean) {
-        if (!this.seasonal && value) {
-            if (await this.ensureThemeSaved()) {
-                this.seasonal = true;
-                this.configModule.setConfig('theme.seasonal', true);
-            }
-        } else {
-            this.seasonal = value;
-            this.configModule.setConfig('theme.seasonal', value);
-        }
+        this.seasonal = value;
+        this.configModule.setConfig('theme.seasonal', value);
     }
 
     async ensureThemeSaved() {
         return new Promise(resolve =>
-            this.configModule.app.emit('themeCheck', (unsaved: boolean) => {
+            this.configModule.app.emit('themeUnsaved', (unsaved?: Theme) => {
                 if (unsaved) {
                     this.$emit(
                         'dialog',
-                        this.$t('unsaved_theme'),
+                        this.$t('has_unsaved_theme'),
                         this.$t('save'),
                         this.$t('discard'),
                         (confirmed: boolean, canceled: boolean) => {

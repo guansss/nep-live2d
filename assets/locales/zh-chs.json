@@ -26,7 +26,8 @@
 
   "theme": "主题",
   "save_theme": "保存当前主题为：",
-  "unsaved_theme": "当前的自定义主题尚未保存，是否保存？",
+  "unsaved_theme": "未保存的主题",
+  "has_unsaved_theme": "当前的自定义主题尚未保存，是否保存？",
   "my_theme": "我的主题",
   "misc": "杂项",
   "leaves": "树叶",

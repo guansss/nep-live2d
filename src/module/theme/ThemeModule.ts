@@ -57,9 +57,9 @@ export default class ThemeModule implements Module {
     selected = -1;
 
     constructor(readonly app: App) {
-        app.on('themeCheck', this.checkThemeUnsaved, this)
+        app.on('themeUnsaved', this.getUnsavedTheme, this)
             .on('themeSave', this.saveTheme, this)
-            .on('config:theme.selected', (selected: number) => this.setTheme(selected))
+            .on('config:theme.selected', this.setTheme, this)
             .on('config:theme.custom', (custom: Theme[]) => (this.customThemes = custom))
             .on('configReady', (config: Config) => {
                 this.config = config;
@@ -68,11 +68,7 @@ export default class ThemeModule implements Module {
 
                 this.app.emit('config', 'theme.seasonal', true, true);
 
-                const seasonalIndex = this.getSeasonalThemeIndex();
-
-                if (seasonalIndex !== -1) {
-                    this.app.emit('config', 'theme.selected', seasonalIndex);
-                }
+                this.setSeasonalTheme();
             })
             .on('init', () => {
                 // apply default theme if there is no applicable seasonal theme
@@ -100,6 +96,23 @@ export default class ThemeModule implements Module {
             }
         }
         return -1;
+    }
+
+    setSeasonalTheme() {
+        const seasonalIndex = this.getSeasonalThemeIndex();
+
+        if (seasonalIndex !== -1) {
+            // save current theme if it's unsaved
+            this.getUnsavedTheme(theme => {
+                if (theme) {
+                    // seriously?
+                    theme.name = this.app.vueApp.$t('unsaved_theme') as string;
+                    this.saveTheme('', theme);
+                }
+
+                this.app.emit('config', 'theme.selected', seasonalIndex);
+            });
+        }
     }
 
     setTheme(index: number) {
@@ -173,25 +186,25 @@ export default class ThemeModule implements Module {
         }
     }
 
-    checkThemeUnsaved(callback: (unsaved: boolean) => void) {
+    getUnsavedTheme(callback: (theme?: Theme) => void) {
         const theme = this.collectTheme('');
 
         if (theme) {
             for (const _theme of THEMES.concat(this.customThemes)) {
                 if (isEqual(omit(_theme, ['name', 'season']), omit(theme, ['name']))) {
-                    callback(false);
+                    callback();
                     return;
                 }
             }
 
-            callback(true);
+            callback(theme);
         }
 
         // don't callback if failed to collect current theme
     }
 
-    saveTheme(name: string) {
-        const theme = this.collectTheme(name);
+    saveTheme(name: string, theme?: Theme) {
+        theme = theme || this.collectTheme(name);
 
         if (theme) {
             this.app.emit('config', 'theme.custom', [...this.customThemes, theme]);
