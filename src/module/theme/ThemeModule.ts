@@ -32,6 +32,7 @@ export interface Theme {
         scale: number;
         x: number;
         y: number;
+        locale?: string;
     }[];
     profiles?: {
         // target describes the screen aspect ratio, e.g. 4:3, 16:9, 21:9
@@ -157,7 +158,13 @@ export default class ThemeModule implements Module {
                 snow,
                 leaves,
                 v: THEME_VERSION,
-                models: models.map(({ file, scale, x, y }) => ({ file, scale, x, y })),
+                models: models.map(({ file, scale, x, y, locale }) => ({
+                    file,
+                    scale,
+                    x,
+                    y,
+                    ...(locale ? { locale } : {}),
+                })),
             };
 
             return theme;

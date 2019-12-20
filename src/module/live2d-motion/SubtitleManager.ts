@@ -73,6 +73,7 @@ export default class SubtitleManager {
         const json = this.subtitles[file];
         if (!json) return;
 
+        // want a pyramid?
         for (const loc of [locale, this.defaultLocale, FALLBACK_LOCALE]) {
             if (loc) {
                 for (const language of json) {
