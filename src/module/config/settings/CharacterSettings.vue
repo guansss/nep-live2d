@@ -36,13 +36,10 @@
 
         <div v-if="!selectedModel">
             <ToggleSwitch key="s1" v-model="draggable">{{ $t('dragging') }}</ToggleSwitch>
-            <ToggleSwitch key="s2" v-model="focusOnPress">{{ $t('focus_on_press') }}</ToggleSwitch>
-            <Slider v-if="!focusOnPress"
-                overlay
-                :min="0"
-                :max="focusTimeoutMax"
-                config="live2d.fPress"
-                v-model="focusTimeout">
+            <ToggleSwitch key="s2" config="live2d.fPress" v-model="focusOnPress">
+                {{ $t('focus_on_press') }}
+            </ToggleSwitch>
+            <Slider v-if="!focusOnPress" overlay :min="0" :max="focusTimeoutMax" v-model="focusTimeout">
                 {{ $t('focus_timeout') }}
             </Slider>
             <ToggleSwitch key="s3" config="sub.bottom" v-model="bottomSubtitle">
@@ -63,11 +60,11 @@
             <div v-else-if="selectedModel.loading" class="info">{{ $t('model_loading') }}</div>
 
             <template v-else>
-                <ToggleSwitch :value="selectedModel.config.enabled" @change="enableChanged">{{
-                    $t('enabled')
-                }}</ToggleSwitch>
-                <Slider :value="selectedModel.config.scale" overlay :min="0.01" :max="scaleMax" @change="scaleChanged"
-                >{{ $t('scale') }}
+                <ToggleSwitch :value="selectedModel.config.enabled" @change="enableChanged">
+                    {{ $t('enabled') }}
+                </ToggleSwitch>
+                <Slider :value="selectedModel.config.scale" overlay :min="0.01" :max="scaleMax" @change="scaleChanged">
+                    {{ $t('scale') }}
                 </Slider>
 
                 <div v-if="selectedModel.subtitleLanguages" class="sub-language">
