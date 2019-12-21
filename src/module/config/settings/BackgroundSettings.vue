@@ -19,7 +19,7 @@
         <template v-if="contentVisible">
             <template v-if="tab < 2">
                 <i18n v-if="tab === 1 && !imgDir" class="info" tag="div" path="no_bg_dir">
-                    <b>{{ $t('ui_img_dir') }}</b>
+                    <b>{{ $t('ui_img_dir') | noHTML }}</b>
                 </i18n>
                 <div v-else class="info">{{ tab === 1 ? imgDir : $t('built_in') }}&nbsp;</div>
                 <div class="bg-list">
@@ -37,7 +37,7 @@
 
             <template v-else>
                 <i18n v-if="!vidDir" class="info" tag="div" path="no_bg_dir">
-                    <b>{{ $t('ui_vid_dir') }}</b>
+                    <b>{{ $t('ui_vid_dir') | noHTML }}</b>
                 </i18n>
                 <div v-else class="info">{{ vidDir }}&nbsp;</div>
                 <div class="bg-list">
@@ -82,6 +82,7 @@ const enum TAB {
 
 @Component({
     components: { Select, ToggleSwitch, Scrollable, Slider, CheckSVG, StarSVG, ImageListSVG, VideoListSVG },
+    filters: { noHTML: (text: string) => text.replace(/<.*?>/g, '') },
 })
 export default class BackgroundSettings extends Vue {
     static readonly ICON = ImageSVG;
