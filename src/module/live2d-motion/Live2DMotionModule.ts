@@ -32,6 +32,7 @@ export default class Live2DMotionModule implements Module {
             .on('configReady', (config: Config) => {
                 this.config = config;
                 app.emit('config', 'volume', this.soundManager.volume, true);
+                app.emit('config', 'locale', this.subtitleManager.defaultLocale, true);
             })
             .on('pause', () => {
                 // lower the volume in background
