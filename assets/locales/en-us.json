@@ -56,6 +56,7 @@
 
   "amount": "Amount",
 
+  "cmd": "Command",
   "dump_logs": "Dump Logs",
   "dump_storage": "Dump Storage",
   "reset": "Reset",

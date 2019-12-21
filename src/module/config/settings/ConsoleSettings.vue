@@ -1,6 +1,7 @@
 <template>
     <div class="log">
         <div class="buttons">
+            <div class="button" @click="runCommand">{{ $t('cmd') }}</div>
             <div class="button" @click="dumpLogs">{{ $t('dump_logs') }}</div>
             <div class="button" @click="dumpStorage">{{ $t('dump_storage') }}</div>
 
@@ -101,6 +102,17 @@ export default class ConsoleSettings extends Vue {
 
             return logs.length;
         };
+    }
+
+    runCommand() {
+        const cmd = prompt('Dump result', '');
+
+        if (cmd) {
+            log('CMD', '> ' + cmd);
+
+            // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval
+            log('CMD', Function('"use strict";return (function(app){return (' + cmd + ')})')()(this.configModule.app));
+        }
     }
 
     dumpLogs() {
