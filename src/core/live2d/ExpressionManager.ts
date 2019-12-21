@@ -38,14 +38,6 @@ export default class ExpressionManager extends MotionQueueManager {
         });
     }
 
-    resetExpression() {
-        this.setExpression(this.defaultExpression);
-    }
-
-    restoreExpression() {
-        this.setExpression(this.currentExpression);
-    }
-
     setRandomExpression() {
         if (this.expressions && this.expressions.length > 0) {
             if (this.expressions.length == 1) {
@@ -63,8 +55,15 @@ export default class ExpressionManager extends MotionQueueManager {
         }
     }
 
+    resetExpression() {
+        this.startMotion(this.defaultExpression);
+    }
+
+    restoreExpression() {
+        this.startMotion(this.currentExpression);
+    }
+
     setExpression(expression: Live2DExpression) {
-        log(this.tag, 'Setting expression:', expression.name);
         this.currentExpression = expression;
         this.startMotion(expression);
     }
