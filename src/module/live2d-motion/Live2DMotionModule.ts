@@ -19,6 +19,8 @@ export default class Live2DMotionModule implements Module {
     soundManager = new SoundManager();
     subtitleManager = new SubtitleManager();
 
+    originalVolume = 0;
+
     constructor(readonly app: App) {
         const live2dModule = app.modules['Live2D'] as Live2DModule;
 
@@ -30,7 +32,13 @@ export default class Live2DMotionModule implements Module {
             .on('configReady', (config: Config) => {
                 this.config = config;
                 app.emit('config', 'volume', this.soundManager.volume, true);
-            });
+            })
+            .on('pause', () => {
+                // lower the volume in background
+                this.originalVolume = this.soundManager.volume;
+                this.soundManager.volume *= 0.3;
+            })
+            .on('resume', () => (this.soundManager.volume = this.originalVolume));
 
         app.addComponent(VueLive2DMotion, { module: () => this }).then();
     }
