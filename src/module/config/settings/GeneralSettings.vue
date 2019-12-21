@@ -31,13 +31,15 @@
                 <div class="button" @click="saveTheme(true)"><PlusSVG class="svg" /></div>
             </div>
 
-            <ToggleSwitch :value="seasonal" @change="setSeasonal">{{ $t('seasonal_theming') }}</ToggleSwitch>
+            <ToggleSwitch config="theme.seasonal" v-model="seasonal">{{ $t('seasonal_theming') }}</ToggleSwitch>
         </div>
         <div class="misc section" :data-title="$t('misc')">
-            <Slider progress v-model="volume">{{ $t('volume') }}</Slider>
-            <Slider overlay :min="1" :max="maxFPSLimit" :step="1" v-model="maxFPS">{{ $t('max_fps') }}</Slider>
-            <ToggleSwitch v-model="showFPS">{{ $t('show_fps') }}</ToggleSwitch>
-            <Select v-model="locale" :options="localeOptions">{{ $t('language') }}</Select>
+            <Slider progress config="volume" v-model="volume">{{ $t('volume') }}</Slider>
+            <Slider int overlay :min="1" :max="maxFPSLimit" :step="1" config="fpsMax" v-model="maxFPS">
+                {{ $t('max_fps') }}
+            </Slider>
+            <ToggleSwitch config="fps" v-model="showFPS">{{ $t('show_fps') }}</ToggleSwitch>
+            <Select config="locale" v-model="locale" :options="localeOptions">{{ $t('language') }}</Select>
         </div>
     </div>
 </template>
@@ -51,12 +53,12 @@ import { error } from '@/core/utils/log';
 import { FPS_MAX, FPS_MAX_LIMIT, LOCALE, THEME_CUSTOM_OFFSET, THEMES } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import LongClickAction from '@/module/config/reusable/LongClickAction.vue';
-import Select, { Option } from '@/module/config/reusable/Select.vue';
+import Select from '@/module/config/reusable/Select.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
 import { Theme } from '@/module/theme/ThemeModule';
 import Vue from 'vue';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 const TAG = 'GeneralSettings';
 
@@ -74,16 +76,21 @@ export default class GeneralSettings extends Vue {
 
     selectedThemeIndex = this.configModule.getConfig('theme.selected', -1);
     themeEdit = false;
-    seasonal = this.configModule.getConfig('theme.seasonal', true);
+    seasonal = true;
 
-    volume = this.configModule.getConfig('volume', 0);
+    volume = 0;
 
-    showFPS = this.configModule.getConfig('fps', false);
-    maxFPS = this.configModule.getConfig('fpsMax', FPS_MAX);
-    maxFPSLimit!: number; // non-reactive
+    showFPS = false;
+    maxFPS = FPS_MAX;
+    maxFPSLimit = FPS_MAX_LIMIT;
 
-    locale = this.configModule.getConfig('locale', LOCALE);
-    localeOptions!: Option[]; // non-reactive
+    locale = LOCALE;
+    localeOptions = Object.entries((process.env.I18N as any) as Record<string, { language_name: string }>).map(
+        ([locale, language]) => ({
+            text: `${language.language_name} (${locale})`,
+            value: locale,
+        }),
+    );
 
     get selectedTheme() {
         return this.selectedThemeIndex < THEME_CUSTOM_OFFSET
@@ -91,46 +98,21 @@ export default class GeneralSettings extends Vue {
             : this.customThemes[this.selectedThemeIndex - THEME_CUSTOM_OFFSET];
     }
 
-    @Watch('volume')
-    volumeChanged(value: number) {
-        this.configModule.setConfig('volume', value);
-    }
-
-    @Watch('showFPS')
-    showFPSChanged(value: boolean) {
-        this.configModule.setConfig('fps', value);
-    }
-
-    @Watch('maxFPS')
-    maxFPSChanged(value: number) {
-        this.configModule.setConfig('fpsMax', value);
-    }
-
-    @Watch('locale')
-    localeChanged(value: string) {
-        this.configModule.setConfig('locale', value);
-    }
-
     created() {
-        this.maxFPSLimit = FPS_MAX_LIMIT;
+        this.configModule.app.on('config:*', this.configUpdate);
+    }
 
-        const locales = (process.env.I18N as any) as Record<string, { language_name: string }>;
-
-        this.localeOptions = Object.entries(locales).map(([locale, language]) => ({
-            text: `${language.language_name} (${locale})`,
-            value: locale,
-        }));
-
-        this.configModule.app
-            .on('config:theme.custom', (custom: Theme[]) => (this.customThemes = custom.slice()))
-            .on('config:theme.selected', (index: number) => (this.selectedThemeIndex = index));
+    configUpdate(path: string, value: any) {
+        if (path === 'theme.custom') {
+            this.customThemes = value.slice();
+        }
     }
 
     async selectTheme(index: number, custom = false) {
         if (this.themeEdit) return;
 
         if (await this.ensureThemeSaved()) {
-            this.setSeasonal(false);
+            this.seasonal = false;
 
             this.selectedThemeIndex = custom ? index + THEME_CUSTOM_OFFSET : index;
             this.configModule.setConfig('theme.selected', this.selectedThemeIndex);
@@ -153,11 +135,6 @@ export default class GeneralSettings extends Vue {
                 selectedIndex === -1 ? -1 : selectedIndex + THEME_CUSTOM_OFFSET,
             );
         }
-    }
-
-    async setSeasonal(value: boolean) {
-        this.seasonal = value;
-        this.configModule.setConfig('theme.seasonal', value);
     }
 
     async ensureThemeSaved() {
@@ -215,7 +192,7 @@ export default class GeneralSettings extends Vue {
     }
 
     beforeDestroy() {
-        this.configModule.app.off('config:theme.custom').off('config:theme.selected');
+        this.configModule.app.off('config:*', this.configUpdate);
     }
 }
 </script>

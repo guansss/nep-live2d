@@ -1,12 +1,16 @@
 <template>
     <div>
         <div class="section" :data-title="$t('leaves')">
-            <ToggleSwitch v-model="leavesEnabled">{{ $t('enabled') }}</ToggleSwitch>
-            <Slider :min="leavesNumberMin" :max="leavesNumberMax" v-model="leavesNumber">{{ $t('amount') }}</Slider>
+            <ToggleSwitch config="leaves.enabled" v-model="leavesEnabled">{{ $t('enabled') }}</ToggleSwitch>
+            <Slider int :min="leavesNumberMin" :max="leavesNumberMax" config="leaves.number" v-model="leavesNumber">
+                {{ $t('amount') }}
+            </Slider>
         </div>
         <div class="section" :data-title="$t('snow')">
-            <ToggleSwitch v-model="snowEnabled">{{ $t('enabled') }}</ToggleSwitch>
-            <Slider :min="snowNumberMin" :max="snowNumberMax" v-model="snowNumber">{{ $t('amount') }}</Slider>
+            <ToggleSwitch config="snow.enabled" v-model="snowEnabled">{{ $t('enabled') }}</ToggleSwitch>
+            <Slider int :min="snowNumberMin" :max="snowNumberMax" config="snow.number" v-model="snowNumber">
+                {{ $t('amount') }}
+            </Slider>
         </div>
     </div>
 </template>
@@ -18,7 +22,7 @@ import ConfigModule from '@/module/config/ConfigModule';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
 import Vue from 'vue';
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop } from 'vue-property-decorator';
 
 @Component({
     components: { ToggleSwitch, Slider },
@@ -29,35 +33,15 @@ export default class EffectsSettings extends Vue {
 
     @Prop() readonly configModule!: ConfigModule;
 
-    snowEnabled = this.configModule.getConfig('snow.enabled', false);
-    snowNumber = this.configModule.getConfig('snow.number', 0);
+    snowEnabled = false;
+    snowNumber = 0;
     snowNumberMin = SNOW_NUMBER_MIN;
     snowNumberMax = SNOW_NUMBER_MAX;
 
-    leavesEnabled = this.configModule.getConfig('leaves.enabled', false);
-    leavesNumber = this.configModule.getConfig('leaves.number', 0);
+    leavesEnabled = false;
+    leavesNumber = 0;
     leavesNumberMin = LEAVES_NUMBER_MIN;
     leavesNumberMax = LEAVES_NUMBER_MAX;
-
-    @Watch('snowEnabled')
-    snowEnabledChanged(value: boolean) {
-        this.configModule.setConfig('snow.enabled', value);
-    }
-
-    @Watch('snowNumber')
-    snowNumberChanged(value: number) {
-        this.configModule.setConfig('snow.number', ~~value);
-    }
-
-    @Watch('leavesEnabled')
-    leavesEnabledChanged(value: boolean) {
-        this.configModule.setConfig('leaves.enabled', value);
-    }
-
-    @Watch('leavesNumber')
-    leavesNumberChanged(value: number) {
-        this.configModule.setConfig('leaves.number', ~~value);
-    }
 }
 </script>
 

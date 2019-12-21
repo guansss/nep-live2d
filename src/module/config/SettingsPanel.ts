@@ -24,7 +24,14 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     @Ref('resizer') readonly resizer!: HTMLDivElement;
     @Ref('page') readonly pageComponent!: Vue;
 
-    readonly pages = [GeneralSettings, CharacterSettings, BackgroundSettings, EffectsSettings, ConsoleSettings, AboutSettings];
+    readonly pages = [
+        GeneralSettings,
+        CharacterSettings,
+        BackgroundSettings,
+        EffectsSettings,
+        ConsoleSettings,
+        AboutSettings,
+    ];
 
     selectedPage = 0;
 

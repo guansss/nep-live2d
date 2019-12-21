@@ -21,15 +21,17 @@ export default class Overlay extends Vue {
     created() {
         if (this.showFPS) this.startFPS();
 
-        this.configModule.app.on('config:fps', (showFPS: boolean) => {
-            if (showFPS) {
-                if (!this.showFPS) this.startFPS();
-            } else if (this.showFPS) {
-                this.cancelFPS();
-            }
+        this.configModule.app.on('config:fps', this.fpsEnabled, this);
+    }
 
-            this.showFPS = showFPS;
-        });
+    fpsEnabled(enabled: boolean) {
+        if (enabled) {
+            if (!this.showFPS) this.startFPS();
+        } else if (this.showFPS) {
+            this.cancelFPS();
+        }
+
+        this.showFPS = enabled;
     }
 
     startFPS() {
@@ -44,6 +46,8 @@ export default class Overlay extends Vue {
 
     beforeDestroy() {
         this.cancelFPS();
+
+        this.configModule.app.off('config:fps', this.fpsEnabled);
     }
 }
 </script>

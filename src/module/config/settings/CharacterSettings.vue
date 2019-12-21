@@ -37,10 +37,17 @@
         <div v-if="!selectedModel">
             <ToggleSwitch key="s1" v-model="draggable">{{ $t('dragging') }}</ToggleSwitch>
             <ToggleSwitch key="s2" v-model="focusOnPress">{{ $t('focus_on_press') }}</ToggleSwitch>
-            <Slider v-if="!focusOnPress" overlay :min="0" :max="focusTimeoutMax" v-model="focusTimeout"
-            >{{ $t('focus_timeout') }}
+            <Slider v-if="!focusOnPress"
+                overlay
+                :min="0"
+                :max="focusTimeoutMax"
+                config="live2d.fPress"
+                v-model="focusTimeout">
+                {{ $t('focus_timeout') }}
             </Slider>
-            <ToggleSwitch key="s3" v-model="bottomSubtitle">{{ $t('bottom_subtitle') }}</ToggleSwitch>
+            <ToggleSwitch key="s3" config="sub.bottom" v-model="bottomSubtitle">
+                {{ $t('bottom_subtitle') }}
+            </ToggleSwitch>
         </div>
         <div v-else>
             <details class="details button" :open="detailsExpanded" @click.prevent="detailsExpanded = !detailsExpanded">
@@ -181,15 +188,15 @@ export default class CharacterSettings extends Vue {
     detailsExpanded = false;
 
     draggable = this.configModule.getConfig('live2d.draggable', false);
-    focusOnPress = this.configModule.getConfig('live2d.fPress', false);
+    focusOnPress = false;
     focusTimeout = this.configModule.getConfig('live2d.fTime', 0) / 1000;
-    bottomSubtitle = this.configModule.getConfig('sub.bottom', false);
+    bottomSubtitle = false;
 
     scaleMax = LIVE2D_SCALE_MAX;
     focusTimeoutMax = FOCUS_TIMEOUT_MAX / 1000;
 
     defaultLocale = this.configModule.getConfig('locale', LOCALE);
-    fallbackLocale!: string; // non-reactive
+    fallbackLocale = SUBTITLE_FALLBACK_LOCALE;
     showLanguages = false;
 
     get selectedModel() {
@@ -225,30 +232,19 @@ export default class CharacterSettings extends Vue {
         this.configModule.app.emit('config', 'live2d.draggable', value, true);
     }
 
-    @Watch('focusOnPress')
-    focusOnPressChanged(value: boolean) {
-        this.configModule.app.emit('config', 'live2d.fPress', value);
-    }
-
     @Watch('focusTimeout')
     focusTimeoutChanged(value: number) {
         this.configModule.app.emit('config', 'live2d.fTime', ~~(value * 1000));
     }
 
-    @Watch('bottomSubtitle')
-    bottomSubtitleChanged(value: boolean) {
-        this.configModule.app.emit('config', 'sub.bottom', value);
-    }
-
     created() {
-        this.fallbackLocale = SUBTITLE_FALLBACK_LOCALE;
-
         this.configModule.app
             .on('live2dLoaded', this.modelLoaded, this)
             .on('live2dError', this.modelError, this)
             .on('live2dSubtitleLoaded', this.subtitleLoaded, this)
-            .on('config:live2d.models', this.updateModels, this)
-            .on('config:locale', (locale: string) => (this.defaultLocale = locale));
+            .on('config:*', this.configUpdate, this);
+
+        this.configModule.getConfigs(this.configUpdate, ['live2d.models', [], 'locale', this.defaultLocale]);
 
         let subtitles: Live2DMotionModule['subtitleManager']['subtitles'] = {};
 
@@ -268,9 +264,19 @@ export default class CharacterSettings extends Vue {
         }
     }
 
-    updateModels() {
+    configUpdate(path: string, value: any) {
+        switch (path) {
+            case 'live2d.models':
+                this.updateModels(value);
+                break;
+            case 'locale':
+                this.defaultLocale = value;
+                break;
+        }
+    }
+
+    updateModels(modelConfigs: ModelConfig[]) {
         const models = this.models;
-        const modelConfigs = this.configModule.getConfig<ModelConfig[]>('live2d.models', []);
 
         // a temporary array to save IDs during first loop
         const modelIDs: number[] = [];
@@ -364,6 +370,14 @@ export default class CharacterSettings extends Vue {
 
     localeChanged(value: string) {
         this.configModule.app.emit('live2dConfig', this.selectedModel.config.id, toStorageValues({ locale: value }));
+    }
+
+    beforeDestroy() {
+        this.configModule.app
+            .off('live2dLoaded', this.modelLoaded)
+            .off('live2dError', this.modelError)
+            .off('live2dSubtitleLoaded', this.subtitleLoaded)
+            .off('config:*', this.configUpdate);
     }
 }
 </script>

@@ -80,7 +80,7 @@ export namespace WEInterface {
 
             if (value) {
                 eventEmitter.sticky(PREFIX + name, value);
-                eventEmitter.sticky(PREFIX + '*', name, value);
+                eventEmitter.emit(PREFIX + '*', name, value);
             }
         }
     }
@@ -88,7 +88,7 @@ export namespace WEInterface {
     function emitFilesUpdate<T extends keyof WEFiles>(propName: T, files: string[]) {
         if (eventEmitter) {
             eventEmitter.sticky(PREFIX_FILES_UPDATE + propName, files, propFiles[propName]);
-            eventEmitter.sticky(PREFIX_FILES_UPDATE + '*', propName, files, propFiles[propName]);
+            eventEmitter.emit(PREFIX_FILES_UPDATE + '*', propName, files, propFiles[propName]);
         }
     }
 

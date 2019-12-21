@@ -33,11 +33,19 @@ export default class VueLive2DMotion extends Vue {
 
     created() {
         this.live2DMotionModule.app
-            .on('config:sub.bottom', (bottom: boolean) => (this.toBottom = bottom))
-            .on('configReady', () => this.live2DMotionModule.app.emit('config', 'sub.bottom', this.toBottom, true));
+            .on('config:sub.bottom', this.bottomChanged, this)
+            .once('configReady', this.configReady, this);
 
         this.live2DMotionModule.subtitleManager.show = (subtitle: Subtitle) => this.show(subtitle);
         this.live2DMotionModule.subtitleManager.dismiss = (id: number) => this.dismiss(id);
+    }
+
+    configReady() {
+        this.live2DMotionModule.app.emit('config', 'sub.bottom', this.toBottom, true);
+    }
+
+    bottomChanged(bottom: boolean) {
+        this.toBottom = bottom;
     }
 
     show(subtitle: Subtitle) {
@@ -51,6 +59,10 @@ export default class VueLive2DMotion extends Vue {
         const index = this.subtitles.findIndex(it => it.id === id);
 
         if (index !== -1) this.subtitles.splice(index, 1);
+    }
+
+    beforeDestroy() {
+        this.live2DMotionModule.app.off('config:sub.bottom', this.bottomChanged);
     }
 }
 </script>

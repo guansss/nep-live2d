@@ -42,7 +42,7 @@ export interface App {
 
     emit(event: 'configReady', config: Config): this;
 
-    emit(event: 'config:*', path: string, value: any, oldValue: any, config: Config): this;
+    emit(event: 'config:*', path: string, value: any, oldValue: any, runtime: boolean | undefined, config: Config): this;
 
     emit(event: 'config:{path}', value: any, oldValue: any, config: Config): this;
 
@@ -74,7 +74,7 @@ export default class ConfigModule implements Module {
         }
     }
 
-    setConfig(path: string, value: any, runtime = false) {
+    setConfig(path: string, value: any, runtime?: boolean) {
         const target = runtime ? this.config.runtime : this.config;
 
         const oldValue = this.config.get(path, undefined);
@@ -86,10 +86,23 @@ export default class ConfigModule implements Module {
         const newValue = this.config.get(path, undefined);
 
         this.app.sticky('config:' + path, newValue, oldValue, runtime, this.config);
+        this.app.emit('config:*', path, newValue, oldValue, runtime, this.config);
     }
 
     getConfig<T>(path: string, defaultValue: T): Readonly<T> {
         return this.config.get(path, defaultValue);
+    }
+
+    /**
+     * @param receiver
+     * @param args - Pairs of path and default value.
+     * @example
+     * getConfigs(receiver, 'obj.number', 0, 'obj.bool', false)
+     */
+    getConfigs(receiver: (path: string, value: any) => void, ...args: any[]) {
+        for (let i = 0; i < args.length; i += 2) {
+            receiver(args[i], this.getConfig(args[i] as string, args[i + 1]));
+        }
     }
 
     read() {

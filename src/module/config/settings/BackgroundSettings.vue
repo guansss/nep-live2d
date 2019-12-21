@@ -70,6 +70,7 @@ import Scrollable from '@/module/config/reusable/Scrollable.vue';
 import Select from '@/module/config/reusable/Select.vue';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
+import { WEInterface } from '@/module/wallpaper/WEInterface';
 import Vue from 'vue';
 import { Component, Prop } from 'vue-property-decorator';
 
@@ -94,8 +95,8 @@ export default class BackgroundSettings extends Vue {
     tabs = [StarSVG, ImageListSVG, VideoListSVG];
     tab = TAB.BUILT_IN;
 
-    imgDir = '';
-    vidDir = '';
+    imgDir = WEInterface.props.imgDir;
+    vidDir = WEInterface.props.vidDir;
 
     images: string[] = [];
     videos: string[] = [];
@@ -115,19 +116,12 @@ export default class BackgroundSettings extends Vue {
 
     private created() {
         this.configModule.app
-            .on('config:bg.src', this.srcChanged, this)
-            .on('config:bg.fill', this.fillChanged, this)
-            .on('config:bg.volume', this.volumeChanged, this)
-            .on('we:imgDir', this.imgDirChanged, this)
-            .on('we:vidDir', this.vidDirChanged, this)
-            .on('weFilesUpdate:imgDir', this.imageUpdated, this)
-            .on('weFilesRemove:imgDir', this.imageUpdated, this)
-            .on('weFilesUpdate:vidDir', this.videoUpdated, this)
-            .on('weFilesRemove:vidDir', this.videoUpdated, this);
+            .on('config:*', this.configUpdate, this)
+            .on('we:*', this.weUpdate, this)
+            .on('weFilesUpdate:*', this.weFileUpdate, this)
+            .on('weFilesRemove:*', this.weFileUpdate, this);
 
-        this.fillChanged(this.configModule.getConfig('bg.fill', undefined));
-        this.volumeChanged(this.configModule.getConfig('bg.volume', undefined));
-        this.srcChanged(this.configModule.getConfig('bg.src', ''));
+        this.configModule.getConfigs(this.configUpdate, ['bg.fill', undefined, 'bg.volume', undefined, 'bg.src', '']);
 
         if (!inWallpaperEngine) {
             // get some random samples in browser!
@@ -137,6 +131,44 @@ export default class BackgroundSettings extends Vue {
                 'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_1mb.mp4',
                 'https://www.sample-videos.com/video123/mp4/360/big_buck_bunny_360p_1mb.mp4',
             ];
+        }
+    }
+
+    configUpdate(path: string, value: any) {
+        switch (path) {
+            case 'bg.src':
+                this.srcChanged(value);
+                break;
+            case 'bg.fill':
+                this.fillType = value ? 'fill' : 'cover';
+                break;
+            case 'bg.volume':
+                this.volume = value || 0;
+                break;
+        }
+    }
+
+    weUpdate(name: string, value: any) {
+        switch (name) {
+            case 'imgDir':
+                this.imgDir = value;
+                break;
+            case 'vidDir':
+                this.vidDir = value;
+                break;
+        }
+    }
+
+    weFileUpdate(name: string, files: string[], allFiles: string[]) {
+        switch (name) {
+            case 'imgDir':
+                this.images = allFiles.slice();
+                break;
+            case 'vidDir':
+                // TODO: remove ogg filter when the bug is fixed
+                // see https://steamcommunity.com/app/431960/discussions/2/1644304412672544283/
+                this.videos = allFiles.filter(file => !file.endsWith('ogg'));
+                break;
         }
     }
 
@@ -152,22 +184,6 @@ export default class BackgroundSettings extends Vue {
         this.configModule.setConfig('bg.src', src);
     }
 
-    imgDirChanged(imgDir: string) {
-        this.imgDir = imgDir;
-    }
-
-    vidDirChanged(vidDir: string) {
-        this.vidDir = vidDir;
-    }
-
-    fillChanged(fill?: boolean) {
-        this.fillType = fill ? 'fill' : 'cover';
-    }
-
-    volumeChanged(volume?: number) {
-        this.volume = volume || 0;
-    }
-
     srcChanged(src: string) {
         this.selected = src;
         this.tab = this.selected.startsWith('img') ? TAB.BUILT_IN : isVideo(src) ? TAB.VIDEO : TAB.IMAGE;
@@ -178,25 +194,12 @@ export default class BackgroundSettings extends Vue {
         }
     }
 
-    imageUpdated(files: string[], allFiles: string[]) {
-        this.images = allFiles.slice();
-    }
-
-    videoUpdated(files: string[], allFiles: string[]) {
-        // TODO: remove ogg filter when the bug is fixed
-        // see https://steamcommunity.com/app/431960/discussions/2/1644304412672544283/
-        this.videos = allFiles.filter(file => !file.endsWith('ogg'));
-    }
-
     beforeDestroy() {
         this.configModule.app
-            .off('config:bg.src', this.srcChanged)
-            .off('config:bg.fill', this.fillChanged)
-            .off('config:bg.volume', this.volumeChanged)
-            .off('weFilesUpdate:imgDir', this.imageUpdated)
-            .off('weFilesRemove:imgDir', this.imageUpdated)
-            .off('weFilesUpdate:vidDir', this.videoUpdated)
-            .off('weFilesRemove:vidDir', this.videoUpdated);
+            .off('config:*', this.configUpdate)
+            .off('we:*', this.weUpdate)
+            .off('weFilesUpdate:*', this.weFileUpdate)
+            .off('weFilesRemove:*', this.weFileUpdate);
     }
 }
 </script>
