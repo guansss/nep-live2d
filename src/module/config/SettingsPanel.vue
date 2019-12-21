@@ -7,16 +7,15 @@
                     <div
                         v-for="(page, i) in pages"
                         :key="page.title"
-                        :class="['tab icon selectable', { selected: i === selectedPage }]"
+                        :class="['tab selectable icon', { selected: i === selectedPage }]"
                         :data-title="$t(page.TITLE)"
                         @click="selectPage(i)"
                     >
                         <component :is="page.ICON" class="svg" />
                     </div>
                 </div>
-                <div class="selectable icon" @click.stop="close">
-                    <CloseSVG />
-                </div>
+                <div class="selectable icon" @click.stop="refresh"><RefreshSVG /></div>
+                <div class="selectable icon" @click.stop="close"><CloseSVG /></div>
             </div>
 
             <Scrollable class="page">
@@ -201,9 +200,6 @@ $toolbarHeight = 36px
         left 0
         height 1px
         background-color lighten($themeColor, 60%)
-
-    .right
-        margin-left auto
 
 .icon
     $svgSize = 24px

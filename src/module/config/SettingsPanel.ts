@@ -1,4 +1,5 @@
 import CloseSVG from '@/assets/img/close.svg';
+import RefreshSVG from '@/assets/img/refresh.svg';
 import { nop } from '@/core/utils/misc';
 import ConfigModule from '@/module/config/ConfigModule';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
@@ -13,7 +14,7 @@ import { Component, Mixins, Prop, Ref } from 'vue-property-decorator';
 import { Vue } from 'vue/types/vue';
 
 @Component({
-    components: { CloseSVG, Scrollable },
+    components: { CloseSVG, RefreshSVG, Scrollable },
 })
 export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     @Prop() readonly configModule!: ConfigModule;
@@ -66,6 +67,10 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
 
     async selectPage(index: number) {
         this.selectedPage = index;
+    }
+
+    refresh() {
+        this.configModule.app.emit('reload');
     }
 
     showDialog(

@@ -17,12 +17,17 @@ function startup() {
         mounted() {
             const app = new App(/** @type {VueApp} */ this.$refs.vueApp);
 
+            app.once('reload', () => {
+                mainApp.$destroy();
+                app.destroy();
+                startup();
+            });
+
             // completely reset!
             app.once('reset', () => {
-                app.destroy();
                 mainApp.$destroy();
+                app.destroy();
                 localStorage.clear();
-
                 startup();
             });
 
