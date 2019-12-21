@@ -237,7 +237,7 @@ export default class CharacterSettings extends Vue {
 
     @Watch('bottomSubtitle')
     bottomSubtitleChanged(value: boolean) {
-        this.configModule.app.emit('config', 'sub.bottom', value, true);
+        this.configModule.app.emit('config', 'sub.bottom', value);
     }
 
     created() {
