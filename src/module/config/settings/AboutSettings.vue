@@ -9,11 +9,13 @@
 
         <div class="desc">{{ $t('desc') }}</div>
 
-        <div class="contrib">
-            <div class="header">Contributors</div>
+        <div class="credit">
+            <div class="header">Credits</div>
+            <div class="title">Live2D Models</div>
+            <div class="list">MAINICHI COMPILE HEART ©IDEA FACTORY/COMPILE HEART</div>
             <div class="title">Programming</div>
-            <div class="list">Take it Easy!</div>
-            <div class="title">Translation</div>
+            <div class="list">今天的风儿好喧嚣<br />Take it Easy!</div>
+            <div class="title">Localization</div>
             <div class="list">
                 Shiro<br />R3M11X（ΦωΦ）<br />afs<br />星空月之夜<br />JaviHunt<br />小莫<br />Raul<br />MrPortal
             </div>
@@ -25,11 +27,10 @@
 
 <script lang="ts">
 import InfoSVG from '@/assets/img/info.svg';
-import ConfigModule from '@/module/config/ConfigModule';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
 import Vue from 'vue';
-import { Component, Prop } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 
 @Component({
     components: { ToggleSwitch, Slider },
@@ -37,8 +38,6 @@ import { Component, Prop } from 'vue-property-decorator';
 export default class EffectsSettings extends Vue {
     static readonly ICON = InfoSVG;
     static readonly TITLE = 'about';
-
-    @Prop() readonly configModule!: ConfigModule;
 
     title = process.env.NAME;
     ver = process.env.VERSION;
@@ -88,7 +87,7 @@ export default class EffectsSettings extends Vue {
     &:hover:after
         opacity 1
 
-.contrib
+.credit
     flex-grow 1
     margin-top 16px
     padding 16px
