@@ -1,7 +1,7 @@
 {
   "ui_info": "{NAME} {VERSION}",
-  "ui_img_dir": "Background Images",
-  "ui_vid_dir": "Background Videos (webm/ogv)",
+  "ui_img_dir": "<b>Background Images</b>",
+  "ui_vid_dir": "<b>Background Videos</b>",
 
   "language_name": "English",
 

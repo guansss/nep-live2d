@@ -15,16 +15,31 @@
         "order": 1,
         "text": "ui_info"
       },
-      "imgDir": {
+      "l1": {
         "order": 2,
-        "text": "ui_img_dir",
+        "text": "<font color=#888>__________________________________</font>"
+      },
+      "_imgDir": {
+        "order": 3,
+        "text": "ui_img_dir"
+      },
+      "imgDir": {
+        "order": 4,
         "type": "directory",
         "mode": "fetchall"
       },
+      "l2": {
+        "order": 5,
+        "text": "<font color=#888>__________________________________</font>"
+      },
+      "_vidDir": {
+        "order": 6,
+        "text": "ui_vid_dir"
+      },
       "vidDir": {
-        "order": 3,
+        "order": 7,
         "fileType": "video",
-        "text": "ui_vid_dir",
+        "text": "(webm/ogv)",
         "type": "directory",
         "mode": "fetchall"
       }

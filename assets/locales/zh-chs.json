@@ -1,7 +1,7 @@
 {
   "ui_info": "{NAME} {VERSION}",
-  "ui_img_dir": "背景图片",
-  "ui_vid_dir": "背景视频（webm/ogv）",
+  "ui_img_dir": "<b>背景图片</b>",
+  "ui_vid_dir": "<b>背景视频</b>",
 
   "language_name": "中文",
 
