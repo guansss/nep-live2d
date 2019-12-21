@@ -70,10 +70,12 @@ export default class ThemeModule implements Module {
 
                 this.setSeasonalTheme();
             })
-            .on('init', () => {
-                // apply default theme if there is no applicable seasonal theme
-                if (this.getSeasonalThemeIndex() === -1) {
-                    this.app.emit('config', 'theme.selected', 0);
+            .on('init', (version?: string) => {
+                if (!version) {
+                    // apply default theme if there is no applicable seasonal theme
+                    if (this.getSeasonalThemeIndex() === -1) {
+                        this.app.emit('config', 'theme.selected', 0);
+                    }
                 }
             });
     }
@@ -102,16 +104,22 @@ export default class ThemeModule implements Module {
         const seasonalIndex = this.getSeasonalThemeIndex();
 
         if (seasonalIndex !== -1) {
-            // save current theme if it's unsaved
-            this.getUnsavedTheme(theme => {
-                if (theme) {
-                    // seriously?
-                    theme.name = this.app.vueApp.$t('unsaved_theme') as string;
-                    this.saveTheme('', theme);
-                }
+            const selected = this.config!.get('theme.selected', undefined);
 
+            if (selected === undefined) {
                 this.app.emit('config', 'theme.selected', seasonalIndex);
-            });
+            } else {
+                // save current theme if it's unsaved
+                this.getUnsavedTheme(theme => {
+                    if (theme) {
+                        // seriously?
+                        theme.name = this.app.vueApp.$t('unsaved_theme') as string;
+                        this.saveTheme('', theme);
+                    }
+
+                    this.app.emit('config', 'theme.selected', seasonalIndex);
+                });
+            }
         }
     }
 
