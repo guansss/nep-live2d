@@ -4,7 +4,7 @@
 [![Steam Subscriptions](https://img.shields.io/steam/subscriptions/1078208425?style=flat-square&logo=steam&color=blue)](https://steamcommunity.com/sharedfiles/filedetails/?id=1078208425)
 ![Made with](https://img.shields.io/badge/made%20with-%E2%99%A5-ff69b4?style=flat-square)
 
-This is the new version of *Neptune Live2D* wallpaper and still in early development state.
+Beta versions can be found in the [Beta Test Channel](https://steamcommunity.com/workshop/filedetails/discussion/1078208425/1484358860953044356/)
 
 The project is based on Live2D WebGL SDK 2.1, and thus models of newer or older version are not supported.
 
