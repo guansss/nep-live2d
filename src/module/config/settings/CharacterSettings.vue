@@ -215,13 +215,7 @@ export default class CharacterSettings extends Vue {
 
     @Watch('modelFile')
     modelFileChanged(value: File | null) {
-        if (value) {
-            const path = makeModelPath(value.name);
-
-            if (!this.models.find(model => model.path === path)) {
-                this.addModel(path);
-            }
-        }
+        if (value) this.addModel(makeModelPath(value.name));
     }
 
     @Watch('draggable')
