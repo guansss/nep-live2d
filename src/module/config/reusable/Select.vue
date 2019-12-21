@@ -21,9 +21,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import ConfigBindingMixin from '@/module/config/reusable/ConfigBindingMixin';
 import { directive as onClickaway } from 'vue-clickaway';
-import { Component, Model, Prop, Ref } from 'vue-property-decorator';
+import { Component, Mixins, Model, Prop, Ref } from 'vue-property-decorator';
 
 export interface Option {
     text: string,
@@ -33,7 +33,7 @@ export interface Option {
 @Component({
     directives: { onClickaway },
 })
-export default class Select extends Vue {
+export default class Select extends Mixins(ConfigBindingMixin) {
     @Prop({ type: Array, default: [] }) readonly options!: readonly Option[];
 
     @Model('change', { default: null }) value!: any;
@@ -50,7 +50,7 @@ export default class Select extends Vue {
     }
 
     select(option: Option) {
-        this.$emit('change', option.value);
+        this.updateValue(option.value);
         this.close();
     }
 

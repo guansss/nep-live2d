@@ -10,15 +10,15 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { Component, Model } from 'vue-property-decorator';
+import ConfigBindingMixin from '@/module/config/reusable/ConfigBindingMixin';
+import { Component, Mixins, Model } from 'vue-property-decorator';
 
 @Component
-export default class ToggleSwitch extends Vue {
+export default class ToggleSwitch extends Mixins(ConfigBindingMixin) {
     @Model('change', { default: false }) readonly value!: boolean;
 
     click() {
-        this.$emit('change', !this.value);
+        this.updateValue(!this.value);
     }
 }
 </script>

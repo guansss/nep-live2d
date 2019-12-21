@@ -21,11 +21,11 @@
 <script lang="ts">
 import Draggable from '@/core/utils/Draggable';
 import { clamp } from '@/core/utils/math';
-import Vue from 'vue';
-import { Component, Model, Prop, Ref } from 'vue-property-decorator';
+import ConfigBindingMixin from '@/module/config/reusable/ConfigBindingMixin';
+import { Component, Mixins, Model, Prop, Ref } from 'vue-property-decorator';
 
 @Component
-export default class Slider extends Vue {
+export default class Slider extends Mixins(ConfigBindingMixin) {
     @Model('change', { default: 0 }) readonly value!: number;
 
     @Prop({ default: 1, type: Number }) readonly max!: number;
