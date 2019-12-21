@@ -1,6 +1,6 @@
 <template>
     <div class="about">
-        <div class="headline">{{ title }}</div>
+        <div class="headline" @click="++counter > 2 ? ($event.target.dataset.alt = 'Weeb Live2D') : 0">{{ title }}</div>
         <div class="subtitle">{{ $t('subtitle') }}</div>
         <div>
             <span class="badge">{{ ver }}</span>
@@ -41,6 +41,8 @@ export default class EffectsSettings extends Vue {
 
     title = process.env.NAME;
     ver = process.env.VERSION;
+
+    counter = 0; // :P
 }
 </script>
 
@@ -54,8 +56,25 @@ export default class EffectsSettings extends Vue {
     font-family Palatino, Palatino Linotype, Palatino LT STD, Book Antiqua, Georgia, SimSun, serif
 
 .headline
+    position relative
     color var(--accentColor)
     font-size 48px
+
+    &[data-alt]
+        align-self center
+        color transparent
+        transition color 1s linear
+
+        &:after
+            content attr(data-alt)
+            position absolute
+            right 0
+            color var(--accentColor)
+            transition color 1s linear
+
+    &:after
+        content ''
+        color transparent
 
 .subtitle
     margin 16px 0 8px 0
