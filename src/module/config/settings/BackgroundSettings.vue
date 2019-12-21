@@ -123,6 +123,9 @@ export default class BackgroundSettings extends Vue {
 
         this.configModule.getConfigs(this.configUpdate, ['bg.fill', undefined, 'bg.volume', undefined, 'bg.src', '']);
 
+        this.weFileUpdate('imgDir', [], WEInterface.propFiles.imgDir || []);
+        this.weFileUpdate('vidDir', [], WEInterface.propFiles.vidDir || []);
+
         if (!inWallpaperEngine) {
             // get some random samples in browser!
             this.images = Array.from({ length: 10 }, (_, i) => 'https://loremflickr.com/1280/720/background?r=' + i);
