@@ -3,10 +3,13 @@
 </template>
 
 <script lang="ts">
+import { clamp } from '@/core/utils/math';
 import { nop } from '@/core/utils/misc';
 import BackgroundModule from '@/module/background/BackgroundModule';
 import Vue from 'vue';
 import { Component, Prop, Ref } from 'vue-property-decorator';
+
+const VOLUME_FADE_DURATION = 500;
 
 @Component
 export default class Background extends Vue {
@@ -19,12 +22,17 @@ export default class Background extends Vue {
     }
 
     visible = true;
+    volume = 0;
     fill = false;
+
+    intervalId = -1;
 
     created() {
         this.bgModule.applyVideo = (url?: string) => this.setVideo(url);
-        this.bgModule.applyVolume = (volume: number) => (this.video.volume = volume);
+        this.bgModule.applyVolume = (volume: number) => (this.video.volume = this.volume = volume);
         this.bgModule.fillVideo = (fill: boolean) => (this.fill = fill);
+
+        this.bgModule.app.on('pause', this.pause, this).on('resume', this.resume, this);
     }
 
     setVideo(src?: string) {
@@ -32,10 +40,41 @@ export default class Background extends Vue {
         this.visible = !!src;
     }
 
+    pause() {
+        this.fadeVolume(0).then(() => this.video.pause());
+    }
+
+    resume() {
+        this.video.play();
+        this.fadeVolume(this.volume);
+    }
+
+    async fadeVolume(value: number) {
+        clearInterval(this.intervalId);
+
+        let ticks = VOLUME_FADE_DURATION / 50;
+        const step = (value - this.video.volume) / ticks;
+
+        return new Promise(resolve => {
+            this.intervalId = window.setInterval(() => {
+                this.video.volume = clamp(this.video.volume + step, 0, 1);
+
+                if (ticks-- <= 0) {
+                    clearInterval(this.intervalId);
+                    resolve();
+                }
+            }, 50);
+        });
+    }
+
     beforeDestroy() {
+        clearInterval(this.intervalId);
+
         this.bgModule.applyVideo = nop;
         this.bgModule.applyVolume = nop;
         this.bgModule.fillVideo = nop;
+
+        this.bgModule.app.off('pause', this.pause).off('resume', this.resume);
     }
 }
 </script>
