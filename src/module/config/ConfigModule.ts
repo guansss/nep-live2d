@@ -95,13 +95,13 @@ export default class ConfigModule implements Module {
 
     /**
      * @param receiver
-     * @param args - Pairs of path and default value.
+     * @param pairs - Pairs of path and default value.
      * @example
      * getConfigs(receiver, 'obj.number', 0, 'obj.bool', false)
      */
-    getConfigs(receiver: (path: string, value: any) => void, ...args: any[]) {
-        for (let i = 0; i < args.length; i += 2) {
-            receiver(args[i], this.getConfig(args[i] as string, args[i + 1]));
+    getConfigs(receiver: (path: string, value: any) => void, pairs: any[]) {
+        for (let i = 0; i < pairs.length; i += 2) {
+            receiver(pairs[i], this.getConfig(pairs[i] as string, pairs[i + 1]));
         }
     }
 
