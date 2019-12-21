@@ -36,7 +36,7 @@
             </template>
 
             <template v-else>
-                <i18n v-if="!vidDir" class="info" path="no_bg_dir">
+                <i18n v-if="!vidDir" class="info" tag="div" path="no_bg_dir">
                     <b>{{ $t('ui_vid_dir') }}</b>
                 </i18n>
                 <div v-else class="info">{{ vidDir }}&nbsp;</div>
@@ -95,8 +95,8 @@ export default class BackgroundSettings extends Vue {
     tabs = [StarSVG, ImageListSVG, VideoListSVG];
     tab = TAB.BUILT_IN;
 
-    imgDir = WEInterface.props.imgDir;
-    vidDir = WEInterface.props.vidDir;
+    imgDir = WEInterface.props.imgDir ? WEInterface.props.imgDir.value : '';
+    vidDir = WEInterface.props.vidDir ? WEInterface.props.vidDir.value : '';
 
     images: string[] = [];
     videos: string[] = [];
