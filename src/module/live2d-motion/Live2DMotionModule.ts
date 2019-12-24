@@ -33,6 +33,7 @@ export default class Live2DMotionModule implements Module {
                 this.config = config;
                 app.emit('config', 'volume', this.soundManager.volume, true);
                 app.emit('config', 'locale', this.subtitleManager.defaultLocale, true);
+                app.emit('config', 'sub.on', true, true);
             })
             .on('pause', () => {
                 // lower the volume in background
@@ -62,7 +63,7 @@ export default class Live2DMotionModule implements Module {
                 audioPromise = this.soundManager.playSound(motionDefinition.sound);
             }
 
-            if (subtitleFile && motionDefinition.subtitle) {
+            if (subtitleFile && motionDefinition.subtitle && this.config && this.config.get('sub.on', true)) {
                 const modelConfig =
                     this.config &&
                     this.config.get<ModelConfig[]>('live2d.models', []).find(model => model.id === sprite.id);

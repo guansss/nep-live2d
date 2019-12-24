@@ -42,8 +42,11 @@
             <Slider v-if="!focusOnPress" overlay :min="0" :max="focusTimeoutMax" v-model="focusTimeout">
                 {{ $t('focus_timeout') }}
             </Slider>
-            <ToggleSwitch key="s3" config="sub.bottom" v-model="bottomSubtitle">
-                {{ $t('bottom_subtitle') }}
+            <ToggleSwitch key="s3" config="sub.on" v-model="subtitleEnabled">
+                {{ $t('subtitle_enabled') }}
+            </ToggleSwitch>
+            <ToggleSwitch v-if="subtitleEnabled" key="s4" config="sub.bottom" v-model="bottomSubtitle">
+                {{ $t('subtitle_bottom') }}
             </ToggleSwitch>
         </div>
         <div v-else>
@@ -187,6 +190,7 @@ export default class CharacterSettings extends Vue {
     draggable = this.configModule.getConfig('live2d.draggable', false);
     focusOnPress = false;
     focusTimeout = this.configModule.getConfig('live2d.fTime', 0) / 1000;
+    subtitleEnabled = true;
     bottomSubtitle = false;
 
     scaleMax = LIVE2D_SCALE_MAX;
