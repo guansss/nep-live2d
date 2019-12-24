@@ -145,8 +145,8 @@ export default class ThemeModule implements Module {
             this.app.emit('config', 'bg.fill', theme.bg.fill);
             this.app.emit('config', 'bg.volume', theme.bg.volume);
             this.app.emit('config', 'bg.src', theme.bg.src);
-            this.app.emit('config', 'leaves.enabled', theme.leaves);
-            this.app.emit('config', 'snow.enabled', theme.snow);
+            this.app.emit('config', 'leaves.on', theme.leaves);
+            this.app.emit('config', 'snow.on', theme.snow);
 
             this.app.emit('live2dRemoveAll');
 
@@ -167,8 +167,8 @@ export default class ThemeModule implements Module {
                 val => val === undefined,
             ) as Theme['bg'];
 
-            const leaves = this.config.get('leaves.enabled', false);
-            const snow = this.config.get('snow.enabled', false);
+            const leaves = this.config.get('leaves.on', false);
+            const snow = this.config.get('snow.on', false);
 
             const models = this.config.get<ModelConfig[]>('live2d.models', []) as {
                 [P in keyof ModelConfig]-?: ModelConfig[P]

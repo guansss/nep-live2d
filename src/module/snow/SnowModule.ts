@@ -13,7 +13,7 @@ export default class SnowModule implements Module {
     number = SNOW_NUMBER;
 
     constructor(readonly app: App) {
-        app.on('config:snow.enabled', (enabled: boolean) => {
+        app.on('config:snow.on', (enabled: boolean) => {
                 if (enabled) this.setup();
 
                 if (enabled) app.mka.enablePlayer('snow');
@@ -28,7 +28,7 @@ export default class SnowModule implements Module {
                 }, 200),
             )
             .on('configReady', (config: Config) => {
-                app.emit('config', 'snow.enabled', false, true);
+                app.emit('config', 'snow.on', false, true);
                 app.emit('config', 'snow.number', this.number, true);
             });
     }

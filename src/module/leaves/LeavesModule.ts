@@ -25,7 +25,7 @@ export default class LeavesModule implements Module {
     number = LEAVES_NUMBER;
 
     constructor(readonly app: App) {
-        app.on('config:leaves.enabled', (enabled: boolean) => {
+        app.on('config:leaves.on', (enabled: boolean) => {
                 if (enabled) this.setup();
 
                 if (enabled) app.mka.enablePlayer('leaves');
@@ -40,7 +40,7 @@ export default class LeavesModule implements Module {
                 }, 200),
             )
             .on('configReady', (config: Config) => {
-                app.emit('config', 'leaves.enabled', false, true);
+                app.emit('config', 'leaves.on', false, true);
                 app.emit('config', 'leaves.number', this.number, true);
             });
     }

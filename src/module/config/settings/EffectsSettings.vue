@@ -1,13 +1,13 @@
 <template>
     <div>
         <div class="section" :data-title="$t('leaves')">
-            <ToggleSwitch config="leaves.enabled" v-model="leavesEnabled">{{ $t('enabled') }}</ToggleSwitch>
+            <ToggleSwitch config="leaves.on" v-model="leavesEnabled">{{ $t('enabled') }}</ToggleSwitch>
             <Slider int :min="leavesNumberMin" :max="leavesNumberMax" config="leaves.number" v-model="leavesNumber">
                 {{ $t('amount') }}
             </Slider>
         </div>
         <div class="section" :data-title="$t('snow')">
-            <ToggleSwitch config="snow.enabled" v-model="snowEnabled">{{ $t('enabled') }}</ToggleSwitch>
+            <ToggleSwitch config="snow.on" v-model="snowEnabled">{{ $t('enabled') }}</ToggleSwitch>
             <Slider int :min="snowNumberMin" :max="snowNumberMax" config="snow.number" v-model="snowNumber">
                 {{ $t('amount') }}
             </Slider>
