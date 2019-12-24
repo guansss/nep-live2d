@@ -1,6 +1,7 @@
 const fs = require('fs');
 const pickBy = require('lodash/pickBy');
 const projectJSON = require('../assets/project.json');
+const env = require('./load-env')();
 
 function generate(devMode) {
     const locales = readLocales();
@@ -17,6 +18,8 @@ function generate(devMode) {
     }
     if (devMode) {
         projectJSON.title = '[DEV] ' + projectJSON.title;
+    } else if (env.WORKSHOP_ID) {
+        projectJSON['workshopid'] = env.WORKSHOP_ID;
     }
 
     return JSON.stringify(projectJSON);

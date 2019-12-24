@@ -6,7 +6,6 @@ import chalk from 'chalk';
 import loadEnv from './load-env';
 import { generate as generateProjectJSON } from './project-json-generator';
 
-/** @type {ENV} */
 const env = loadEnv();
 
 if (!env) {
