@@ -42,6 +42,15 @@
         "text": "(webm/ogv)",
         "type": "directory",
         "mode": "fetchall"
+      },
+      "volume": {
+        "condition": "false",
+        "max": 10,
+        "min": 0,
+        "order": 999,
+        "text": "A hidden property to retrieve the value from old 1.x versions. Since the configuration mechanism has been changed in 2.0, it's important to preserve the volume to prevent bothering users who have previously muted this wallpaper.",
+        "type": "slider",
+        "value": 0.5
       }
     }
   },

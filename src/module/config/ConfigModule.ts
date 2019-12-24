@@ -68,8 +68,15 @@ export default class ConfigModule implements Module {
         app.addComponent(SettingsPanel, { configModule: this }).then();
         app.addComponent(Overlay, { configModule: this }).then();
 
-        if (localStorage.v !== process.env.VERSION) {
-            app.sticky('init', localStorage.v);
+        const prevVersion = localStorage.v;
+
+        if (prevVersion !== process.env.VERSION) {
+            if (!prevVersion) {
+                // inherit volume from old 1.x versions
+                app.once('we:volume', (value: number) => app.emit('config', 'volume', value / 10));
+            }
+
+            app.sticky('init', prevVersion);
             localStorage.v = process.env.VERSION;
         }
     }
