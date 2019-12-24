@@ -1,10 +1,11 @@
 import { error } from '@/core/utils/log';
 import { clamp } from '@/core/utils/math';
+import { VOLUME } from '@/defaults';
 
 const TAG = 'SoundManager';
 
 export default class SoundManager {
-    private _volume = 0.3;
+    private _volume = VOLUME;
 
     get volume(): number {
         return this._volume;
