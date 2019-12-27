@@ -187,6 +187,7 @@ export default class ConsoleSettings extends Vue {
         border-bottom 1px solid #0001
 
 .error
-    .message
+    td
         color #c0392b
+        font-weight bold
 </style>
