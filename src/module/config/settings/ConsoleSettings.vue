@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import ConsoleSVG from '@/assets/img/console.svg';
-import { log, LogRecord, logs as _logs } from '@/core/utils/log';
+import { error, log, LogRecord, logs as _logs } from '@/core/utils/log';
 import { randomHSLColor } from '@/core/utils/string';
 import ConfigModule from '@/module/config/ConfigModule';
 import LongClickAction from '@/module/config/reusable/LongClickAction.vue';
@@ -105,13 +105,20 @@ export default class ConsoleSettings extends Vue {
     }
 
     runCommand() {
-        const cmd = prompt('Dump result', '');
+        const cmd = prompt('Run command', '');
 
         if (cmd) {
             log('CMD', '> ' + cmd);
 
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval
-            log('CMD', Function('"use strict";return (function(app){return (' + cmd + ')})')()(this.configModule.app));
+            try {
+                log(
+                    'CMD',
+                    Function('"use strict";return (function(app){return (' + cmd + ')})')()(this.configModule.app),
+                );
+            } catch (e) {
+                error('CMD', e);
+            }
         }
     }
 
