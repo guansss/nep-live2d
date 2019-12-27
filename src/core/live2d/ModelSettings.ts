@@ -67,6 +67,7 @@ export default class ModelSettings {
         }
 
         this.copy(cloneWithCamelCase(json));
+        this.adaptLegacy();
         this.convertPaths(basePath);
     }
 
@@ -159,6 +160,36 @@ export default class ModelSettings {
                         });
                 }
             }
+        }
+    }
+
+    /**
+     * Adapt legacy models for version 1.x.
+     */
+    private adaptLegacy() {
+        if (this.pose) {
+            // @ts-ignore
+            this.pose = this.pose.replace(/^\.\/general/, '../general').replace(/^\.\/neptune/, '../neptune');
+        }
+
+        if (this.motions['start_up']) {
+            this.motions['greet'] = this.motions['start_up'];
+            this.motions['greet'].forEach(motionDef => {
+                switch (motionDef.time) {
+                    case -1:
+                        // @ts-ignore
+                        motionDef.season = 'Halloween';
+                        break;
+                    case -2:
+                        // @ts-ignore
+                        motionDef.season = 'Christmas';
+                        break;
+                    case -3:
+                        // @ts-ignore
+                        motionDef.season = 'NewYear';
+                        break;
+                }
+            });
         }
     }
 
