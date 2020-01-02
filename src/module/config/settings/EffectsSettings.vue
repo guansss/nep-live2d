@@ -1,5 +1,8 @@
 <template>
     <div>
+        <div class="section" :data-title="$t('overall')">
+            <ToggleSwitch config="hq" v-model="hq">{{ $t('high_quality') }}</ToggleSwitch>
+        </div>
         <div class="section" :data-title="$t('leaves')">
             <ToggleSwitch config="leaves.on" v-model="leavesEnabled">{{ $t('enabled') }}</ToggleSwitch>
             <Slider int :min="leavesNumberMin" :max="leavesNumberMax" config="leaves.number" v-model="leavesNumber">
@@ -32,6 +35,8 @@ export default class EffectsSettings extends Vue {
     static readonly TITLE = 'effect';
 
     @Prop() readonly configModule!: ConfigModule;
+
+    hq = true;
 
     snowEnabled = false;
     snowNumber = 0;

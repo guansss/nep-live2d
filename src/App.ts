@@ -44,6 +44,8 @@ export class App extends EventEmitter {
                 this.on('we:language', (locale: string) => this.emit('config', 'locale', locale, true));
 
                 this.emit('config', 'fpsMax', Ticker.getMaxFPS(), true);
+
+                this.emit('config', 'hq', HIGH_QUALITY, true);
             });
     }
 

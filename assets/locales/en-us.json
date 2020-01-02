@@ -56,6 +56,8 @@
   "built_in": "Built-in",
   "no_bg_dir": "No directory. Please specify {0} in Wallpaper Engine",
 
+  "overall": "Overall",
+  "high_quality": "High Quality",
   "amount": "Amount",
 
   "cmd": "Command",

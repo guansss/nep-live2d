@@ -92,6 +92,8 @@ export const LIVE2D_SCALE_MAX = 1.5;
 export const FOCUS_TIMEOUT = 2000;
 export const FOCUS_TIMEOUT_MAX = 10000;
 
+export const HIGH_QUALITY = true;
+
 export const SNOW_NUMBER = ~~((innerWidth * innerHeight) / 1000);
 export const SNOW_NUMBER_MIN = 10;
 export const SNOW_NUMBER_MAX = 9999;
