@@ -7,6 +7,8 @@ export interface LogRecord {
     count: number;
 }
 
+const debug = process.env.NODE_ENV !== 'production';
+
 export const logs = (() => {
     const arr: any = [];
     arr.limit = 200;
@@ -14,6 +16,29 @@ export const logs = (() => {
 })() as LogRecord[] & { limit: number };
 
 let lastLog: LogRecord;
+
+const consoleLog = console.log;
+const consoleError = console.error;
+
+// say hello before messing up the native console!
+pixiSayHello('WebGL');
+
+// this can be useful to catch third-party logs
+console.log = (...args: any[]) => log('Log', ...args);
+console.warn = (...args: any[]) => error('Warn', ...args);
+console.error = (...args: any[]) => error('Error', ...args);
+
+window.onerror = (message, source, lineno, colno, err) =>
+    error(
+        'Uncaught',
+        `${err && err.toString()}
+Msg: ${message}
+Src: ${source}
+Ln: ${lineno}
+Col ${colno}`,
+    );
+
+window.onunhandledrejection = (event: PromiseRejectionEvent) => error('Rejection', event.reason);
 
 logs.push = (log: LogRecord) => {
     // when this log is identical to last log, we increase the counter rather than push it to the array
@@ -39,7 +64,7 @@ export function log(tag: string, ...messages: any[]) {
         count: 1,
     });
 
-    consoleLog(`[${tag}]`, ...messages);
+    if (debug) consoleLog(`[${tag}]`, ...messages);
 }
 
 export function error(tag: string, ...messages: any[]) {
@@ -50,28 +75,5 @@ export function error(tag: string, ...messages: any[]) {
         count: 1,
     });
 
-    consoleError(`[${tag}]`, ...messages);
+    if (debug) consoleError(`[${tag}]`, ...messages);
 }
-
-// say hello before messing up the native console!
-pixiSayHello('WebGL');
-
-const consoleLog = console.log;
-const consoleError = console.error;
-
-// this can be useful to catch third-party logs
-console.log = (...args: any[]) => log('Log', ...args);
-console.warn = (...args: any[]) => error('Warn', ...args);
-console.error = (...args: any[]) => error('Error', ...args);
-
-window.onerror = (message, source, lineno, colno, err) =>
-    error(
-        'Uncaught',
-        `${err && err.toString()}
-Msg: ${message}
-Src: ${source}
-Ln: ${lineno}
-Col ${colno}`,
-    );
-
-window.onunhandledrejection = (event: PromiseRejectionEvent) => error('Rejection', event.reason);
