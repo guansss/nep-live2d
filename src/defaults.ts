@@ -90,6 +90,8 @@ export const VOLUME = 0.05;
 export const Z_INDEX_LIVE2D = 100;
 export const Z_INDEX_LEAVES = 120;
 export const Z_INDEX_LEAVES_BACK = 90;
+export const Z_INDEX_SNOW = 110;
+export const Z_INDEX_SNOW_BACK = 80;
 
 export const LIVE2D_DIRECTORY = 'live2d';
 export const LIVE2D_SCALE_MAX = 1.5;

@@ -8,19 +8,38 @@ import { Mesh } from '@pixi/mesh';
 import frag from 'raw-loader!./snow.frag';
 import vert from 'raw-loader!./snow.vert';
 
+const TAG = 'Snow';
+
+export const DEFAULT_OPTIONS = {
+    number: 100,
+    width: 100,
+    height: 100,
+    minSize: 75,
+    maxSize: 150,
+};
+
 export class Wind {
     current = 0;
     force = 0.1;
     target = 0.1;
     min = 0.1;
     max = 0.25;
-    easing = 0.005;
+    easing = 0.003;
+
+    update(dt: DOMHighResTimeStamp) {
+        this.force += (this.target - this.force) * this.easing;
+        this.current += this.force * (dt * 0.2);
+
+        if (Math.random() > 0.995) {
+            this.target = (this.min + Math.random() * (this.max - this.min)) * (Math.random() > 0.5 ? -1 : 1);
+        }
+    }
 }
 
-const TAG = 'Snow';
-
 export default class Snow extends Mesh {
-    wind = new Wind();
+    static wind = new Wind();
+
+    options = DEFAULT_OPTIONS;
 
     private _number: number;
 
@@ -32,11 +51,15 @@ export default class Snow extends Mesh {
     }
 
     set number(value: number) {
-        this._number = value;
-        this.setup();
+        if (value !== this._number) {
+            this._number = value;
+            this.setup();
+        } else {
+            this._number = value;
+        }
     }
 
-    constructor(readonly textureSource: string, width = 100, height = 100, number = 100) {
+    constructor(readonly textureSource: string, options: Partial<typeof DEFAULT_OPTIONS>) {
         super(
             new Geometry()
                 .addAttribute('a_position', Buffer.from([]), 3)
@@ -60,9 +83,11 @@ export default class Snow extends Mesh {
             DRAW_MODES.POINTS,
         );
 
-        this._width = width;
-        this._height = height;
-        this._number = number;
+        Object.assign(this.options, options);
+
+        this._width = this.options.width;
+        this._height = this.options.height;
+        this._number = this.options.number;
 
         this.state.blend = true;
         this.state.blendMode = BLEND_MODES.NORMAL_NPM;
@@ -71,7 +96,7 @@ export default class Snow extends Mesh {
         this.setup();
     }
 
-    protected setup() {
+    setup() {
         const boundWidth = this._width;
         const boundHeight = this._height;
 
@@ -81,7 +106,8 @@ export default class Snow extends Mesh {
         const width = (boundWidth / boundHeight) * height;
         const depth = 80;
 
-        const baseSize = 5000;
+        const maxSize = 5000 * this.options.maxSize;
+        const minSize = 5000 * this.options.minSize;
 
         const position = [];
         const rotation = [];
@@ -111,7 +137,7 @@ export default class Snow extends Mesh {
                 Math.random() * 10,
             ); // x, y, sinusoid
 
-            size.push(baseSize * Math.random());
+            size.push((maxSize - minSize) * Math.random() + minSize);
 
             alpha.push(0.1 + Math.random() * 0.2);
         }
@@ -154,15 +180,7 @@ export default class Snow extends Mesh {
     }
 
     update(dt: DOMHighResTimeStamp, now: DOMHighResTimeStamp) {
-        this.wind.force += (this.wind.target - this.wind.force) * this.wind.easing;
-        this.wind.current += this.wind.force * (dt * 0.2);
-
-        if (Math.random() > 0.995) {
-            this.wind.target =
-                (this.wind.min + Math.random() * (this.wind.max - this.wind.min)) * (Math.random() > 0.5 ? -1 : 1);
-        }
-
         this.shader.uniforms.time = now / 5000;
-        this.shader.uniforms.wind = this.wind.current;
+        this.shader.uniforms.wind = Snow.wind.current;
     }
 }

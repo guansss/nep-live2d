@@ -1,9 +1,13 @@
 import Player from '@/core/mka/Player';
 import Ticker from '@/core/mka/Ticker';
-import { log } from '@/core/utils/log';
+import { error, log } from '@/core/utils/log';
 import { Z_INDEX_LEAVES, Z_INDEX_LEAVES_BACK } from '@/defaults';
 import Leaves, { DEFAULT_OPTIONS as LEAVES_DEFAULT_OPTIONS } from '@/module/leaves/Leaves';
 import { Loader } from '@pixi/loaders';
+
+export interface Loader {
+    on(event: 'error', fn: (e: any, loader: Loader, resources: any) => void): this;
+}
 
 // TODO: Import the JSON and copy related image
 const LEAVES_SOURCE = 'sheet/leaves.json';
@@ -46,7 +50,8 @@ export default class LeavesPlayer extends Player {
                     .add(LEAVES_SOURCE, { crossOrigin: true })
                     .load((loader: Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) => {
                         resolve(Object.values(resources[LEAVES_SOURCE]!.spritesheet!.textures));
-                    });
+                    })
+                    .on('error', e => error(TAG, 'Failed to load texture:', e));
             });
         }
 
@@ -123,10 +128,8 @@ export default class LeavesPlayer extends Player {
     }
 
     private destroyLeaves(leaves: Leaves) {
-        if (this.mka) {
-            if (this.mka.pixiApp.stage.children.includes(leaves)) {
-                this.mka.pixiApp.stage.removeChild(leaves);
-            }
+        if (this.mka && this.mka.pixiApp.stage.children.includes(leaves)) {
+            this.mka.pixiApp.stage.removeChild(leaves);
         }
 
         leaves.destroy();
