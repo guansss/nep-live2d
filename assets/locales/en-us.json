@@ -38,7 +38,7 @@
   "volume": "Volume",
   "show_fps": "Show FPS",
   "max_fps": "Max FPS",
-  "language": "Language",
+  "_ui_language": "UI Language",
 
   "dragging": "Dragging",
   "focus_on_press": "Focus on Press",
@@ -48,6 +48,7 @@
   "details": "Details",
   "model_loading": "Loading...\n\nIf loading never finishes, you can check the logs in console for details.",
   "scale": "Scale",
+  "language": "Language",
 
   "fill_type": "Fill Type",
   "fill": "Fill",

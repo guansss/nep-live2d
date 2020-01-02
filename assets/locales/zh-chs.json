@@ -38,7 +38,7 @@
   "volume": "音量",
   "show_fps": "显示FPS",
   "max_fps": "最大FPS",
-  "language": "语言",
+  "_ui_language": "UI语言",
 
   "dragging": "拖拽",
   "focus_on_press": "按下鼠标跟随",
@@ -48,6 +48,7 @@
   "details": "详情",
   "model_loading": "加载中...\n\n如果无限加载的话，可以通过控制台里的日志来查看详情",
   "scale": "缩放",
+  "language": "语言",
 
   "fill_type": "填充类型",
   "fill": "填充",

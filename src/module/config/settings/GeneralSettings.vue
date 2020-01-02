@@ -39,7 +39,7 @@
                 {{ $t('max_fps') }}
             </Slider>
             <ToggleSwitch config="fps" v-model="showFPS">{{ $t('show_fps') }}</ToggleSwitch>
-            <Select config="locale" v-model="locale" :options="localeOptions">{{ $t('language') }}</Select>
+            <Select config="locale" v-model="locale" :options="localeOptions">{{ $t('_ui_language') }}</Select>
         </div>
     </div>
 </template>
