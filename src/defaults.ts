@@ -1,4 +1,5 @@
 import { isInRange } from '@/core/utils/date';
+import { clamp } from '@/core/utils/math';
 import { Theme, THEME_VERSION } from '@/module/theme/ThemeModule';
 
 export const LOCALE = 'en-us';
@@ -98,10 +99,10 @@ export const FOCUS_TIMEOUT_MAX = 10000;
 
 export const HIGH_QUALITY = true;
 
-export const SNOW_NUMBER = ~~((innerWidth * innerHeight) / 1000);
 export const SNOW_NUMBER_MIN = 10;
 export const SNOW_NUMBER_MAX = 9999;
+export const SNOW_NUMBER = clamp(~~((innerWidth * innerHeight) / 1000), SNOW_NUMBER_MIN, SNOW_NUMBER_MAX);
 
-export const LEAVES_NUMBER = ~~(innerWidth / 10);
 export const LEAVES_NUMBER_MIN = 1;
 export const LEAVES_NUMBER_MAX = 500;
+export const LEAVES_NUMBER = clamp(~~(innerWidth / 10), LEAVES_NUMBER_MIN, LEAVES_NUMBER_MAX);

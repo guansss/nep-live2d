@@ -1,4 +1,5 @@
 import { clamp, rand } from '@/core/utils/math';
+import { LEAVES_NUMBER_MAX } from '@/defaults';
 import { Point } from '@pixi/math';
 import { ParticleContainer } from '@pixi/particles';
 import { Sprite } from '@pixi/sprite';
@@ -18,7 +19,7 @@ export const DEFAULT_OPTIONS = {
     autoFall: true,
 };
 
-const NUMBER_LIMIT = 2000; // don't make too many piece leaves...
+const NUMBER_LIMIT = LEAVES_NUMBER_MAX * 1.2; // don't make too many piece leaves...
 const MAX_ANCHOR_OFFSET = 5;
 const PIECE_RATIO = 0.8;
 const NORMAL_FADING_STEP = 0.02;
@@ -79,21 +80,23 @@ export default class Leaves extends ParticleContainer {
 
     hit(x: number, y: number) {
         const point = new Point(x, y);
+        let hasOneSplit = false;
 
         for (let i = this.children.length - 1, leaf: Leaf; i >= 0; i--) {
             leaf = this.children[i] as Leaf;
 
             if (leaf.alpha > 0) {
-                leaf.updateTransform();
+                if (!leaf.falling) {
+                    leaf.updateTransform();
+                    leaf.falling = leaf.containsPoint(point);
+                } else if (!hasOneSplit && this.children.length < NUMBER_LIMIT) {
+                    leaf.updateTransform();
 
-                if (leaf.containsPoint(point)) {
-                    if (!leaf.falling) {
-                        leaf.falling = true;
-                    } else {
-                        if (this.children.length < NUMBER_LIMIT) {
-                            for (let j = rand(2, Math.max(2, this.options.multiply)); j > 0; j--) {
-                                this.addChild(Leaf.splitFrom(leaf, this));
-                            }
+                    if (leaf.containsPoint(point)) {
+                        hasOneSplit = true;
+
+                        for (let j = rand(2, Math.max(2, this.options.multiply)); j > 0; j--) {
+                            this.addChild(Leaf.splitFrom(leaf, this));
                         }
                     }
                 }
