@@ -2,6 +2,7 @@ import Mka from '@/core/mka/Mka';
 import Ticker from '@/core/mka/Ticker';
 import EventEmitter from '@/core/utils/EventEmitter';
 import { error } from '@/core/utils/log';
+import { HIGH_QUALITY } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import VueApp from '@/VueApp.vue';
 import { Vue, VueConstructor } from 'vue/types/vue';

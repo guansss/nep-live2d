@@ -35,6 +35,8 @@ export default class Mka {
             transparent: true,
         });
 
+        this.pixiApp.stage.sortableChildren = true;
+
         this.rafId = requestAnimationFrame(this.tick);
     }
 

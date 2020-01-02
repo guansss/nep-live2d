@@ -1,5 +1,5 @@
 import { App, Module } from '@/App';
-import { LEAVES_NUMBER } from '@/defaults';
+import { HIGH_QUALITY, LEAVES_NUMBER } from '@/defaults';
 import LeavesPlayer from '@/module/leaves/LeavesPlayer';
 import { Renderer } from '@pixi/core';
 import { Loader } from '@pixi/loaders';
@@ -23,6 +23,7 @@ export default class LeavesModule implements Module {
     player?: LeavesPlayer;
 
     number = LEAVES_NUMBER;
+    highQuality = HIGH_QUALITY;
 
     constructor(readonly app: App) {
         app.on('config:leaves.on', (enabled: boolean) => {
@@ -35,10 +36,13 @@ export default class LeavesModule implements Module {
                 'config:leaves.number',
                 debounce((value: number) => {
                     this.number = value;
-
                     this.player && (this.player.number = value);
                 }, 200),
             )
+            .on('config:hq', (highQuality: boolean) => {
+                this.highQuality = highQuality;
+                this.player && (this.player.layering = highQuality);
+            })
             .on('configReady', (config: Config) => {
                 app.emit('config', 'leaves.on', false, true);
                 app.emit('config', 'leaves.number', this.number, true);
@@ -49,6 +53,7 @@ export default class LeavesModule implements Module {
         if (!this.player) {
             this.player = new LeavesPlayer();
             this.player.number = this.number;
+            this.player.layering = this.highQuality;
 
             this.app.mka.addPlayer('leaves', this.player);
         }

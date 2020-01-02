@@ -1,6 +1,7 @@
 import Mka from '@/core/mka/Mka';
 import Player from '@/core/mka/Player';
 import { clamp } from '@/core/utils/math';
+import { Z_INDEX_LIVE2D } from '@/defaults';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import MouseHandler from '@/module/live2d/MouseHandler';
 import { Container } from '@pixi/display';
@@ -87,6 +88,7 @@ export default class Live2DPlayer extends Player {
             }
         }(MOUSE_HANDLING_ELEMENT);
 
+        this.container.zIndex = Z_INDEX_LIVE2D;
         this.container.sortableChildren = true;
         mka.pixiApp.stage.addChild(this.container);
     }

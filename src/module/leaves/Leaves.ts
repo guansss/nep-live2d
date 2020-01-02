@@ -1,10 +1,9 @@
 import { clamp, rand } from '@/core/utils/math';
-import { Loader } from '@pixi/loaders';
 import { Point } from '@pixi/math';
 import { ParticleContainer } from '@pixi/particles';
 import { Sprite } from '@pixi/sprite';
 
-const DEFAULT_OPTIONS = {
+export const DEFAULT_OPTIONS = {
     number: 50,
     width: 500,
     height: 500,
@@ -43,31 +42,20 @@ export default class Leaves extends ParticleContainer {
 
     options = DEFAULT_OPTIONS;
 
-    texture?: PIXI.Texture; // texture of the sprite sheet
-    textures: PIXI.Texture[] = [];
-
     leaves: Leaf[] = [];
 
     nextFallTime = performance.now();
 
-    constructor(sheetSource: string, options: Partial<typeof DEFAULT_OPTIONS>) {
+    constructor(readonly textures: PIXI.Texture[], options: Partial<typeof DEFAULT_OPTIONS>) {
         super(NUMBER_LIMIT, { vertices: true, rotation: true, tint: true });
-
-        new Loader()
-            .add(sheetSource, { crossOrigin: true })
-            .load((loader: Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) => {
-                if (!this._destroyed) {
-                    this.texture = resources[sheetSource]!.children[0].texture;
-                    this.textures = Object.values(resources[sheetSource]!.spritesheet!.textures);
-                    this.updateLeaves();
-                }
-            });
 
         Object.assign(this.options, options);
 
         this._width = this.options.width;
         this._height = this.options.height;
         this._number = this.options.number;
+
+        this.updateLeaves();
     }
 
     updateLeaves() {
@@ -127,7 +115,7 @@ export default class Leaves extends ParticleContainer {
              *    |
              *  1 |_     _______     ______
              *    | \   /       \   /                  sin(t) - 0.4 + |sin(t) - 0.4|
-             *    |  '-'         '-'               1 - -----------------------------
+             *    |  '-'         '-'               1 - _____________________________
              *  0 |___________________________                      2
              */
 
@@ -189,12 +177,11 @@ export default class Leaves extends ParticleContainer {
         this._bounds.addFrame(this.transform, 0, 0, this._width, this._height);
     }
 
-    destroy() {
-        super.destroy();
-
-        // manually destroy textures, otherwise Pixi will warn that it's already in cache when loading same sprite sheet again
-        this.texture && this.texture.destroy(true);
-        this.textures.forEach(texture => texture.destroy());
+    clone() {
+        return new Leaves(this.textures, {
+            ...this.options,
+            number: this._number,
+        });
     }
 }
 
@@ -275,10 +262,10 @@ class Leaf extends Sprite {
          * Offset to correct position by the new transform.
          *
          *            w
-         * originX = --- * [(ax' - 0.5) * R - (ax - 0.5)]
+         * originX = ___ * [(ax' - 0.5) * R - (ax - 0.5)]
          *            R
          *                               ax - 0.5
-         *         = w * [(ax' - 0.5) - ----------]
+         *         = w * [(ax' - 0.5) - __________]
          *                                  R
          *
          * ax' = piece.anchor.x
