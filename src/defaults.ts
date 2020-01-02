@@ -103,7 +103,7 @@ export const HIGH_QUALITY = true;
 
 export const SNOW_NUMBER_MIN = 10;
 export const SNOW_NUMBER_MAX = 9999;
-export const SNOW_NUMBER = clamp(~~((innerWidth * innerHeight) / 1000), SNOW_NUMBER_MIN, SNOW_NUMBER_MAX);
+export const SNOW_NUMBER = clamp(~~((innerWidth * innerHeight) / 2000), SNOW_NUMBER_MIN, SNOW_NUMBER_MAX);
 
 export const LEAVES_NUMBER_MIN = 1;
 export const LEAVES_NUMBER_MAX = 500;

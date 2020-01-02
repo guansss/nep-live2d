@@ -22,8 +22,8 @@ export class Wind {
     current = 0;
     force = 0.1;
     target = 0.1;
-    min = 0.1;
-    max = 0.25;
+    min = 0.02;
+    max = 0.2;
     easing = 0.003;
 
     update(dt: DOMHighResTimeStamp) {
@@ -132,8 +132,8 @@ export default class Snow extends Mesh {
 
             // prettier-ignore
             speed.push(
-                1 + Math.random(),
-                1 + Math.random(),
+                0.7 + Math.random(),
+                0.7 + Math.random(),
                 Math.random() * 10,
             ); // x, y, sinusoid
 
