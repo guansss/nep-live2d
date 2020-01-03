@@ -23,7 +23,7 @@ export default class SnowPlayer extends Player {
 
     set number(value: number) {
         this._number = value;
-        this.snow && (this.snow.number = value);
+        this.setup();
     }
 
     get layering() {
@@ -55,6 +55,8 @@ export default class SnowPlayer extends Player {
                 this.snow.options.maxSize = MAX_SIZE;
                 this.snow.setup();
             }
+
+            this.backSnow.number = this.snow.number;
         } else {
             this.snow.number = this._number;
 
