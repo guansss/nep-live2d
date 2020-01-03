@@ -147,6 +147,7 @@ export default class LeavesPlayer extends Player {
     }
 
     enable() {
+        this.mka && this.mka!.pixiApp.stage.on('hit', this.hit, this);
         this.setup().then();
     }
 
