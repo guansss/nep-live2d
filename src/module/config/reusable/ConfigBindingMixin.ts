@@ -12,9 +12,9 @@ export default class ConfigBindingMixin extends Vue {
     readonly value!: any;
 
     created() {
-        const configModule = (this.$parent as SettingsComponent).configModule!;
-
         if (this.config) {
+            const configModule = (this.$parent as SettingsComponent).configModule!;
+
             this.updateValue(configModule.getConfig(this.config, this.value));
 
             configModule.app.on('config:' + this.config, this.updateValue, this);

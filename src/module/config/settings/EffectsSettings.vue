@@ -20,7 +20,14 @@
 
 <script lang="ts">
 import FlareSVG from '@/assets/img/flare.svg';
-import { LEAVES_NUMBER_MAX, LEAVES_NUMBER_MIN, SNOW_NUMBER_MAX, SNOW_NUMBER_MIN } from '@/defaults';
+import {
+    LEAVES_NUMBER,
+    LEAVES_NUMBER_MAX,
+    LEAVES_NUMBER_MIN,
+    SNOW_NUMBER,
+    SNOW_NUMBER_MAX,
+    SNOW_NUMBER_MIN,
+} from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import Slider from '@/module/config/reusable/Slider.vue';
 import ToggleSwitch from '@/module/config/reusable/ToggleSwitch.vue';
@@ -39,12 +46,12 @@ export default class EffectsSettings extends Vue {
     hq = true;
 
     snowEnabled = false;
-    snowNumber = 0;
+    snowNumber = SNOW_NUMBER;
     snowNumberMin = SNOW_NUMBER_MIN;
     snowNumberMax = SNOW_NUMBER_MAX;
 
     leavesEnabled = false;
-    leavesNumber = 0;
+    leavesNumber = LEAVES_NUMBER;
     leavesNumberMin = LEAVES_NUMBER_MIN;
     leavesNumberMax = LEAVES_NUMBER_MAX;
 }
