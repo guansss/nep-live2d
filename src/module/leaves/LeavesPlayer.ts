@@ -71,12 +71,14 @@ export default class LeavesPlayer extends Player {
         }
 
         if (this._layering) {
-            this.leaves.number = ~~(this._number / 2);
+            this.leaves.number = Math.ceil(this._number / 2);
 
             if (!this.backLeaves) {
                 this.backLeaves = this.leaves.clone();
                 this.backLeaves.zIndex = Z_INDEX_LEAVES_BACK;
             }
+
+            this.backLeaves.number = this.leaves.number;
         } else {
             this.leaves.number = this._number;
 

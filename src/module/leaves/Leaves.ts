@@ -61,7 +61,8 @@ export default class Leaves extends ParticleContainer {
 
     updateLeaves() {
         const texturesNumber = this.textures.length;
-        const delta = this._number - this.leaves.length;
+        const normalLeavesNumber = this.leaves.reduce((sum, leaf) => (leaf.piece ? sum : sum + 1), 0);
+        let delta = this._number - normalLeavesNumber;
 
         if (texturesNumber === 0 || delta === 0) return;
 
@@ -73,7 +74,25 @@ export default class Leaves extends ParticleContainer {
                 this.addChild(leaf);
             }
         } else {
-            const removed = this.leaves.splice(delta);
+            let removed: Leaf[] = [];
+            let start = 0;
+            let loops = 0; // don't bring me troubles...
+
+            while (delta < 0) {
+                let end = start;
+
+                while (delta < 0 && this.leaves[end] && !this.leaves[end].piece) {
+                    delta++;
+                    end++;
+                }
+
+                removed = removed.concat(this.leaves.splice(start, end - start));
+
+                start++;
+
+                if (start >= this.leaves.length || loops++ > 20) break;
+            }
+
             this.removeChild(...removed);
         }
     }
