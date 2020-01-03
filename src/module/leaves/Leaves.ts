@@ -8,7 +8,7 @@ export const DEFAULT_OPTIONS = {
     number: 50,
     width: 500,
     height: 500,
-    minSize: 75,
+    minSize: 90,
     maxSize: 150,
     g: 0.0001, // gravity, pixel/ms^2
     minSpeed: 0.1,
@@ -245,6 +245,7 @@ class Leaf extends Sprite {
         this.y = rand(-0.3, 0.3) * this.height;
         this.vy = 0;
         this.alpha = 0;
+        this.fadingStep = NORMAL_FADING_STEP;
 
         this.rotation = this.direction * rand(0, Math.PI / 3);
     }
