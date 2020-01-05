@@ -2,7 +2,7 @@ import Mka from '@/core/mka/Mka';
 import Ticker from '@/core/mka/Ticker';
 import EventEmitter from '@/core/utils/EventEmitter';
 import { error } from '@/core/utils/log';
-import { HIGH_QUALITY } from '@/defaults';
+import { FPS_MAX, HIGH_QUALITY } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import VueApp from '@/VueApp.vue';
 import { Vue, VueConstructor } from 'vue/types/vue';
@@ -44,7 +44,7 @@ export class App extends EventEmitter {
             .on('configReady', (config: Config) => {
                 this.on('we:language', (locale: string) => this.emit('config', 'locale', locale, true));
 
-                this.emit('config', 'fpsMax', Ticker.getMaxFPS(), true);
+                this.emit('config', 'fpsMax', FPS_MAX, true);
 
                 this.emit('config', 'hq', HIGH_QUALITY, true);
             });
