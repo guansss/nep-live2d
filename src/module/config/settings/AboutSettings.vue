@@ -3,7 +3,7 @@
         <div class="headline" @click="++counter > 2 ? ($event.target.dataset.alt = 'Weeb Live2D') : 0">{{ title }}</div>
         <div class="subtitle">{{ $t('subtitle') }}</div>
         <div>
-            <span class="badge">{{ ver }}</span>
+            <span class="badge">v{{ ver }}</span>
             <span class="badge" data-title="/guansss/nep-live2d">Now on Github</span>
         </div>
 
