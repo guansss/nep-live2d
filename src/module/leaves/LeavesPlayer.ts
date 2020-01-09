@@ -12,6 +12,9 @@ export interface Loader {
 // TODO: Import the JSON and copy related image
 const LEAVES_SOURCE = 'sheet/leaves.json';
 
+const LEAF_SIZE_MIN = 10 * (innerWidth / 2560);
+const LEAF_SIZE_MAX = 100 * (innerWidth / 2560);
+
 const TAG = 'LeavesPlayer';
 
 export default class LeavesPlayer extends Player {
@@ -123,9 +126,10 @@ export default class LeavesPlayer extends Player {
         return new Leaves(textures, {
             width,
             height,
-            minSize: 10,
-            maxSize: 100,
+            minSize: LEAF_SIZE_MIN,
+            maxSize: LEAF_SIZE_MAX,
             number: this._number,
+            multiply: 5,
         });
     }
 
