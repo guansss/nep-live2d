@@ -32,6 +32,7 @@ export default class Slider extends Mixins(ConfigBindingMixin) {
     @Prop({ default: 0, type: Number }) readonly min!: number;
     @Prop({ default: 0, type: Number }) readonly step!: number;
     @Prop({ default: false, type: Boolean }) readonly int!: boolean;
+    @Prop({ default: false, type: Boolean }) readonly inverse!: boolean;
     @Prop({ default: false, type: Boolean }) readonly progress!: boolean;
     @Prop({ default: false, type: Boolean }) readonly overlay!: boolean;
 
@@ -47,7 +48,7 @@ export default class Slider extends Mixins(ConfigBindingMixin) {
     get position() {
         // must access dependencies explicitly
         // @see http://optimizely.github.io/vuejs.org/guide/computed.html
-        const fraction = (this.value - this.min) / (this.max - this.min);
+        const fraction = (this.offsetValue - this.min) / (this.max - this.min);
 
         // a flag to force re-computation of the computed property
         // noinspection BadExpressionStatementJS
@@ -56,9 +57,14 @@ export default class Slider extends Mixins(ConfigBindingMixin) {
         return this.domReady ? fraction * (this.track.offsetWidth - this.thumb.offsetWidth) + 'px' : '0px';
     }
 
+    get offsetValue() {
+        const sum = this.min + this.max;
+        return this.inverse ? sum - this.value : this.value;
+    }
+
     get displayValue() {
         // keep at most 2 decimals
-        return Math.round(this.value * 100) / 100;
+        return Math.round(this.offsetValue * 100) / 100;
     }
 
     mounted() {
@@ -97,14 +103,22 @@ export default class Slider extends Mixins(ConfigBindingMixin) {
         draggableTrack.onDrag = draggableOverlay.onDrag = (e: MouseEvent) => {
             const trackWidth = this.track.offsetWidth - this.thumb.offsetWidth;
 
-            const value =
+            let value =
                 (clamp(e.clientX - mouseOffsetX, 0, trackWidth) / trackWidth) * (this.max - this.min) + this.min;
 
-            const snappedValue =
-                this.step === 0 || value === this.max ? value : value - ((value - this.min) % this.step);
+            // snap the value
+            value = this.step === 0 || value === this.max ? value : value - ((value - this.min) % this.step);
 
-            if (snappedValue !== this.value) {
-                this.updateValue(this.int ? ~~snappedValue : snappedValue);
+            if (value !== this.offsetValue) {
+                if (this.int) {
+                    value = ~~value;
+                }
+
+                if (this.inverse) {
+                    value = this.min + this.max - value;
+                }
+
+                this.updateValue(value);
             }
 
             return true;

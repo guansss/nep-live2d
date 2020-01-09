@@ -59,6 +59,7 @@
   "overall": "综合",
   "high_quality": "高品质",
   "amount": "数量",
+  "drop_rate": "掉落速率",
 
   "cmd": "命令",
   "dump_logs": "导出日志",

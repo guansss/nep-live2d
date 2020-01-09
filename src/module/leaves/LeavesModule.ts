@@ -1,5 +1,5 @@
 import { App, Module } from '@/App';
-import { HIGH_QUALITY, LEAVES_NUMBER } from '@/defaults';
+import { HIGH_QUALITY, LEAVES_DROP_RATE, LEAVES_NUMBER } from '@/defaults';
 import LeavesPlayer from '@/module/leaves/LeavesPlayer';
 import { Renderer } from '@pixi/core';
 import { Loader } from '@pixi/loaders';
@@ -23,6 +23,7 @@ export default class LeavesModule implements Module {
     player?: LeavesPlayer;
 
     number = LEAVES_NUMBER;
+    dropRate = LEAVES_NUMBER;
     highQuality = HIGH_QUALITY;
 
     constructor(readonly app: App) {
@@ -39,6 +40,10 @@ export default class LeavesModule implements Module {
                     this.player && (this.player.number = value);
                 }, 200),
             )
+            .on('config:leaves.rate', (value: number) => {
+                this.dropRate = value;
+                this.player && (this.player.dropRate = value);
+            })
             .on('config:hq', (highQuality: boolean) => {
                 this.highQuality = highQuality;
                 this.player && (this.player.layering = highQuality);
@@ -46,6 +51,7 @@ export default class LeavesModule implements Module {
             .on('configReady', (config: Config) => {
                 app.emit('config', 'leaves.on', false, true);
                 app.emit('config', 'leaves.number', this.number, true);
+                app.emit('config', 'leaves.rate', LEAVES_DROP_RATE, true);
             });
     }
 
@@ -53,6 +59,7 @@ export default class LeavesModule implements Module {
         if (!this.player) {
             this.player = new LeavesPlayer();
             this.player.number = this.number;
+            this.player.dropRate = this.dropRate;
             this.player.layering = this.highQuality;
 
             this.app.mka.addPlayer('leaves', this.player);

@@ -116,7 +116,7 @@ export default class Leaves extends ParticleContainer {
             // TODO: relate to wind force
 
             /*
-             * make a variant of sine wave!
+             * make a variant of sinusoid!
              *
              *    |
              *  1 |_     _______     ______

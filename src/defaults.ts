@@ -108,3 +108,6 @@ export const SNOW_NUMBER = clamp(~~((innerWidth * innerHeight) / 2000), SNOW_NUM
 export const LEAVES_NUMBER_MIN = 1;
 export const LEAVES_NUMBER_MAX = 500;
 export const LEAVES_NUMBER = clamp(~~(innerWidth / 10), LEAVES_NUMBER_MIN, LEAVES_NUMBER_MAX);
+export const LEAVES_DROP_RATE_MIN = 500;
+export const LEAVES_DROP_RATE_MAX = 8000;
+export const LEAVES_DROP_RATE = 2000;

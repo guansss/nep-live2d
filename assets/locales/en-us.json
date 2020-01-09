@@ -59,6 +59,7 @@
   "overall": "Overall",
   "high_quality": "High Quality",
   "amount": "Amount",
+  "drop_rate": "Drop Rate",
 
   "cmd": "Command",
   "dump_logs": "Dump Logs",

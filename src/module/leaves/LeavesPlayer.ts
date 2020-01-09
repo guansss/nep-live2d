@@ -1,7 +1,7 @@
 import Player from '@/core/mka/Player';
 import Ticker from '@/core/mka/Ticker';
 import { error, log } from '@/core/utils/log';
-import { Z_INDEX_LEAVES, Z_INDEX_LEAVES_BACK } from '@/defaults';
+import { LEAVES_DROP_RATE, Z_INDEX_LEAVES, Z_INDEX_LEAVES_BACK } from '@/defaults';
 import Leaves, { DEFAULT_OPTIONS as LEAVES_DEFAULT_OPTIONS } from '@/module/leaves/Leaves';
 import { Loader } from '@pixi/loaders';
 
@@ -23,8 +23,18 @@ export default class LeavesPlayer extends Player {
 
     private textureLoadingPromise?: Promise<PIXI.Texture[]>;
 
-    private _number = LEAVES_DEFAULT_OPTIONS.number;
     private _layering = false;
+    private _number = LEAVES_DEFAULT_OPTIONS.number;
+    private _dropRate = LEAVES_DROP_RATE;
+
+    get layering() {
+        return this._layering;
+    }
+
+    set layering(value: boolean) {
+        this._layering = value;
+        this.setup().then();
+    }
 
     get number() {
         return this._number;
@@ -35,12 +45,12 @@ export default class LeavesPlayer extends Player {
         this.setup().then();
     }
 
-    get layering() {
-        return this._layering;
+    get dropRate() {
+        return this._dropRate;
     }
 
-    set layering(value: boolean) {
-        this._layering = value;
+    set dropRate(value: number) {
+        this._dropRate = value;
         this.setup().then();
     }
 
@@ -73,6 +83,10 @@ export default class LeavesPlayer extends Player {
             this.leaves.zIndex = Z_INDEX_LEAVES;
         }
 
+        console.warn(this._dropRate);
+        this.leaves.options.minDropRate = this._dropRate;
+        this.leaves.options.dropInterval = this._dropRate * 2.5;
+
         if (this._layering) {
             this.leaves.number = Math.ceil(this._number / 2);
 
@@ -82,6 +96,8 @@ export default class LeavesPlayer extends Player {
             }
 
             this.backLeaves.number = this.leaves.number;
+            this.backLeaves.options.minDropRate = this._dropRate;
+            this.backLeaves.options.dropInterval = this._dropRate * 2.5;
         } else {
             this.leaves.number = this._number;
 

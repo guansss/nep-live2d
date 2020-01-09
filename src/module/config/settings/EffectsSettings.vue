@@ -8,6 +8,9 @@
             <Slider int :min="leavesNumberMin" :max="leavesNumberMax" config="leaves.number" v-model="leavesNumber">
                 {{ $t('amount') }}
             </Slider>
+            <Slider int inverse :min="leavesRateMin" :max="leavesRateMax" config="leaves.rate" v-model="leavesRate">
+                {{ $t('drop_rate') }}
+            </Slider>
         </div>
         <div class="section" :data-title="$t('snow')">
             <ToggleSwitch config="snow.on" v-model="snowEnabled">{{ $t('enabled') }}</ToggleSwitch>
@@ -21,6 +24,9 @@
 <script lang="ts">
 import FlareSVG from '@/assets/img/flare.svg';
 import {
+    LEAVES_DROP_RATE,
+    LEAVES_DROP_RATE_MAX,
+    LEAVES_DROP_RATE_MIN,
     LEAVES_NUMBER,
     LEAVES_NUMBER_MAX,
     LEAVES_NUMBER_MIN,
@@ -54,6 +60,9 @@ export default class EffectsSettings extends Vue {
     leavesNumber = LEAVES_NUMBER;
     leavesNumberMin = LEAVES_NUMBER_MIN;
     leavesNumberMax = LEAVES_NUMBER_MAX;
+    leavesRate = LEAVES_DROP_RATE;
+    leavesRateMin = LEAVES_DROP_RATE_MIN;
+    leavesRateMax = LEAVES_DROP_RATE_MAX;
 }
 </script>
 
