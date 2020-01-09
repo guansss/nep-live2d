@@ -61,38 +61,19 @@ export default class Leaves extends ParticleContainer {
 
     updateLeaves() {
         const texturesNumber = this.textures.length;
-        const normalLeavesNumber = this.leaves.reduce((sum, leaf) => (leaf.piece ? sum : sum + 1), 0);
-        let delta = this._number - normalLeavesNumber;
+        const delta = this._number - this.leaves.length;
 
         if (texturesNumber === 0 || delta === 0) return;
 
         if (delta >= 0) {
             for (let i = 0, leaf; i < delta; i++) {
-                leaf = new Leaf(this.textures[~~rand(0, texturesNumber)], this, this.options);
+                leaf = new Leaf(this.textures[~~rand(0, texturesNumber)], this._width, this._height, this.options);
 
                 this.leaves.push(leaf);
                 this.addChild(leaf);
             }
         } else {
-            let removed: Leaf[] = [];
-            let start = 0;
-            let loops = 0; // don't bring me troubles...
-
-            while (delta < 0) {
-                let end = start;
-
-                while (delta < 0 && this.leaves[end] && !this.leaves[end].piece) {
-                    delta++;
-                    end++;
-                }
-
-                removed = removed.concat(this.leaves.splice(start, end - start));
-
-                start++;
-
-                if (start >= this.leaves.length || loops++ > 20) break;
-            }
-
+            const removed = this.leaves.splice(delta);
             this.removeChild(...removed);
         }
     }
@@ -118,7 +99,7 @@ export default class Leaves extends ParticleContainer {
                         hasOneSplit = true;
 
                         for (let j = rand(2, Math.max(2, this.options.multiply)); j > 0; j--) {
-                            this.addChild(Leaf.splitFrom(leaf, this));
+                            this.addChild(Leaf.splitFrom(leaf, this._width, this._height));
                         }
                     }
                 }
@@ -181,7 +162,7 @@ export default class Leaves extends ParticleContainer {
                     removals.push(leaf);
                 } else {
                     // reset normal leaves to top when they fall to ground
-                    leaf.reset(this);
+                    leaf.reset(this._width);
                 }
             } else if (shouldFall) {
                 // drop at most one leaf at a time
@@ -227,7 +208,12 @@ class Leaf extends Sprite {
     rotationSpeed = this.direction * rand(0.0002, 0.0005);
     fadingStep = NORMAL_FADING_STEP;
 
-    constructor(texture: PIXI.Texture, container: PIXI.Container, readonly options: typeof DEFAULT_OPTIONS) {
+    constructor(
+        texture: PIXI.Texture,
+        containerWidth: number,
+        containerHeight: number,
+        readonly options: typeof DEFAULT_OPTIONS,
+    ) {
         super(texture);
 
         const size = ~~rand(options.minSize, options.maxSize);
@@ -235,16 +221,16 @@ class Leaf extends Sprite {
         this.height = size;
 
         this.anchor.set(0.5, 0.5);
-        this.maxY = container.height + size * 0.5;
+        this.maxY = containerHeight + size * 0.5;
         this.maxSpeed = rand(options.minSpeed, options.maxSpeed);
 
-        this.reset(container);
+        this.reset(containerWidth);
     }
 
-    reset(container: PIXI.Container) {
+    reset(containerWidth: number) {
         this.falling = false;
         this.split = false;
-        this.x = rand(0, container.width);
+        this.x = rand(0, containerWidth);
         this.y = rand(-0.3, 0.3) * this.height;
         this.vy = 0;
         this.alpha = 0;
@@ -253,11 +239,11 @@ class Leaf extends Sprite {
         this.rotation = this.direction * rand(0, Math.PI / 3);
     }
 
-    static splitFrom(leaf: Leaf, container: PIXI.Container) {
+    static splitFrom(leaf: Leaf, containerWidth: number, containerHeight: number) {
         leaf.split = true;
         leaf.fadingStep = -SPLIT_FADING_STEP; // prepare to fade out
 
-        const piece = new Leaf(leaf.texture, container, leaf.options);
+        const piece = new Leaf(leaf.texture, containerWidth, containerHeight, leaf.options);
 
         piece.piece = true;
         piece.falling = true;
@@ -282,7 +268,7 @@ class Leaf extends Sprite {
          *
          * But using `MAX_ANCHOR_OFFSET` is faster and the error can be just ignored
          */
-        piece.maxY = container.height + piece.height * MAX_ANCHOR_OFFSET;
+        piece.maxY = containerHeight + piece.height * MAX_ANCHOR_OFFSET;
 
         /*
          * Offset to correct position by the new transform.
