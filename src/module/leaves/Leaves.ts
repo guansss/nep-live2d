@@ -289,7 +289,7 @@ class Leaf extends Sprite {
         );
         piece.toGlobal(origin, piece.position);
 
-        piece.rotationSpeed = clamp(leaf.rotationSpeed * 3, -0.01, 0.01);
+        piece.rotationSpeed = clamp(leaf.rotationSpeed, -0.003, 0.003) * rand(2, 3);
         piece.maxRotation = Infinity;
 
         return piece;
