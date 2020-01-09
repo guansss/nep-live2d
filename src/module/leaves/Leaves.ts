@@ -107,7 +107,10 @@ export default class Leaves extends ParticleContainer {
             if (leaf.alpha > 0) {
                 if (!leaf.falling) {
                     leaf.updateTransform();
-                    leaf.falling = leaf.containsPoint(point);
+
+                    if (leaf.containsPoint(point)) {
+                        leaf.falling = true;
+                    }
                 } else if (!hasOneSplit && this.children.length < NUMBER_LIMIT) {
                     leaf.updateTransform();
 
