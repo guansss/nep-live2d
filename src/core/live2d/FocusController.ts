@@ -1,7 +1,6 @@
 const EPSILON = 0.01; // Minimum distance to respond
 
-const FRAME_RATE = 60;
-const MAX_SPEED = 40 / 7.5 / FRAME_RATE;
+const MAX_SPEED = 40 / 7.5;
 const ACCELERATION_TIME = 1 / (0.15 * 1000);
 
 export default class FocusController {
@@ -28,12 +27,13 @@ export default class FocusController {
         if (Math.abs(dx) < EPSILON && Math.abs(dy) < EPSILON) return;
 
         const d = Math.sqrt(dx ** 2 + dy ** 2);
+        const maxSpeed = MAX_SPEED / (1000 / dt);
 
-        let ax = MAX_SPEED * (dx / d) - this.vx;
-        let ay = MAX_SPEED * (dy / d) - this.vy;
+        let ax = maxSpeed * (dx / d) - this.vx;
+        let ay = maxSpeed * (dy / d) - this.vy;
 
         const a = Math.sqrt(ax ** 2 + ay ** 2);
-        const maxA = MAX_SPEED * ACCELERATION_TIME * dt;
+        const maxA = maxSpeed * ACCELERATION_TIME * dt;
 
         if (a > maxA) {
             ax *= maxA / a;
