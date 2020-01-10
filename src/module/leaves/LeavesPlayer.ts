@@ -12,8 +12,8 @@ export interface Loader {
 // TODO: Import the JSON and copy related image
 const LEAVES_SOURCE = 'sheet/leaves.json';
 
-const LEAF_SIZE_MIN = 10 * (innerWidth / 2560);
-const LEAF_SIZE_MAX = 100 * (innerWidth / 2560);
+const LEAF_SIZE_MIN = 10 * (innerHeight / 1440);
+const LEAF_SIZE_MAX = 100 * (innerHeight / 1440);
 
 const TAG = 'LeavesPlayer';
 
