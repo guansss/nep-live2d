@@ -162,7 +162,7 @@ export default class Live2DModel {
         model.addToParamFloat('PARAM_BODY_ANGLE_X', focusX * 10 + 4 * Math.sin(t / 15.5345) * 0.5);
         model.setParamFloat('PARAM_BREATH', 0.5 + 0.5 * Math.sin(t / 3.2345));
 
-        this.physics && this.physics.update(dt);
+        this.physics && this.physics.update(now);
         this.pose && this.pose.update(dt);
 
         model.update();

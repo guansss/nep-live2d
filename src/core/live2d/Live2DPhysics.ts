@@ -40,8 +40,6 @@ export default class Live2DPhysics {
 
     physicsHairs: PhysicsHair[] = [];
 
-    time: DOMHighResTimeStamp = 0;
-
     constructor(internalModel: Live2DModelWebGL, json: any) {
         this.internalModel = internalModel;
 
@@ -72,8 +70,7 @@ export default class Live2DPhysics {
         }
     }
 
-    update(dt: DOMHighResTimeStamp) {
-        this.time += dt;
-        this.physicsHairs.forEach(physicsHair => physicsHair.update(this.internalModel, this.time));
+    update(elapsed: DOMHighResTimeStamp) {
+        this.physicsHairs.forEach(physicsHair => physicsHair.update(this.internalModel, elapsed));
     }
 }
