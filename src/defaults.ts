@@ -1,8 +1,10 @@
 import { isInRange } from '@/core/utils/date';
 import { clamp } from '@/core/utils/math';
 import { Theme, THEME_VERSION } from '@/module/theme/ThemeModule';
+import VueI18n from 'vue-i18n';
 
 export const LOCALE = 'en-us';
+export const I18N = (process.env.I18N as any) as VueI18n.LocaleMessages;
 
 interface Season {
     active: boolean;

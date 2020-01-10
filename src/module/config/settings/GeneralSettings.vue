@@ -50,7 +50,7 @@ import PlusSVG from '@/assets/img/plus.svg';
 import SettingsSVG from '@/assets/img/settings.svg';
 import ShapeSVG from '@/assets/img/shape.svg';
 import { error } from '@/core/utils/log';
-import { FPS_MAX, FPS_MAX_LIMIT, LOCALE, THEME_CUSTOM_OFFSET, THEMES } from '@/defaults';
+import { FPS_MAX, FPS_MAX_LIMIT, I18N, LOCALE, THEME_CUSTOM_OFFSET, THEMES } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import LongClickAction from '@/module/config/reusable/LongClickAction.vue';
 import Select from '@/module/config/reusable/Select.vue';
@@ -85,12 +85,10 @@ export default class GeneralSettings extends Vue {
     maxFPSLimit = FPS_MAX_LIMIT;
 
     locale = LOCALE;
-    localeOptions = Object.entries((process.env.I18N as any) as Record<string, { language_name: string }>).map(
-        ([locale, language]) => ({
-            text: `${language.language_name} (${locale})`,
-            value: locale,
-        }),
-    );
+    localeOptions = Object.entries(I18N).map(([locale, language]) => ({
+        text: `${language.language_name} (${locale})`,
+        value: locale,
+    }));
 
     get selectedTheme() {
         return this.selectedThemeIndex < THEME_CUSTOM_OFFSET
