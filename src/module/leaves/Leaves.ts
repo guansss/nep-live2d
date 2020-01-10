@@ -21,9 +21,10 @@ export const DEFAULT_OPTIONS = {
 
 const NUMBER_LIMIT = LEAVES_NUMBER_MAX * 1.2; // don't make too many piece leaves...
 const MAX_ANCHOR_OFFSET = 5;
-const PIECE_RATIO = 0.8;
-const NORMAL_FADING_STEP = 0.02;
-const SPLIT_FADING_STEP = 0.1;
+const PIECE_RATIO_MAX = 0.9;
+const PIECE_RATIO_MIN = 0.7;
+const FADING_STEP_NORMAL = 0.02;
+const FADING_STEP_SPLIT = 0.1;
 
 export default class Leaves extends ParticleContainer {
     private _number: number;
@@ -206,7 +207,7 @@ class Leaf extends Sprite {
 
     direction: -1 | 1 = Math.random() > 0.5 ? 1 : -1;
     rotationSpeed = this.direction * rand(0.0002, 0.0005);
-    fadingStep = NORMAL_FADING_STEP;
+    fadingStep = FADING_STEP_NORMAL;
 
     constructor(
         texture: PIXI.Texture,
@@ -234,25 +235,27 @@ class Leaf extends Sprite {
         this.y = rand(-0.3, 0.3) * this.height;
         this.vy = 0;
         this.alpha = 0;
-        this.fadingStep = NORMAL_FADING_STEP;
+        this.fadingStep = FADING_STEP_NORMAL;
 
         this.rotation = this.direction * rand(0, Math.PI / 3);
     }
 
     static splitFrom(leaf: Leaf, containerWidth: number, containerHeight: number) {
         leaf.split = true;
-        leaf.fadingStep = -SPLIT_FADING_STEP; // prepare to fade out
+        leaf.fadingStep = -FADING_STEP_SPLIT; // prepare to fade out
 
         const piece = new Leaf(leaf.texture, containerWidth, containerHeight, leaf.options);
 
         piece.piece = true;
         piece.falling = true;
 
+        const ratio = rand(PIECE_RATIO_MIN, PIECE_RATIO_MAX);
+        piece.width = leaf.width * ratio;
+        piece.height = leaf.height * ratio;
+
         piece.vy = leaf.vy * 1.5;
-        piece.width = leaf.width * PIECE_RATIO;
-        piece.height = leaf.height * PIECE_RATIO;
         piece.rotation = leaf.rotation;
-        piece.fadingStep = SPLIT_FADING_STEP;
+        piece.fadingStep = FADING_STEP_SPLIT;
 
         const ax = rand(-MAX_ANCHOR_OFFSET, MAX_ANCHOR_OFFSET);
         const ay = rand(-MAX_ANCHOR_OFFSET, MAX_ANCHOR_OFFSET);
@@ -284,8 +287,8 @@ class Leaf extends Sprite {
          * ax  = leaf.anchor.x
          */
         const origin = new Point(
-            piece.texture.width * (ax - 0.5 - (leaf.anchor.x - 0.5) / PIECE_RATIO),
-            piece.texture.height * (ay - 0.5 - (leaf.anchor.y - 0.5) / PIECE_RATIO),
+            piece.texture.width * (ax - 0.5 - (leaf.anchor.x - 0.5) / ratio) * rand(0.9, 1.1),
+            piece.texture.height * (ay - 0.5 - (leaf.anchor.y - 0.5) / ratio) * rand(0.9, 1.1),
         );
         piece.toGlobal(origin, piece.position);
 

@@ -83,7 +83,6 @@ export default class LeavesPlayer extends Player {
             this.leaves.zIndex = Z_INDEX_LEAVES;
         }
 
-        console.warn(this._dropRate);
         this.leaves.options.minDropRate = this._dropRate;
         this.leaves.options.dropInterval = this._dropRate * 2.5;
 
