@@ -1,5 +1,4 @@
-import clamp from 'lodash/clamp';
-import random from 'lodash/random';
+import { clamp, rand } from '@/core/utils/math';
 
 enum EyeState {
     Idle,
@@ -46,7 +45,7 @@ export default class Live2DEyeBlink {
                         this.closingDuration +
                         this.closedDuration +
                         this.openingDuration +
-                        random(2000);
+                        rand(0, 2000);
                 }
                 break;
 
