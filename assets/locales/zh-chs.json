@@ -52,6 +52,7 @@
   "subtitle_bottom": "底部字幕",
   "details": "详情",
   "model_loading": "加载中...\n\n如果无限加载的话，可以通过控制台里的日志来查看详情",
+  "model_not_found": "无法从该位置加载模型，请检查文件",
   "scale": "缩放",
   "language": "语言",
 

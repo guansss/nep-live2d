@@ -51,7 +51,8 @@
   "subtitle_enabled": "Subtitle Enabled",
   "subtitle_bottom": "Subtitle at Bottom",
   "details": "Details",
-  "model_loading": "Loading...\n\nIf loading never finishes, you can check the logs in console for details.",
+  "model_loading": "Loading...\n\nIf this keeps showing, you can check the logs in console for details.",
+  "model_not_found": "Failed to load model from this location, please check the files.",
   "scale": "Scale",
   "language": "Language",
 

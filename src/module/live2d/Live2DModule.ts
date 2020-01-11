@@ -32,8 +32,9 @@ export default class Live2DModule implements Module {
     config?: Config;
 
     loadingIDs: number[] = [];
-
     pendingRemoveIDs: number[] = []; // a list for models which are pending to be removed
+
+    errors: Record<number, Error | string> = {};
 
     get modelConfigs() {
         return this.config ? this.config.get<ModelConfig[]>('live2d.models', []) : [];
@@ -82,47 +83,49 @@ export default class Live2DModule implements Module {
     }
 
     private loadSavedModels() {
-        this.modelConfigs.forEach(async config => {
+        this.modelConfigs.forEach(config => {
             // update ID
             config.id = generateID();
 
             if (config.enabled) {
-                try {
-                    await this.loadModel(config.file, config.id);
-                } catch (e) {
-                    error(TAG, e);
-                }
+                this.loadModel(config.file, config.id).then();
             }
         });
     }
 
     private async loadModel(path: string, id: number, loaded?: (sprite: Live2DSprite) => void) {
-        this.loadingIDs.push(id);
+        try {
+            this.loadingIDs.push(id);
 
-        const sprite = await this.player.addSprite(path);
+            const sprite = await this.player.addSprite(path);
 
-        this.loadingIDs.splice(this.loadingIDs.indexOf(id), 1);
+            this.loadingIDs.splice(this.loadingIDs.indexOf(id), 1);
 
-        if (this.pendingRemoveIDs.includes(id)) {
-            this.pendingRemoveIDs.splice(this.pendingRemoveIDs.indexOf(id), 1);
-            this.player.removeSprite(sprite);
-            log(TAG, `Loading canceled: [${id}] ${sprite.model.name}`);
-            return;
+            if (this.pendingRemoveIDs.includes(id)) {
+                this.pendingRemoveIDs.splice(this.pendingRemoveIDs.indexOf(id), 1);
+                this.player.removeSprite(sprite);
+                log(TAG, `Loading canceled: [${id}] ${sprite.model.name}`);
+                return;
+            }
+
+            sprite.id = id;
+
+            if (sprite.model.modelSettings.preview) {
+                // save the preview so we can show it without the need to load a model
+                this.configureModel(id, { preview: sprite.model.modelSettings.preview });
+            }
+
+            this.updateSprite(sprite);
+
+            // prepare before emitting the event
+            loaded && loaded(sprite);
+
+            this.app.emit('live2dLoaded', id, sprite);
+        } catch (e) {
+            error(TAG, e);
+            this.errors[id] = e;
+            this.app.emit('live2dError', id, e);
         }
-
-        sprite.id = id;
-
-        if (sprite.model.modelSettings.preview) {
-            // save the preview so we can show it without the need to load a model
-            this.configureModel(id, { preview: sprite.model.modelSettings.preview });
-        }
-
-        this.updateSprite(sprite);
-
-        // prepare before emitting the event
-        loaded && loaded(sprite);
-
-        this.app.emit('live2dLoaded', id, sprite);
     }
 
     private async addModel(file: string, config?: ModelConfig) {
@@ -141,12 +144,7 @@ export default class Live2DModule implements Module {
 
         if (!modelConfig.enabled) return;
 
-        try {
-            await this.loadModel(file, id);
-        } catch (e) {
-            error(TAG, e);
-            this.app.emit('live2dError', id, e);
-        }
+        await this.loadModel(file, id);
     }
 
     private removeAllModels() {
@@ -217,12 +215,7 @@ export default class Live2DModule implements Module {
                     ModelConfigUtils.configureSprite(sprite, config);
                 } else if (!this.loadingIDs.includes(id)) {
                     // create sprite if not existing
-                    try {
-                        this.loadModel(updatedConfig.file, id);
-                    } catch (e) {
-                        error(TAG, e);
-                        this.app.emit('live2dError', id, e);
-                    }
+                    await this.loadModel(updatedConfig.file, id);
                 }
             } else {
                 if (sprite) {

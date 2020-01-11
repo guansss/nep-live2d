@@ -51,6 +51,9 @@ body
 ul
     list-style none
 
+pre
+    font-family Consolas, monospace
+
 #canvas
     position absolute
     width 100%

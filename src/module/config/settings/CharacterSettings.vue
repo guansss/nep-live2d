@@ -59,8 +59,8 @@
                 </template>
             </details>
 
-            <div v-if="selectedModel.error" class="info error">{{ selectedModel.error }}</div>
-            <div v-else-if="selectedModel.loading" class="info">{{ $t('model_loading') }}</div>
+            <pre v-if="selectedModel.error" class="info error">{{ selectedModel.error }}</pre>
+            <pre v-else-if="selectedModel.loading" class="info">{{ $t('model_loading') }}</pre>
 
             <template v-else>
                 <ToggleSwitch :value="selectedModel.config.enabled" @change="enableChanged">
@@ -247,15 +247,18 @@ export default class CharacterSettings extends Vue {
         const live2dMotionModule = this.configModule.app.modules['Live2DMotion'] as Live2DMotionModule;
         if (live2dMotionModule) subtitles = live2dMotionModule.subtitleManager.subtitles;
 
-        // fetch existing models and match subtitles
         const live2dModule = this.configModule.app.modules['Live2D'] as Live2DModule;
         if (live2dModule) {
+            // fetch existing models and match subtitles
             live2dModule.player.sprites.forEach(sprite => {
                 this.modelLoaded(sprite.id, sprite);
 
                 const subtitle = subtitles[sprite.model.modelSettings.subtitle || ''];
                 subtitle && this.subtitleLoaded(sprite.id, subtitle);
             });
+
+            // fetch errors
+            Object.entries(live2dModule.errors).forEach(([id, error]) => this.modelError(Number(id), error));
         }
     }
 
@@ -321,12 +324,25 @@ export default class CharacterSettings extends Vue {
         const model = this.models.find(model => model.config.id === id);
 
         if (model) {
-            model.error =
-                error instanceof Error
-                    ? error.message.includes('Failed to fetch')
-                    ? 'Failed to load model file. Have you put files in "live2d" folder of this wallpaper?'
-                    : error.toString()
-                    : error;
+            if (error instanceof Error) {
+                if (error.message.includes('Empty response')) {
+                    let url = model.path;
+
+                    if (url) {
+                        try {
+                            url = new URL(model.path, location.toString()).toString();
+                        } catch (ignored) {} // eslint-disable-line no-empty
+                    } else {
+                        url = '<EMPTY>';
+                    }
+
+                    model.error = unescape(url) + '\n\n' + this.$t('model_not_found');
+                } else {
+                    model.error = error.toString();
+                }
+            } else {
+                model.error = error;
+            }
         }
     }
 
@@ -509,7 +525,8 @@ $selectableCard
 
 .info
     margin 8px 16px
-    font-style italic
+    white-space pre-wrap
+    word-break break-all
 
 .error
     color #e74c3c
