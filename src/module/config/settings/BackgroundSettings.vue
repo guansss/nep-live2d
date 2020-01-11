@@ -233,7 +233,7 @@ export default class BackgroundSettings extends Vue {
     padding 16px
     width 100%
     height 100%
-    grid-template-columns repeat(3, 1fr)
+    grid-template-columns repeat(auto-fill, minmax(180px, 1fr))
     grid-gap 8px
 
 .bg-item
