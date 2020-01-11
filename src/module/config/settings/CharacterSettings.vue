@@ -124,7 +124,7 @@ import {
 } from '@/module/live2d-motion/SubtitleManager';
 import Live2DModule from '@/module/live2d/Live2DModule';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
-import { makeModelPath, ModelConfig, toActualValues, toStorageValues } from '@/module/live2d/ModelConfig';
+import { ModelConfig, ModelConfigUtils } from '@/module/live2d/ModelConfig';
 import { basename } from 'path';
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
@@ -159,7 +159,7 @@ class ModelEntity {
     }
 
     updateConfig(config: ModelConfig) {
-        Object.assign(this.config, toActualValues(config));
+        Object.assign(this.config, ModelConfigUtils.toActualValues(config));
     }
 
     attach(live2dModel: Live2DModel) {
@@ -219,7 +219,7 @@ export default class CharacterSettings extends Vue {
 
     @Watch('modelFile')
     modelFileChanged(value: File | null) {
-        if (value) this.addModel(makeModelPath(value.name));
+        if (value) this.addModel(ModelConfigUtils.makeModelPath(value.name));
     }
 
     @Watch('draggable')
@@ -360,11 +360,19 @@ export default class CharacterSettings extends Vue {
     }
 
     scaleChanged(value: number) {
-        this.configModule.app.emit('live2dConfig', this.selectedModel.config.id, toStorageValues({ scale: value }));
+        this.configModule.app.emit(
+            'live2dConfig',
+            this.selectedModel.config.id,
+            ModelConfigUtils.toStorageValues({ scale: value }),
+        );
     }
 
     localeChanged(value: string) {
-        this.configModule.app.emit('live2dConfig', this.selectedModel.config.id, toStorageValues({ locale: value }));
+        this.configModule.app.emit(
+            'live2dConfig',
+            this.selectedModel.config.id,
+            ModelConfigUtils.toStorageValues({ locale: value }),
+        );
     }
 
     beforeDestroy() {

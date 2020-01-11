@@ -4,7 +4,7 @@ import { FOCUS_TIMEOUT } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import Live2DPlayer from '@/module/live2d/Live2DPlayer';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
-import { configureSprite, DEFAULT_MODEL_CONFIG, ModelConfig, toStorageValues } from '@/module/live2d/ModelConfig';
+import { DEFAULT_MODEL_CONFIG, ModelConfig, ModelConfigUtils } from '@/module/live2d/ModelConfig';
 
 export interface App {
     emit(event: 'live2dAdd', path: string, config?: ModelConfig): this;
@@ -43,7 +43,9 @@ export default class Live2DModule implements Module {
         this.player = new Live2DPlayer(app.mka!);
         this.player.dragEnded = sprite => this.savePosition(sprite);
 
-        app.mka!.addPlayer('live2d', this.player);
+        app.mka.addPlayer('live2d', this.player);
+
+        ((app.mka.pixiApp.renderer as any) as { runners: { resize: PIXI.Runner } }).runners.resize.add(this);
 
         app.on('config:live2d.draggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable))
             .on('config:live2d.fPress', this.player.mouseHandler.setFocusOnPress, this.player.mouseHandler)
@@ -61,6 +63,22 @@ export default class Live2DModule implements Module {
 
                 this.loadSavedModels();
             });
+    }
+
+    // will be called from "resize" runner of pixiApp's renderer
+    resize(width: number, height: number) {
+        ModelConfigUtils.containerWidth = width;
+        ModelConfigUtils.containerHeight = height;
+
+        this.player.sprites.forEach(sprite => this.updateSprite(sprite));
+    }
+
+    updateSprite(sprite: Live2DSprite) {
+        const modelConfig = this.modelConfigs.find(config => config.id === sprite.id);
+
+        if (modelConfig) {
+            ModelConfigUtils.configureSprite(sprite, modelConfig);
+        }
     }
 
     private loadSavedModels() {
@@ -99,11 +117,7 @@ export default class Live2DModule implements Module {
             this.configureModel(id, { preview: sprite.model.modelSettings.preview });
         }
 
-        const modelConfig = this.modelConfigs.find(config => config.id === id);
-
-        if (modelConfig) {
-            configureSprite(sprite, modelConfig);
-        }
+        this.updateSprite(sprite);
 
         // prepare before emitting the event
         loaded && loaded(sprite);
@@ -200,7 +214,7 @@ export default class Live2DModule implements Module {
 
             if (updatedConfig.enabled) {
                 if (sprite) {
-                    configureSprite(sprite, config);
+                    ModelConfigUtils.configureSprite(sprite, config);
                 } else if (!this.loadingIDs.includes(id)) {
                     // create sprite if not existing
                     try {
@@ -225,7 +239,7 @@ export default class Live2DModule implements Module {
     private savePosition(sprite: Live2DSprite) {
         this.modifyModel(
             sprite.id,
-            toStorageValues({
+            ModelConfigUtils.toStorageValues({
                 x: sprite.x + sprite.width / 2,
                 y: sprite.y + sprite.height / 2,
             }),
