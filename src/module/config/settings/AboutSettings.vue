@@ -4,7 +4,13 @@
         <div class="subtitle">{{ $t('subtitle') }}</div>
         <div>
             <span class="badge">v{{ ver }}</span>
+            <span class="badge">{{ time }}</span>
             <span class="badge" data-title="/guansss/nep-live2d">Now on Github</span>
+        </div>
+
+        <div class="changelog">
+            <div class="title">{{ $t('changelog') }}</div>
+            <p v-for="log in $t('changelog_logs')" :key="log">· {{ log }}</p>
         </div>
 
         <div class="desc">{{ $t('desc') }}</div>
@@ -41,6 +47,7 @@ export default class EffectsSettings extends Vue {
 
     title = process.env.NAME;
     ver = process.env.VERSION;
+    time = new Date(process.env.BUILT_TIME!).toLocaleDateString();
 
     counter = 0; // :P
 }
@@ -53,7 +60,7 @@ export default class EffectsSettings extends Vue {
     padding-top 36px
     flex-flow column
     text-align center
-    font-family Palatino, Palatino Linotype, Palatino LT STD, Book Antiqua, Georgia, SimSun, serif
+    font-family Palatino, Palatino Linotype, Palatino LT STD, Book Antiqua, Georgia, Microsoft YaHei UI, serif
 
 .headline
     position relative
@@ -80,9 +87,6 @@ export default class EffectsSettings extends Vue {
     margin 16px 0 8px 0
     color #777
 
-.desc
-    margin-top 16px
-
 .badge
     position relative
     margin 0 4px
@@ -106,11 +110,22 @@ export default class EffectsSettings extends Vue {
     &:hover:after
         opacity 1
 
+.changelog
+    margin 28px auto 24px
+    padding 8px
+    background #0001
+    text-align left
+
+    .title
+        margin-bottom 4px
+        font-weight bold
+
 .credit
     flex-grow 1
-    margin-top 16px
+    margin-top 24px
     padding 16px
     background #0002
+    color #333
 
     .header
         margin-bottom 16px

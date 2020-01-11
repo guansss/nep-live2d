@@ -57,6 +57,7 @@ module.exports = {
         config.plugin('define').tap(args => {
             args[0]['process.env'].NAME = JSON.stringify(projectJSON.title);
             args[0]['process.env'].VERSION = JSON.stringify(process.env.npm_package_version);
+            args[0]['process.env'].BUILT_TIME = JSON.stringify(Date.now());
             args[0]['process.env'].I18N = JSON.stringify(readLocales());
             return args;
         });
