@@ -1,4 +1,10 @@
 {
+  // ===================================================================================================================
+  // these logs should only be updated by the project maintainer, please do NOT put them in languages other than English and Chinese
+  "changelog_logs": [
+  ],
+  // ===================================================================================================================
+
   // translations begin with "ui_" will be used in project.json
   "ui_info": "{NAME} v{VERSION}",
   "ui_img_dir": "<b>Background Images</b>",
@@ -85,5 +91,6 @@
 
   // about
   "subtitle": "The Ultimate Live2D Wallpaper",
+  "changelog": "Changelog",
   "desc": "For tutorial and more information, please visit the Workshop page."
 }
