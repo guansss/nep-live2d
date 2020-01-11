@@ -38,7 +38,7 @@ export default function greet(sprite: Live2DSprite, config: Config) {
             }
 
             if (indices.length !== 0) {
-                index = ~~(Math.random() * indices.length);
+                index = indices[~~(Math.random() * indices.length)];
             } else {
                 // start a random non-seasonal greeting motion
                 const nonSeasonalIndices = Array.from(definitions.keys()).filter(i => !definitions[i].season);
