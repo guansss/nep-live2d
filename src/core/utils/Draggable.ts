@@ -29,8 +29,8 @@ export default class Draggable {
     @autobind
     private mousedown(e: MouseEvent) {
         if ((!this.exact || e.target === e.currentTarget) && this.onStart(e)) {
-            this.lastMouseX = e.screenX;
-            this.lastMouseY = e.screenY;
+            this.lastMouseX = e.clientX;
+            this.lastMouseY = e.clientY;
 
             document.addEventListener('mousemove', this.mousemove, { passive: true });
             document.addEventListener('mouseup', this.mouseup);
@@ -42,8 +42,8 @@ export default class Draggable {
     private mousemove(e: MouseEvent) {
         // `e.movementX` and `e.movementY` are always 0 in Wallpaper Engine,
         // need to calculate them manually.
-        e._movementX = e.screenX - this.lastMouseX;
-        e._movementY = e.screenY - this.lastMouseY;
+        e._movementX = e.clientX - this.lastMouseX;
+        e._movementY = e.clientY - this.lastMouseY;
 
         if (
             this.dragged ||
@@ -53,8 +53,8 @@ export default class Draggable {
             e._movementY < -this.deadZone
         ) {
             this.dragged = true;
-            this.lastMouseX = e.screenX;
-            this.lastMouseY = e.screenY;
+            this.lastMouseX = e.clientX;
+            this.lastMouseY = e.clientY;
 
             if (this.onDrag(e) && this.target) {
                 this.target.style.left = this.target.offsetLeft + e._movementX + 'px';
