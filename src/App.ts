@@ -47,7 +47,10 @@ export class App extends EventEmitter {
             })
             .on('config:locale', (locale: string) => (vueApp.$i18n.locale = locale))
             .on('config:fpsMax', (maxFPS: number) => Ticker.setMaxFPS(maxFPS))
-            .on('config:safe', (safe: boolean) => SafeArea.setSafe(safe))
+            .on('config:safe', (safe: boolean) => {
+                SafeArea.setSafe(safe);
+                setTimeout(() => this.mka.pixiApp.resize(), 0);
+            })
             .on('configReady', (config: Config) => {
                 this.emit('config', 'locale', LOCALE, true);
                 this.emit('config', 'fpsMax', FPS_MAX, true);
