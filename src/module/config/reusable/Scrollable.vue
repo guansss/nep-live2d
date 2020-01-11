@@ -54,7 +54,7 @@ export default class Scrollable extends Vue {
             } else {
                 this.barTop = 0;
             }
-        }, 500);
+        }, 300);
 
         this.draggable = new Draggable(this.thumb);
 
@@ -90,7 +90,7 @@ export default class Scrollable extends Vue {
 </script>
 
 <style scoped lang="stylus">
-$barWidth = 12px
+$barWidth = 14px
 
 .scrollable
     position relative
@@ -105,16 +105,19 @@ $barWidth = 12px
     background #0002
     opacity 0
     transition opacity .15s ease-out
-    transition-delay 1s
 
 .overflow
-    .dragging, .scrollbar:hover
+    .scrollbar
         opacity 1
-        transition-delay 0s
 
 .thumb
     position absolute
     width $barWidth
+    background #0003
+    transition background .15s ease-out
+
+.dragging .thumb
+.thumb:hover
     background #0006
 
 .container
