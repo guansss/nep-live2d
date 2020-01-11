@@ -3,6 +3,7 @@ import Ticker from '@/core/mka/Ticker';
 import { error, log } from '@/core/utils/log';
 import { LEAVES_DROP_RATE, Z_INDEX_LEAVES, Z_INDEX_LEAVES_BACK } from '@/defaults';
 import Leaves, { DEFAULT_OPTIONS as LEAVES_DEFAULT_OPTIONS } from '@/module/leaves/Leaves';
+import { BaseTexture, Texture } from '@pixi/core';
 import { Loader } from '@pixi/loaders';
 
 export interface Loader {
@@ -62,7 +63,19 @@ export default class LeavesPlayer extends Player {
                 new Loader()
                     .add(LEAVES_SOURCE, { crossOrigin: true })
                     .load((loader: Loader, resources: Partial<Record<string, PIXI.LoaderResource>>) => {
-                        resolve(Object.values(resources[LEAVES_SOURCE]!.spritesheet!.textures));
+                        const res = resources[LEAVES_SOURCE]!;
+                        const spriteTextures = Object.values(res.textures!);
+
+                        // remove main textures from cache
+                        res.children.forEach(childRes => {
+                            Texture.removeFromCache(childRes.texture);
+                            BaseTexture.removeFromCache(childRes.texture.baseTexture);
+                        });
+
+                        // remove sprite textures from cache
+                        spriteTextures.forEach(texture => Texture.removeFromCache(texture));
+
+                        resolve(spriteTextures);
                     })
                     .on('error', e => error(TAG, 'Failed to load texture:', e));
             });

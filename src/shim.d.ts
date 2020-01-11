@@ -20,7 +20,7 @@ declare module '@pixi/constants' {
 }
 
 declare module '@pixi/core' {
-    export { Buffer, Geometry, Renderer, Shader, State, Texture } from 'pixi.js';
+    export { Buffer, Geometry, Renderer, Shader, State, Texture, BaseTexture } from 'pixi.js';
 }
 
 declare module '@pixi/loaders' {
