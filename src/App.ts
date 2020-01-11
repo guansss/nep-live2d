@@ -42,7 +42,7 @@ export class App extends EventEmitter {
             .on('config:locale', (locale: string) => (vueApp.$i18n.locale = locale))
             .on('config:fpsMax', (maxFPS: number) => Ticker.setMaxFPS(maxFPS))
             .on('configReady', (config: Config) => {
-                this.on('we:language', (locale: string) => this.emit('config', 'locale', locale, true));
+                this.on('we:language', (locale: string) => this.emit('config', 'locale', locale));
 
                 this.emit('config', 'fpsMax', FPS_MAX, true);
 
