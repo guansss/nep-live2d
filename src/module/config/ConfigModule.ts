@@ -14,9 +14,9 @@ export class Config {
     // runtime object won't be saved into localStorage
     runtime: { [key: string]: any } = {};
 
-    get<T>(path: string, defaultValue: T): Readonly<T> {
-        let savedValue: any = get(this, path, UNSET);
-        let runtimeValue: any = get(this.runtime, path, UNSET);
+    get<T>(path: string, defaultValue: T, storageOnly?: boolean): Readonly<T> {
+        let savedValue = get(this, path, UNSET);
+        let runtimeValue = storageOnly ? UNSET : get(this.runtime, path, UNSET);
 
         if (savedValue === UNSET) return runtimeValue === UNSET ? defaultValue : runtimeValue;
         if (runtimeValue === UNSET) return savedValue;

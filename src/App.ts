@@ -3,7 +3,7 @@ import Ticker from '@/core/mka/Ticker';
 import { SafeArea } from '@/core/utils/dom';
 import EventEmitter from '@/core/utils/EventEmitter';
 import { error } from '@/core/utils/log';
-import { FPS_MAX, HIGH_QUALITY, SAFE_AREA_MODE } from '@/defaults';
+import { FPS_MAX, HIGH_QUALITY, LOCALE, SAFE_AREA_MODE } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import VueApp from '@/VueApp.vue';
 import { Vue, VueConstructor } from 'vue/types/vue';
@@ -49,13 +49,15 @@ export class App extends EventEmitter {
             .on('config:fpsMax', (maxFPS: number) => Ticker.setMaxFPS(maxFPS))
             .on('config:safe', (safe: boolean) => SafeArea.setSafe(safe))
             .on('configReady', (config: Config) => {
-                this.on('we:language', (locale: string) => this.emit('config', 'locale', locale));
-
+                this.emit('config', 'locale', LOCALE, true);
                 this.emit('config', 'fpsMax', FPS_MAX, true);
-
                 this.emit('config', 'safe', SAFE_AREA_MODE, true);
-
                 this.emit('config', 'hq', HIGH_QUALITY, true);
+
+                this.on('we:language', (locale: string) => {
+                    const shouldSave = !config.get('locale', undefined, true);
+                    this.emit('config', 'locale', locale, !shouldSave);
+                });
             });
     }
 
