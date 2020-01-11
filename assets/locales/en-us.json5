@@ -2,6 +2,17 @@
   // ===================================================================================================================
   // these logs should only be updated by the project maintainer, please do NOT put them in languages other than English and Chinese
   "changelog_logs": [
+    "Optimized layout of background list",
+    "Optimized display of Live2D loading errors",
+    "Changed scrollbar to be static",
+    "Added Toggle Menu option",
+    "Added Reset Settings option",
+    "Added safe area mode",
+    "Added in-app changelog",
+    "Fixed only morning greetings would be made",
+    "Fixed greeting subtitles sometimes stuck to default language on startup",
+    "Fixed dragging offset in high resolutions",
+    "Fixed loading Live2D model would be endless when the file is not found"
   ],
   // ===================================================================================================================
 
