@@ -1,14 +1,17 @@
 {
+  // translations begin with "ui_" will be used in project.json
   "ui_info": "{NAME} v{VERSION}",
   "ui_img_dir": "<b>Background Images</b>",
   "ui_vid_dir": "<b>Background Videos</b>",
   "ui_switch": "<b>Toggle Menu</b><br><font color=gray><small>Press this if you can't find the switch.</small></font>",
   "ui_reset": "<font color=red><b>Reset Settings</b></font><br><font color=gray><small>Press this if you can't do reset in the wallpaper.</small></font>",
 
+  // displayed in language selector
   "language_name": "English",
 
   "v2_note": "Now comes version 2.0!",
 
+  // dialog actions
   "confirm": "Confirm",
   "cancel": "Cancel",
   "save": "Save",
@@ -16,11 +19,13 @@
 
   "reset_confirm": "Are you sure to reset all settings?",
 
+  // theme names
   "Default": "Default",
   "Halloween": "Halloween",
   "Christmas": "Christmas",
   "New Year": "New Year",
 
+  // tabs
   "general": "General",
   "character": "Character",
   "background": "Background",
@@ -28,6 +33,7 @@
   "console": "Console",
   "about": "About",
 
+  // section titles
   "theme": "Theme",
   "save_theme": "Save current theme as:",
   "unsaved_theme": "Unsaved Theme",
@@ -37,6 +43,7 @@
   "leaves": "Leaves",
   "snow": "Snow",
 
+  // general settings
   "enabled": "Enabled",
   "seasonal_theming": "Seasonal Theming",
   "volume": "Volume",
@@ -45,6 +52,7 @@
   "max_fps": "Max FPS",
   "_ui_language": "UI Language",
 
+  // character settings
   "dragging": "Dragging",
   "focus_on_press": "Focus on Press",
   "focus_timeout": "Focus Timeout",
@@ -56,22 +64,26 @@
   "scale": "Scale",
   "language": "Language",
 
+  // background settings
   "fill_type": "Fill Type",
   "fill": "Fill",
   "cover": "Cover",
   "built_in": "Built-in",
   "no_bg_dir": "No directory. Please specify {0} in Wallpaper Engine",
 
+  // effect settings
   "overall": "Overall",
   "high_quality": "High Quality",
   "amount": "Amount",
   "drop_rate": "Drop Rate",
 
+  // console
   "cmd": "Command",
   "dump_logs": "Dump Logs",
   "dump_storage": "Dump Storage",
   "reset": "Reset",
 
+  // about
   "subtitle": "The Ultimate Live2D Wallpaper",
   "desc": "For tutorial and more information, please visit the Workshop page."
 }

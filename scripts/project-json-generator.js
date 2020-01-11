@@ -1,4 +1,5 @@
 const fs = require('fs');
+const JSON5 = require('json5');
 const pickBy = require('lodash/pickBy');
 const projectJSON = require('../assets/project.json');
 const env = require('./load-env')();
@@ -33,7 +34,7 @@ function readLocales() {
         let content = fs.readFileSync('assets/locales/' + file, 'utf8');
 
         content = populate(content);
-        locales[locale] = JSON.parse(content);
+        locales[locale] = JSON5.parse(content);
     });
 
     return locales;
