@@ -1,3 +1,4 @@
+import { inWallpaperEngine } from '@/core/utils/misc';
 import { sayHello as pixiSayHello } from '@pixi/utils';
 
 export interface LogRecord {
@@ -7,7 +8,7 @@ export interface LogRecord {
     count: number;
 }
 
-const debug = process.env.NODE_ENV !== 'production';
+const debug = !inWallpaperEngine;
 
 export const logs = (() => {
     const arr: any = [];
