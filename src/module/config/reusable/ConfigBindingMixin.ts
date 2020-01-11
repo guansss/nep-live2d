@@ -4,6 +4,8 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 
 type SettingsComponent = { configModule?: ConfigModule };
 
+const NOT_FOUND = Symbol();
+
 @Component
 export default class ConfigBindingMixin extends Vue {
     @Prop({ default: '', type: String }) readonly config!: string;
@@ -23,8 +25,10 @@ export default class ConfigBindingMixin extends Vue {
 
     @Watch('value')
     valueChanged(value: any) {
-        if (this.config) {
-            (this.$parent as SettingsComponent).configModule!.setConfig(this.config, value);
+        const configModule = (this.$parent as SettingsComponent).configModule!;
+
+        if (this.config && value !== configModule.getConfig(this.config, NOT_FOUND)) {
+            configModule.setConfig(this.config, value);
         }
     }
 
