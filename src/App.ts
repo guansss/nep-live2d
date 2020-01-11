@@ -39,6 +39,11 @@ export class App extends EventEmitter {
                     .join(',');
                 document.documentElement.style.setProperty('--accentColor', `rgb(${rgb})`);
             })
+            .on('we:reset', (reset: boolean, initial?: boolean) => {
+                if (!initial && confirm(vueApp.$t('reset_confirm') as string)) {
+                    this.emit('reset');
+                }
+            })
             .on('config:locale', (locale: string) => (vueApp.$i18n.locale = locale))
             .on('config:fpsMax', (maxFPS: number) => Ticker.setMaxFPS(maxFPS))
             .on('configReady', (config: Config) => {

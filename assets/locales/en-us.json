@@ -1,7 +1,9 @@
 {
-  "ui_info": "{NAME} {VERSION}",
+  "ui_info": "{NAME} v{VERSION}",
   "ui_img_dir": "<b>Background Images</b>",
   "ui_vid_dir": "<b>Background Videos</b>",
+  "ui_switch": "<b>Toggle Menu</b><br><font color=gray><small>Press this if you can't find the switch.</small></font>",
+  "ui_reset": "<font color=red><b>Reset Settings</b></font><br><font color=gray><small>Press this if you can't do reset in the wallpaper.</small></font>",
 
   "language_name": "English",
 
@@ -11,6 +13,8 @@
   "cancel": "Cancel",
   "save": "Save",
   "discard": "Discard",
+
+  "reset_confirm": "Are you sure to reset all settings?",
 
   "Default": "Default",
   "Halloween": "Halloween",

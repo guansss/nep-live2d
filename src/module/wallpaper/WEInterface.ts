@@ -34,7 +34,8 @@ export namespace WEInterface {
         eventEmitter = emitter;
 
         // immediately emit all properties and files
-        (Object.keys(props) as (keyof WEProperties)[]).forEach(emitProp);
+        Object.keys(props).forEach(name => emitProp(name as keyof WEProperties, true));
+
         (Object.entries(propFiles) as [keyof WEFiles, string[]][]).forEach(([propName, files]) =>
             emitFilesUpdate(propName, files),
         );
@@ -43,14 +44,16 @@ export namespace WEInterface {
     export function getPropValue<T extends keyof WEProperties>(name: T): string | undefined {
         const prop = props[name];
 
-        if (prop) {
+        if (prop !== undefined && prop !== null) {
             return typeof prop === 'string' ? prop : prop.value;
         }
     }
 
     function updateProps(_props: Partial<WEProperties>) {
+        const initial = Object.keys(_props).length > 1;
+
         Object.assign(props, _props);
-        (Object.keys(_props) as (keyof WEProperties)[]).forEach(emitProp);
+        Object.keys(_props).forEach(name => emitProp(name as keyof WEProperties, initial));
     }
 
     function updateFiles<T extends keyof WEFiles>(propName: T, files: string[]) {
@@ -74,13 +77,13 @@ export namespace WEInterface {
         emitFilesRemove(propName, files);
     }
 
-    function emitProp<T extends keyof WEProperties>(name: T) {
+    function emitProp<T extends keyof WEProperties>(name: T, initial?: boolean) {
         if (eventEmitter) {
             const value = getPropValue(name);
 
-            if (value) {
-                eventEmitter.sticky(PREFIX + name, value);
-                eventEmitter.emit(PREFIX + '*', name, value);
+            if (value !== undefined) {
+                eventEmitter.sticky(PREFIX + name, value, initial);
+                eventEmitter.emit(PREFIX + '*', name, value, initial);
             }
         }
     }

@@ -63,6 +63,15 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
         this.panelLeft = this.configModule.getConfig('settings.panelLeft', this.panelLeft);
         this.panelWidth = this.configModule.getConfig('settings.panelWidth', this.panelWidth);
         this.panelHeight = this.configModule.getConfig('settings.panelHeight', this.panelHeight);
+
+        this.configModule.app.on('we:switch', this.toggle, this);
+    }
+
+    toggle(_: boolean, initial?: boolean) {
+        if (!initial) {
+            console.warn(_);
+            this.expanded ? this.close() : this.open();
+        }
     }
 
     async selectPage(index: number) {
@@ -99,5 +108,9 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     panelResizeEnded() {
         this.configModule.setConfig('settings.panelWidth', this.panelWidth);
         this.configModule.setConfig('settings.panelHeight', this.panelHeight);
+    }
+
+    beforeDestroy() {
+        this.configModule.app.off('we:switch', this.toggle);
     }
 }

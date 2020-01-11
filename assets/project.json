@@ -43,6 +43,25 @@
         "type": "directory",
         "mode": "fetchall"
       },
+      "l3": {
+        "order": 8,
+        "text": "<font color=#888>__________________________________</font>"
+      },
+      "switch": {
+        "order": 100,
+        "text": "ui_switch",
+        "type": "bool",
+        "value": false
+      },
+      "b1": {
+        "order": 101
+      },
+      "reset": {
+        "order": 102,
+        "text": "ui_reset",
+        "type": "bool",
+        "value": false
+      },
       "volume": {
         "condition": "false",
         "max": 10,

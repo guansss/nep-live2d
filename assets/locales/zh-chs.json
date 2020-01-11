@@ -1,7 +1,9 @@
 {
-  "ui_info": "{NAME} {VERSION}",
+  "ui_info": "{NAME} v{VERSION}",
   "ui_img_dir": "<b>背景图片</b>",
   "ui_vid_dir": "<b>背景视频</b>",
+  "ui_switch": "<b>切换菜单</b><br><font color=gray><small>如果找不到菜单开关，请点击这个按钮</small></font>",
+  "ui_reset": "<font color=red><b>重置设定</b></font><br><font color=gray><small>如果无法在壁纸里完成重置，请点击这个按钮</small></font>",
 
   "language_name": "中文",
 
@@ -11,6 +13,8 @@
   "cancel": "取消",
   "save": "保存",
   "discard": "放弃",
+
+  "reset_confirm": "确定要重置所有设定吗？",
 
   "Default": "默认",
   "Halloween": "万圣节",
