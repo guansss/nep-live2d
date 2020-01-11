@@ -1,6 +1,6 @@
 import { App, Module } from '@/App';
+import { SCREEN_ASPECT_RATIO } from '@/core/utils/dom';
 import { error } from '@/core/utils/log';
-import { screenAspectRatio } from '@/core/utils/misc';
 import { SEASONS, THEME_CUSTOM_OFFSET, THEMES } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import { ModelConfig } from '@/module/live2d/ModelConfig';
@@ -135,7 +135,7 @@ export default class ThemeModule implements Module {
             if (isEqual(omit(theme, 'season'), this.collectTheme(theme.name))) return;
 
             if (theme.profiles) {
-                const profile = theme.profiles[screenAspectRatio] || theme.profiles['16:9']; // fall back to 16:9
+                const profile = theme.profiles[SCREEN_ASPECT_RATIO] || theme.profiles['16:9']; // fall back to 16:9
 
                 // override the theme by profile
                 Object.assign(theme, profile);

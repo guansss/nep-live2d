@@ -40,6 +40,7 @@
   "enabled": "Enabled",
   "seasonal_theming": "Seasonal Theming",
   "volume": "Volume",
+  "safe_area": "Safe Area",
   "show_fps": "Show FPS",
   "max_fps": "Max FPS",
   "_ui_language": "UI Language",

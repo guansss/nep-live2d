@@ -1,19 +1,5 @@
 import camelCase from 'lodash/camelCase';
 
-export const screenAspectRatio = (() => {
-    // https://stackoverflow.com/a/1186465
-
-    function gcd(a: number, b: number): number {
-        return b == 0 ? a : gcd(b, a % b);
-    }
-
-    const w = screen.width;
-    const h = screen.height;
-    const r = gcd(w, h);
-
-    return w / r + ':' + h / r;
-})();
-
 // check if running in Wallpaper Engine
 export const inWallpaperEngine = !!window.wallpaperRequestRandomFileForProperty;
 

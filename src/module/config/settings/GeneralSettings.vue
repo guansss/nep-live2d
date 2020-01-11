@@ -35,10 +35,11 @@
         </div>
         <div class="misc section" :data-title="$t('misc')">
             <Slider progress config="volume" v-model="volume">{{ $t('volume') }}</Slider>
+            <ToggleSwitch config="safe" v-model="safeArea">{{ $t('safe_area') }}</ToggleSwitch>
+            <ToggleSwitch config="fps" v-model="showFPS">{{ $t('show_fps') }}</ToggleSwitch>
             <Slider int overlay :min="1" :max="maxFPSLimit" :step="1" config="fpsMax" v-model="maxFPS">
                 {{ $t('max_fps') }}
             </Slider>
-            <ToggleSwitch config="fps" v-model="showFPS">{{ $t('show_fps') }}</ToggleSwitch>
             <Select config="locale" v-model="locale" :options="localeOptions">{{ $t('_ui_language') }}</Select>
         </div>
     </div>
@@ -50,7 +51,7 @@ import PlusSVG from '@/assets/img/plus.svg';
 import SettingsSVG from '@/assets/img/settings.svg';
 import ShapeSVG from '@/assets/img/shape.svg';
 import { error } from '@/core/utils/log';
-import { FPS_MAX, FPS_MAX_LIMIT, I18N, LOCALE, THEME_CUSTOM_OFFSET, THEMES } from '@/defaults';
+import { FPS_MAX, FPS_MAX_LIMIT, I18N, LOCALE, SAFE_AREA_MODE, THEME_CUSTOM_OFFSET, THEMES } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import LongClickAction from '@/module/config/reusable/LongClickAction.vue';
 import Select from '@/module/config/reusable/Select.vue';
@@ -79,6 +80,8 @@ export default class GeneralSettings extends Vue {
     seasonal = true;
 
     volume = 0;
+
+    safeArea = SAFE_AREA_MODE;
 
     showFPS = false;
     maxFPS = FPS_MAX;

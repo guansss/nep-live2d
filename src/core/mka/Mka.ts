@@ -30,8 +30,7 @@ export default class Mka {
     constructor(canvas: HTMLCanvasElement) {
         this.pixiApp = new PIXIApplication({
             view: canvas,
-            width: canvas.offsetWidth,
-            height: canvas.offsetHeight,
+            resizeTo: canvas,
             transparent: true,
         });
 

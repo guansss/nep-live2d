@@ -39,7 +39,12 @@ export default class VueApp extends Vue {
     margin 0
     padding 0
 
+html
 body
+    height 100%
+
+body
+    padding var(--safeTop, 0) var(--safeRight, 0) var(--safeBottom, 0) var(--safeLeft, 0)
     background-color #333
     overflow hidden
 
@@ -48,11 +53,12 @@ ul
 
 #canvas
     position absolute
-    width 100vw
-    height 100vh
+    width 100%
+    height 100%
 
 #app
-    height: 100vh
+    position relative
+    height 100%
     color: #333
     font-family: 'Avenir', Helvetica, Arial, 'Microsoft Yahei UI'
     -webkit-font-smoothing: antialiased

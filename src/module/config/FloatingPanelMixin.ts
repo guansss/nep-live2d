@@ -1,3 +1,4 @@
+import { SafeArea } from '@/core/utils/dom';
 import Draggable from '@/core/utils/Draggable';
 import { clamp } from '@/core/utils/math';
 import Vue from 'vue';
@@ -9,8 +10,8 @@ const TRANSFORM_EASING = 'cubic-bezier(0.4, 0.0, 0.2, 1)';
 const SNAP_DISTANCE_X = 150;
 const SNAP_DISTANCE_Y = 150;
 
-const PANEL_WIDTH = Math.min(600, innerWidth);
-const PANEL_HEIGHT = Math.min(450, innerHeight);
+const PANEL_WIDTH = Math.min(600, SafeArea.area.width);
+const PANEL_HEIGHT = Math.min(450, SafeArea.area.height);
 
 @Component
 export default class FloatingPanelMixin extends Vue {
@@ -28,15 +29,15 @@ export default class FloatingPanelMixin extends Vue {
     stateClass = 'switch';
     snapped = false;
 
-    switchTop = innerHeight / 2 - 32;
-    switchLeft = innerWidth / 2 - 32;
+    switchTop = SafeArea.area.height / 2 - 32;
+    switchLeft = SafeArea.area.width / 2 - 32;
     switchWidth = 64;
     switchHeight = 64;
     switchBorderRadius = '50%';
     switchTransform = '';
 
-    panelTop = (innerHeight - PANEL_HEIGHT) / 2; // center in screen
-    panelLeft = (innerWidth - PANEL_WIDTH) / 2;
+    panelTop = (SafeArea.area.height - PANEL_HEIGHT) / 2; // center in screen
+    panelLeft = (SafeArea.area.width - PANEL_WIDTH) / 2;
     panelWidth = PANEL_WIDTH;
     panelHeight = PANEL_HEIGHT;
     panelBorderRadius = '0';

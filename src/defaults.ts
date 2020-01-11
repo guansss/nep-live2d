@@ -84,6 +84,8 @@ export const THEME_CUSTOM_OFFSET = 100;
 
 export const BACKGROUNDS = THEMES.map(theme => theme.bg.src);
 
+export const SAFE_AREA_MODE = true;
+
 export const FPS_MAX = 60;
 export const FPS_MAX_LIMIT = 300;
 
