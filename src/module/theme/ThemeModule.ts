@@ -28,7 +28,7 @@ export interface Theme {
         fill?: boolean;
     };
     models: {
-        file: string;
+        file: string | string[];
         scale: number;
         x: number;
         y: number;

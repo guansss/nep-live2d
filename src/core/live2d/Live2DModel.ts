@@ -31,13 +31,34 @@ export default class Live2DModel {
 
     focusController = new FocusController();
 
-    static async create(file: string) {
-        const modelSettings = await loadModelSettings(file);
-        if (!modelSettings) throw `Failed to load model settings from "${file}"`;
+    static async create(file: string | string[]) {
+        let modelSettingsFile: string | undefined;
+        let modelSettings: ModelSettings | undefined;
 
-        const internalModel = await loadModel(modelSettings.model);
+        if (typeof file === 'string') {
+            modelSettingsFile = file;
+        } else if (Array.isArray(file)) {
+            // check if there is already a model settings file in folder
+            modelSettingsFile = file.find(f => f.endsWith('.model.json'));
 
-        return new Live2DModel(internalModel!, modelSettings);
+            if (!modelSettingsFile) {
+                modelSettings = ModelSettings.fromFolder(file);
+            }
+        } else {
+            throw 'Invalid source.';
+        }
+
+        if (modelSettingsFile) {
+            modelSettings = await loadModelSettings(modelSettingsFile);
+
+            if (!modelSettings) {
+                throw `Failed to load model settings from "${modelSettingsFile}"`;
+            }
+        }
+
+        const internalModel = await loadModel(modelSettings!.model);
+
+        return new Live2DModel(internalModel!, modelSettings!);
     }
 
     private constructor(readonly internalModel: Live2DModelWebGL, public modelSettings: ModelSettings) {

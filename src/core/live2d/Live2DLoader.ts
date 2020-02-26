@@ -21,7 +21,7 @@ export async function loadModelSettings(file?: string) {
         throw new TypeError('Empty response');
     }
 
-    return new ModelSettings(json, file, baseDir);
+    return new ModelSettings(json, baseDir);
 }
 
 export async function loadModel(file?: string) {

@@ -1,6 +1,6 @@
 import { App, Module } from '@/App';
 import { error, log } from '@/core/utils/log';
-import { FOCUS_TIMEOUT } from '@/defaults';
+import { FOCUS_TIMEOUT, LIVE2D_DIRECTORY } from '@/defaults';
 import { Config } from '@/module/config/ConfigModule';
 import Live2DPlayer from '@/module/live2d/Live2DPlayer';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
@@ -93,11 +93,17 @@ export default class Live2DModule implements Module {
         });
     }
 
-    private async loadModel(path: string, id: number, loaded?: (sprite: Live2DSprite) => void) {
+    private async loadModel(file: string | string[], id: number, loaded?: (sprite: Live2DSprite) => void) {
         try {
             this.loadingIDs.push(id);
 
-            const sprite = await this.player.addSprite(path);
+            if (Array.isArray(file)) {
+                file = file.map(file => LIVE2D_DIRECTORY + '/' + file);
+            } else {
+                file = LIVE2D_DIRECTORY + '/' + file;
+            }
+
+            const sprite = await this.player.addSprite(file);
 
             this.loadingIDs.splice(this.loadingIDs.indexOf(id), 1);
 
@@ -112,7 +118,7 @@ export default class Live2DModule implements Module {
 
             if (sprite.model.modelSettings.preview) {
                 // save the preview so we can show it without the need to load a model
-                this.configureModel(id, { preview: sprite.model.modelSettings.preview });
+                this.configureModel(id, { preview: sprite.model.modelSettings.json.preview });
             }
 
             this.updateSprite(sprite);
@@ -128,12 +134,22 @@ export default class Live2DModule implements Module {
         }
     }
 
-    private async addModel(file: string, config?: ModelConfig) {
+    private async addModel(file: string | string[], config?: ModelConfig) {
         const id = generateID();
+
+        if (Array.isArray(file)) {
+            const modelSettingsFile = file.find(f => f.endsWith('.model.json'));
+
+            if (modelSettingsFile) {
+                // just save the model settings file rather than all the files
+                file = modelSettingsFile;
+            }
+        }
+
         const modelConfig: ModelConfig = Object.assign(
             {
                 id,
-                file,
+                file: file,
                 order: this.modelConfigs.length,
             },
             DEFAULT_MODEL_CONFIG,
@@ -142,9 +158,9 @@ export default class Live2DModule implements Module {
 
         this.app.emit('config', 'live2d.models', [...this.modelConfigs, modelConfig]);
 
-        if (!modelConfig.enabled) return;
-
-        await this.loadModel(file, id);
+        if (modelConfig.enabled) {
+            await this.loadModel(file, id);
+        }
     }
 
     private removeAllModels() {

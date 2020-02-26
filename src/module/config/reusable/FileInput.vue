@@ -1,6 +1,6 @@
 <template>
     <div class="file-input">
-        <input :multiple="multiple" type="file" :accept="accept" @change="change" />
+        <input :multiple="multiple" type="file" :accept="accept" :webkitdirectory="directory" @change="change" />
         <PlusSVG class="svg" />
     </div>
 </template>
@@ -17,6 +17,7 @@ export default class FileInput extends Vue {
     @Model('change', { default: undefined }) readonly files!: File[] | File | null;
 
     @Prop({ default: false, type: Boolean }) readonly multiple!: boolean;
+    @Prop({ default: false, type: Boolean }) readonly directory!: boolean;
     @Prop({ default: '', type: String }) readonly accept!: string;
 
     change(e: Event) {

@@ -93,8 +93,8 @@ export default class Live2DPlayer extends Player {
         mka.pixiApp.stage.addChild(this.container);
     }
 
-    async addSprite(modelSettingsFile: string) {
-        const sprite = await Live2DSprite.create(modelSettingsFile);
+    async addSprite(file: string | string[]) {
+        const sprite = await Live2DSprite.create(file);
         this.sprites.push(sprite);
         this.container.addChild(sprite);
 

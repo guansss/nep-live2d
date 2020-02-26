@@ -30,7 +30,7 @@ export const THEMES: Theme[] = [
         },
         models: [
             {
-                file: 'live2d/neptune/neptune.model.json',
+                file: 'neptune/neptune.model.json',
                 scale: 0.0004141,
                 x: 0.75,
                 y: 0.6,
@@ -49,7 +49,7 @@ export const THEMES: Theme[] = [
         },
         models: [
             {
-                file: 'live2d/neptune/neptune.model.json',
+                file: 'neptune/neptune.model.json',
                 scale: 0.0004141,
                 x: 0.75,
                 y: 0.6,
@@ -68,7 +68,7 @@ export const THEMES: Theme[] = [
         },
         models: [
             {
-                file: 'live2d/nepsanta/nepsanta.model.json',
+                file: 'nepsanta/nepsanta.model.json',
                 scale: 0.0004141,
                 x: 0.75,
                 y: 0.6,

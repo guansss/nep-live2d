@@ -35,8 +35,8 @@ class Live2DSprite extends Container {
     drawingScaleX = 1;
     drawingScaleY = 1;
 
-    static async create(modelSettingsFile: string) {
-        const model = await Live2DModel.create(modelSettingsFile);
+    static async create(file: string | string[]) {
+        const model = await Live2DModel.create(file);
         return new Live2DSprite(model);
     }
 

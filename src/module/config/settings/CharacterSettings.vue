@@ -1,11 +1,11 @@
 <template>
     <div class="model">
         <transition-group class="list" name="move">
-            <div class="actions" key="??">
+            <div class="actions" key="(unused but required by transition-group)">
                 <div :class="['action general', { selected: selectedIndex === -1 }]" @click="selectedIndex = -1">
                     <TuneSVG class="icon" />
                 </div>
-                <FileInput class="action" accept=".json" v-model="modelFile" />
+                <FileInput directory multiple class="action" v-model="modelFiles" />
             </div>
 
             <LongClickAction
@@ -16,7 +16,7 @@
                 @click.native="selectedIndex = i"
                 @long-click="deleteModel(model)"
             >
-                <img v-if="model.config && model.config.preview" :src="model.config.preview" class="preview" />
+                <img v-if="model.preview" :src="model.preview" class="preview" />
                 <div v-else class="preview-alt">{{ model.name }}</div>
 
                 <div v-if="model.config && model.config.order > 0" class="left action" @click.stop="shift(model, -1)">
@@ -53,7 +53,7 @@
             <details class="details button" :open="detailsExpanded" @click.prevent="detailsExpanded = !detailsExpanded">
                 <summary>{{ $t('details') }}</summary>
                 <template v-if="detailsExpanded">
-                    <div>File: {{ selectedModel.path }}</div>
+                    <div>File: {{ selectedModel.file }}</div>
                     <div>Name: {{ selectedModel.name }}</div>
                     <div>Size: {{ selectedModel.width }} x {{ selectedModel.height }}</div>
                 </template>
@@ -110,7 +110,7 @@ import TShirtSVG from '@/assets/img/tshirt.svg';
 import TuneSVG from '@/assets/img/tune.svg';
 import Live2DModel from '@/core/live2d/Live2DModel';
 import { clamp } from '@/core/utils/math';
-import { FOCUS_TIMEOUT_MAX, LIVE2D_SCALE_MAX, LOCALE } from '@/defaults';
+import { FOCUS_TIMEOUT_MAX, LIVE2D_DIRECTORY, LIVE2D_SCALE_MAX, LOCALE } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import FileInput from '@/module/config/reusable/FileInput.vue';
 import LongClickAction from '@/module/config/reusable/LongClickAction.vue';
@@ -125,15 +125,23 @@ import {
 import Live2DModule from '@/module/live2d/Live2DModule';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import { ModelConfig, ModelConfigUtils } from '@/module/live2d/ModelConfig';
-import { basename } from 'path';
+import { basename, dirname } from 'path';
 import Vue from 'vue';
 import { Component, Prop, Watch } from 'vue-property-decorator';
+
+declare global {
+    interface File {
+        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/webkitdirectory
+        webkitRelativePath?: string;
+    }
+}
 
 class ModelEntity {
     config = {} as ModelConfig;
 
     name: string;
-    path: string;
+    file: string;
+    preview?: string;
 
     width = 0;
     height = 0;
@@ -150,16 +158,17 @@ class ModelEntity {
     }
 
     constructor(config: ModelConfig) {
-        this.name = basename(config.file)
-            .replace('.model.json', '')
-            .replace('.json', '');
-        this.path = config.file;
+        this.file = Array.isArray(config.file) ? config.file.find(f => f.endsWith('.moc'))! : config.file;
+
+        this.name = basename(this.file).replace(/\.(moc|json|model\.json)/, '');
 
         this.updateConfig(config);
     }
 
     updateConfig(config: ModelConfig) {
         Object.assign(this.config, ModelConfigUtils.toActualValues(config));
+
+        this.preview = config.preview && `${LIVE2D_DIRECTORY}/${dirname(this.file)}/${config.preview}`;
     }
 
     attach(live2dModel: Live2DModel) {
@@ -181,7 +190,7 @@ export default class CharacterSettings extends Vue {
 
     models: ModelEntity[] = [];
 
-    modelFile: File | null = null;
+    modelFiles: File[] | null = null;
 
     selectedIndex = -1;
 
@@ -217,9 +226,11 @@ export default class CharacterSettings extends Vue {
         return language ? language.name : '';
     }
 
-    @Watch('modelFile')
-    modelFileChanged(value: File | null) {
-        if (value) this.addModel(ModelConfigUtils.makeModelPath(value.name));
+    @Watch('modelFiles')
+    modelFileChanged(files: File[] | null) {
+        if (files && files.length > 0 && 'webkitRelativePath' in files[0]) {
+            this.configModule.app.emit('live2dAdd', files.map(f => f.webkitRelativePath));
+        }
     }
 
     @Watch('draggable')
@@ -311,10 +322,6 @@ export default class CharacterSettings extends Vue {
         this.selectedIndex = models.indexOf(selectedModel);
     }
 
-    addModel(path: string) {
-        this.configModule.app.emit('live2dAdd', path);
-    }
-
     modelLoaded(id: number, sprite: Live2DSprite) {
         const model = this.models.find(model => model.config.id === id);
         model && model.attach(sprite.model);
@@ -326,11 +333,11 @@ export default class CharacterSettings extends Vue {
         if (model) {
             if (error instanceof Error) {
                 if (error.message.includes('Empty response')) {
-                    let url = model.path;
+                    let url = model.file;
 
                     if (url) {
                         try {
-                            url = new URL(model.path, location.toString()).toString();
+                            url = new URL(model.file, location.toString()).toString();
                         } catch (ignored) {} // eslint-disable-line no-empty
                     } else {
                         url = '<EMPTY>';
