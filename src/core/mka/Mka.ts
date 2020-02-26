@@ -97,6 +97,8 @@ export default class Mka {
         this._paused = true;
         cancelAnimationFrame(this.rafId);
 
+        Ticker.pause();
+
         this.forEachPlayer(player => {
             if (player.enabled) {
                 player.paused = true;
@@ -108,14 +110,24 @@ export default class Mka {
     resume() {
         this._paused = false;
 
-        this.forEachPlayer(player => {
-            if (player.enabled) {
-                player.paused = false;
-                player.resume();
-            }
-        });
+        // postpone the resuming to prevent discrepancy of timestamp (https://stackoverflow.com/a/38360320)
+        // note that we must wrap it with two rAF here, because in WE, the first rAF will possibly be invoked with
+        //  timestamp of the animation frame that is right after the pausing frame, and thus the Ticker.timeSincePause
+        //  will be broken.
+        this.rafId = requestAnimationFrame(() => {
+            this.rafId = requestAnimationFrame(now => {
+                Ticker.resume(now);
 
-        requestAnimationFrame(this.tick);
+                this.forEachPlayer(player => {
+                    if (player.enabled) {
+                        player.paused = false;
+                        player.resume();
+                    }
+                });
+
+                this.tick(now);
+            });
+        });
     }
 
     forEachPlayer(fn: (player: InternalPlayer, name: string) => void) {

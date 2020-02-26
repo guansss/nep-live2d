@@ -15,6 +15,10 @@ namespace Ticker {
     let then = start;
     let adjustedDelta = now - then;
 
+    export let paused = false;
+    let pauseTime = now;
+    export let elapsedSincePause = now - pauseTime;
+
     // see https://stackoverflow.com/a/5111475
     let maxFps = FPS_MAX;
     let frameInterval = 1000 / maxFps;
@@ -31,6 +35,24 @@ namespace Ticker {
 
     export function getFPS() {
         return ~~(1000 / actualFrameInterval);
+    }
+
+    export function pause() {
+        const time = performance.now();
+
+        // pause can be triggered multiple times in WE, probably when interacting with multiple monitors
+        if (paused) {
+            elapsedSincePause += time - pauseTime;
+        }
+
+        paused = true;
+        pauseTime = time;
+    }
+
+    export function resume(time: DOMHighResTimeStamp) {
+        paused = false;
+        before = then = now = time;
+        elapsedSincePause = now - pauseTime;
     }
 
     /**

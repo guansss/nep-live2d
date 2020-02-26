@@ -186,6 +186,11 @@ export default class LeavesPlayer extends Player {
         this.destroy();
     }
 
+    resume() {
+        this.leaves && (this.leaves.nextFallTime += Ticker.elapsedSincePause);
+        this.backLeaves && (this.backLeaves.nextFallTime += Ticker.elapsedSincePause);
+    }
+
     hit(x: number, y: number) {
         this.leaves && this.leaves.hit(x, y);
         this.backLeaves && this.backLeaves.hit(x, y);
