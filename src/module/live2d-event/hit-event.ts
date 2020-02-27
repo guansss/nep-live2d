@@ -11,9 +11,6 @@ export default function registerHitEvent(sprite: Live2DSprite) {
                 break;
 
             case 'body':
-                sprite.model.motionManager.startRandomMotion('tapBody');
-                break;
-
             case 'belly':
                 sprite.model.motionManager.startRandomMotion('tapBody');
                 break;

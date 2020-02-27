@@ -82,8 +82,9 @@ export default class ModelSettings {
                 physics: files.find(f => f.includes('physics')),
                 hit_areas: neptuniaModelName
                     ? [
-                        { name: 'head', id: 'D_REF.PT_HEAD' },
-                        { name: 'mouth', id: 'D_REF.PT_MOUTH' },
+                        // use the name trick to bind these parts with compatible hit events
+                        { name: 'body', id: 'D_REF.PT_HEAD' },
+                        { name: 'head', id: 'D_REF.PT_MOUTH' },
                     ]
                     : undefined,
                 expressions: files.filter(f => f.includes('exp/')).map(f => ({ name: f, file: f })),
