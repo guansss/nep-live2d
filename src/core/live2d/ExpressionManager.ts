@@ -7,20 +7,20 @@ import sample from 'lodash/sample';
 export default class ExpressionManager extends MotionQueueManager {
     tag: string;
 
-    private readonly internalModel: Live2DModelWebGL;
+    readonly definitions: ExpressionDefinition[];
+    readonly expressions: Live2DExpression[] = [];
 
-    private readonly definitions: ExpressionDefinition[];
-    private readonly expressions: Live2DExpression[] = [];
+    defaultExpression: Live2DExpression;
+    currentExpression: Live2DExpression;
 
-    private defaultExpression = new Live2DExpression({}, 'default');
-    private currentExpression = this.defaultExpression;
-
-    constructor(name: string, model: Live2DModelWebGL, definitions: ExpressionDefinition[]) {
+    constructor(name: string, readonly internalModel: Live2DModelWebGL, definitions: ExpressionDefinition[]) {
         super();
 
         this.tag = `ExpressionManager\n(${name})`;
-        this.internalModel = model;
         this.definitions = definitions;
+
+        this.defaultExpression = new Live2DExpression(internalModel, {}, '(default)');
+        this.currentExpression = this.defaultExpression;
 
         this.loadExpressions().then();
         this.stopAllMotions();
@@ -30,7 +30,7 @@ export default class ExpressionManager extends MotionQueueManager {
         for (const { name, file } of this.definitions) {
             try {
                 const json = await getJSON(file);
-                this.expressions.push(new Live2DExpression(json, name));
+                this.expressions.push(new Live2DExpression(this.internalModel, json, name));
             } catch (e) {
                 error(this.tag, `Failed to load expression [${name}]: ${file}`, e);
             }

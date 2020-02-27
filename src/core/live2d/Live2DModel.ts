@@ -31,6 +31,14 @@ export default class Live2DModel {
 
     focusController = new FocusController();
 
+    eyeballXParamIndex: number;
+    eyeballYParamIndex: number;
+    angleXParamIndex: number;
+    angleYParamIndex: number;
+    angleZParamIndex: number;
+    bodyAngleXParamIndex: number;
+    breathParamIndex: number;
+
     static async create(file: string | string[]) {
         let modelSettingsFile: string | undefined;
         let modelSettings: ModelSettings | undefined;
@@ -110,6 +118,14 @@ export default class Live2DModel {
         }
 
         internalModel.saveParam();
+
+        this.eyeballXParamIndex = internalModel.getParamIndex('PARAM_EYE_BALL_X');
+        this.eyeballYParamIndex = internalModel.getParamIndex('PARAM_EYE_BALL_Y');
+        this.angleXParamIndex = internalModel.getParamIndex('PARAM_ANGLE_X');
+        this.angleYParamIndex = internalModel.getParamIndex('PARAM_ANGLE_Y');
+        this.angleZParamIndex = internalModel.getParamIndex('PARAM_ANGLE_Z');
+        this.bodyAngleXParamIndex = internalModel.getParamIndex('PARAM_BODY_ANGLE_X');
+        this.breathParamIndex = internalModel.getParamIndex('PARAM_BREATH');
     }
 
     bindTexture(index: number, texture: WebGLTexture) {
@@ -130,7 +146,7 @@ export default class Live2DModel {
         if (this.internalModel && this.modelSettings.hitAreas) {
             return this.modelSettings.hitAreas
                 .filter(({ name, id }) => {
-                    let drawIndex = this.internalModel.getDrawDataIndex(id);
+                    const drawIndex = this.internalModel.getDrawDataIndex(id);
 
                     if (drawIndex >= 0) {
                         const points = this.internalModel.getTransformedPoints(drawIndex);
@@ -175,13 +191,13 @@ export default class Live2DModel {
         const focusX = this.focusController.x;
         const focusY = this.focusController.y;
         const t = (now / 1000) * 2 * Math.PI;
-        model.addToParamFloat('PARAM_EYE_BALL_X', focusX);
-        model.addToParamFloat('PARAM_EYE_BALL_Y', focusY);
-        model.addToParamFloat('PARAM_ANGLE_X', focusX * 30 + 15 * Math.sin(t / 6.5345) * 0.5);
-        model.addToParamFloat('PARAM_ANGLE_Y', focusY * 30 + 8 * Math.sin(t / 3.5345) * 0.5);
-        model.addToParamFloat('PARAM_ANGLE_Z', focusX * focusY * -30 + 10 * Math.sin(t / 5.5345) * 0.5);
-        model.addToParamFloat('PARAM_BODY_ANGLE_X', focusX * 10 + 4 * Math.sin(t / 15.5345) * 0.5);
-        model.setParamFloat('PARAM_BREATH', 0.5 + 0.5 * Math.sin(t / 3.2345));
+        model.addToParamFloat(this.eyeballXParamIndex, focusX);
+        model.addToParamFloat(this.eyeballYParamIndex, focusY);
+        model.addToParamFloat(this.angleXParamIndex, focusX * 30 + 15 * Math.sin(t / 6.5345) * 0.5);
+        model.addToParamFloat(this.angleYParamIndex, focusY * 30 + 8 * Math.sin(t / 3.5345) * 0.5);
+        model.addToParamFloat(this.angleZParamIndex, focusX * focusY * -30 + 10 * Math.sin(t / 5.5345) * 0.5);
+        model.addToParamFloat(this.bodyAngleXParamIndex, focusX * 10 + 4 * Math.sin(t / 15.5345) * 0.5);
+        model.setParamFloat(this.breathParamIndex, 0.5 + 0.5 * Math.sin(t / 3.2345));
 
         this.physics && this.physics.update(now);
         this.pose && this.pose.update(dt);

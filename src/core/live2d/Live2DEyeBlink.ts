@@ -8,10 +8,8 @@ enum EyeState {
 }
 
 export default class Live2DEyeBlink {
-    readonly internalModel: Live2DModelWebGL;
-
-    leftParam = 'PARAM_EYE_L_OPEN';
-    rightParam = 'PARAM_EYE_R_OPEN';
+    leftParam: number;
+    rightParam: number;
 
     blinkInterval: DOMHighResTimeStamp = 4000;
     closingDuration: DOMHighResTimeStamp = 100;
@@ -23,8 +21,9 @@ export default class Live2DEyeBlink {
     closedTimer = 0;
     nextBlinkTimeLeft = this.blinkInterval;
 
-    constructor(internalModel: Live2DModelWebGL) {
-        this.internalModel = internalModel;
+    constructor(readonly internalModel: Live2DModelWebGL) {
+        this.leftParam = internalModel.getParamIndex('PARAM_EYE_L_OPEN');
+        this.rightParam = internalModel.getParamIndex('PARAM_EYE_R_OPEN');
     }
 
     setEyeParams(value: number) {

@@ -7,7 +7,7 @@ const enum ParamCalcType {
 }
 
 interface Param {
-    id: string;
+    id: number;
     value: number;
     type: ParamCalcType;
 }
@@ -19,7 +19,7 @@ export default class Live2DExpression extends AMotion {
 
     readonly params: Param[] = [];
 
-    constructor(json: object, name?: string) {
+    constructor(readonly internalModel: Live2DModelWebGL, json: object, name?: string) {
         super();
 
         this.name = name;
@@ -32,14 +32,14 @@ export default class Live2DExpression extends AMotion {
 
         if (Array.isArray(json.params)) {
             json.params.forEach((paramDef: any) => {
-                const id = paramDef.id;
                 let value = parseFloat(paramDef.val);
 
-                if (!id || !value) {
+                if (!paramDef.id || !value) {
                     // skip if missing essential properties
                     return;
                 }
 
+                const id = this.internalModel.getParamIndex(paramDef.id);
                 const type = paramDef.calc || ParamCalcType.Add;
 
                 if (type === ParamCalcType.Add) {

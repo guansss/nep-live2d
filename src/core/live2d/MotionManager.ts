@@ -17,8 +17,6 @@ enum Group {
 const DEFAULT_FADE_TIMEOUT = 500;
 
 export default class MotionManager extends MotionQueueManager {
-    static readonly Priority = Priority;
-
     tag: string;
 
     readonly internalModel: Live2DModelWebGL;
@@ -65,12 +63,10 @@ export default class MotionManager extends MotionQueueManager {
     }
 
     private async loadMotion(group: string, index: number) {
-        log(this.tag, `Loading motion at ${index} in group "${group}"`);
-
         const definition = this.definitions[group] && this.definitions[group][index];
 
         if (!definition) {
-            error(this.tag, 'Motion not found');
+            error(this.tag, `Motion not found at ${index} in group "${group}"`);
             return;
         }
 
@@ -107,7 +103,7 @@ export default class MotionManager extends MotionQueueManager {
 
         this.currentPriority = priority;
 
-        log(this.tag, 'Starting motion:', this.definitions[group][index].file);
+        log(this.tag, 'Start motion:', this.definitions[group][index].file);
 
         if (priority > Priority.Idle) {
             this.expressionManager && this.expressionManager.resetExpression();
