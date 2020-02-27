@@ -65,7 +65,7 @@ export function log(tag: string, ...messages: any[]) {
         count: 1,
     });
 
-    if (debug) consoleLog(`[${tag}]`, ...messages);
+    if (debug) consoleLog(`[${tag.replace('\n', '')}]`, ...messages);
 }
 
 export function error(tag: string, ...messages: any[]) {
@@ -76,5 +76,5 @@ export function error(tag: string, ...messages: any[]) {
         count: 1,
     });
 
-    if (debug) consoleError(`[${tag}]`, ...messages);
+    if (debug) consoleError(`[${tag.replace('\n', '')}]`, ...messages);
 }
