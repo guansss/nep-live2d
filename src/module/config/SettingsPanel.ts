@@ -17,13 +17,17 @@ import { Vue } from 'vue/types/vue';
     components: { CloseSVG, RefreshSVG, Scrollable },
 })
 export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
-    @Prop() readonly configModule!: ConfigModule;
+    @Prop() readonly module!: () => ConfigModule;
 
     @Ref('settings') readonly panel!: HTMLDivElement;
     @Ref('content') readonly content!: HTMLDivElement;
     @Ref('tabs') readonly handle!: HTMLDivElement;
     @Ref('resizer') readonly resizer!: HTMLDivElement;
     @Ref('page') readonly pageComponent!: Vue;
+
+    get configModule() {
+        return this.module();
+    }
 
     readonly pages = [
         GeneralSettings,

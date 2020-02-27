@@ -65,8 +65,8 @@ export default class ConfigModule implements Module {
 
         app.sticky('configReady', this.config);
 
-        app.addComponent(SettingsPanel, { configModule: this }).then();
-        app.addComponent(Overlay, { configModule: this }).then();
+        app.addComponent(SettingsPanel, { module: () => this }).then();
+        app.addComponent(Overlay, { module: () => this }).then();
 
         const prevVersion = localStorage.v;
 

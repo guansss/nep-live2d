@@ -12,7 +12,11 @@ const FPS_REFRESH_INTERVAL = 500;
 
 @Component
 export default class Overlay extends Vue {
-    @Prop() readonly configModule!: ConfigModule;
+    @Prop() readonly module!: () => ConfigModule;
+
+    get configModule() {
+        return this.module();
+    }
 
     showFPS = this.configModule.getConfig('fps', false);
     fps = 0;
