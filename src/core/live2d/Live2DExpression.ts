@@ -12,7 +12,7 @@ interface Param {
     type: ParamCalcType;
 }
 
-const DEFAULT_FADE_TIMEOUT = 500;
+const DEFAULT_FADING_DURATION = 500;
 
 export default class Live2DExpression extends AMotion {
     name?: string;
@@ -27,8 +27,8 @@ export default class Live2DExpression extends AMotion {
     }
 
     private load(json: any) {
-        this.setFadeIn(json.fadeIn > 0 ? json.fadeIn : DEFAULT_FADE_TIMEOUT);
-        this.setFadeOut(json.fadeOut > 0 ? json.fadeOut : DEFAULT_FADE_TIMEOUT);
+        this.setFadeIn(json.fadeIn > 0 ? json.fadeIn : DEFAULT_FADING_DURATION);
+        this.setFadeOut(json.fadeOut > 0 ? json.fadeOut : DEFAULT_FADING_DURATION);
 
         if (Array.isArray(json.params)) {
             json.params.forEach((paramDef: any) => {
@@ -58,17 +58,22 @@ export default class Live2DExpression extends AMotion {
     /** @override */
     updateParamExe(model: Live2DModelWebGL, time: DOMTimeStamp, weight: number, motionQueueEnt: unknown) {
         this.params.forEach(param => {
-            switch (param.type) {
-                case ParamCalcType.Set:
-                    model.setParamFloat(param.id, param.value, weight);
-                    break;
-                case ParamCalcType.Add:
-                    model.addToParamFloat(param.id, param.value, weight);
-                    break;
-                case ParamCalcType.Mult:
-                    model.multParamFloat(param.id, param.value, weight);
-                    break;
-            }
+            // this algorithm seems to be broken for newer Neptunia series models, have no idea
+            //
+            // switch (param.type) {
+            //     case ParamCalcType.Set:
+            //         model.setParamFloat(param.id, param.value, weight);
+            //         break;
+            //     case ParamCalcType.Add:
+            //         model.addToParamFloat(param.id, param.value * weight);
+            //         break;
+            //     case ParamCalcType.Mult:
+            //         model.multParamFloat(param.id, param.value, weight);
+            //         break;
+            // }
+
+            // this works fine for any model
+            model.setParamFloat(param.id, param.value * weight);
         });
     }
 }

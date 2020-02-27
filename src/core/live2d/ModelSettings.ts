@@ -86,7 +86,7 @@ export default class ModelSettings {
                         { name: 'mouth', id: 'D_REF.PT_MOUTH' },
                     ]
                     : undefined,
-                expressions: files.filter(f => f.includes('exp/')).map((f, i) => ({ name: i, file: f })),
+                expressions: files.filter(f => f.includes('exp/')).map(f => ({ name: f, file: f })),
                 motions: {
                     idle: [
                         { file: LIVE2D_DIRECTORY + '/general/mtn/idle_00.mtn', fade_in: 2000, fade_out: 2000 },
