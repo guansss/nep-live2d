@@ -96,8 +96,8 @@
 
   // console
   "cmd": "Command",
-  "dump_logs": "Dump Logs",
-  "dump_storage": "Dump Storage",
+  "copy_logs": "Copy Logs",
+  "copy_storage": "Copy Storage",
   "reset": "Reset Settings",
 
   // about

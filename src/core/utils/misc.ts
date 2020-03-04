@@ -29,4 +29,26 @@ export function cloneWithCamelCase(value: any): any {
     return value;
 }
 
+/**
+ * Copies text to clipboard.
+ *
+ * @see https://stackoverflow.com/a/30810322
+ */
+export function copy(text: string) {
+    const textArea = document.createElement('textarea') as HTMLTextAreaElement;
+    document.body.appendChild(textArea);
+
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    textArea.value = text;
+    textArea.focus();
+    textArea.select();
+
+    try {
+        document.execCommand('copy');
+    } catch (e) {}
+
+    document.body.removeChild(textArea);
+}
+
 export function nop(): any {}

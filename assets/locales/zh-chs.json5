@@ -85,8 +85,8 @@
   "drop_rate": "掉落速率",
 
   "cmd": "命令",
-  "dump_logs": "导出日志",
-  "dump_storage": "导出内部存储",
+  "copy_logs": "复制日志",
+  "copy_storage": "复制内部存储",
   "reset": "重置设定",
 
   "subtitle": "终极的Live2D壁纸",

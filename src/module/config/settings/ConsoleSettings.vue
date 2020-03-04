@@ -2,8 +2,8 @@
     <div class="log">
         <div class="buttons">
             <div class="button" @click="runCommand">{{ $t('cmd') }}</div>
-            <div class="button" @click="dumpLogs">{{ $t('dump_logs') }}</div>
-            <div class="button" @click="dumpStorage">{{ $t('dump_storage') }}</div>
+            <div class="button" @click="copyLogs">{{ $t('copy_logs') }}</div>
+            <div class="button" @click="copyStorage">{{ $t('copy_storage') }}</div>
 
             <LongClickAction class="button reset" :duration="1500" @long-click="reset">{{
                 $t('reset')
@@ -22,6 +22,7 @@
 <script lang="ts">
 import ConsoleSVG from '@/assets/img/console.svg';
 import { error, log, LogRecord, logs as _logs } from '@/core/utils/log';
+import { copy } from '@/core/utils/misc';
 import { randomHSLColor } from '@/core/utils/string';
 import ConfigModule from '@/module/config/ConfigModule';
 import LongClickAction from '@/module/config/reusable/LongClickAction.vue';
@@ -46,6 +47,7 @@ function setColor(log: ExtendedLogRecord) {
 }
 
 const cachedColors: { [key: string]: string } = {};
+
 @Component({
     components: { LongClickAction, Scrollable },
 })
@@ -122,20 +124,30 @@ export default class ConsoleSettings extends Vue {
         }
     }
 
-    dumpLogs() {
-        const data = logs.reduce((result, log) => `${result}##[${log.tag}]${log.message}`, '').replace('\n', '##');
-        prompt('Dump result', data);
+    copyLogs() {
+        const data = logs.map(log => `[${log.tag.replace('\n', '')}]${log.message}`).join('\n');
+        copy(data);
     }
 
-    dumpStorage() {
+    copyStorage() {
         // print to console
         Object.entries(localStorage).forEach(([key, value]) => log(`Storage[${key}]`, value));
 
-        prompt(
-            'Dump result',
-            Object.entries(localStorage)
-                .map(([key, value]) => `${key}:${value}`)
-                .join('##'),
+        // copy as JSON
+        copy(
+            JSON.stringify(
+                Object.entries(localStorage).reduce(
+                    (obj, [key, value]) => {
+                        try {
+                            obj[key] = JSON.parse(value);
+                        } catch (e) {
+                            obj[key] = value;
+                        }
+                        return obj;
+                    },
+                    {} as any,
+                ),
+            ),
         );
     }
 
