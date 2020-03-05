@@ -5,6 +5,8 @@ import { Config } from '@/module/config/ConfigModule';
 import Live2DPlayer from '@/module/live2d/Live2DPlayer';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import { DEFAULT_MODEL_CONFIG, ModelConfig, ModelConfigUtils } from '@/module/live2d/ModelConfig';
+import versionLessThan from 'semver/functions/lt';
+import versionValid from 'semver/functions/valid';
 
 export interface App {
     emit(event: 'live2dAdd', path: string, config?: ModelConfig): this;
@@ -48,7 +50,8 @@ export default class Live2DModule implements Module {
 
         ((app.mka.pixiApp.renderer as any) as { runners: { resize: PIXI.Runner } }).runners.resize.add(this);
 
-        app.on('config:live2d.draggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable))
+        app.on('init', this.migrate, this)
+            .on('config:live2d.draggable', (draggable: boolean) => (this.player.mouseHandler.draggable = draggable))
             .on('config:live2d.fPress', this.player.mouseHandler.setFocusOnPress, this.player.mouseHandler)
             .on('config:live2d.fTime', this.player.mouseHandler.setLoseFocusTimeout, this.player.mouseHandler)
             .on('live2dConfig', this.configureModel, this)
@@ -64,6 +67,24 @@ export default class Live2DModule implements Module {
 
                 this.loadSavedModels();
             });
+    }
+
+    migrate(prevVersion: string | undefined, config: Config) {
+        // apply changes of config format in commit d5184febf31119458ea33e06ce41f057257c5947
+        if (versionValid(prevVersion) && versionLessThan(prevVersion, '2.1.0')) {
+            const models = config.get<any[]>('live2d.models', []);
+
+            if (models.length) {
+                for (const model of models) {
+                    if (typeof model.file === 'string') {
+                        // the "live2d/" prefix in Live2D model path had been deprecated
+                        model.file = model.file.replace('live2d/', '');
+                    }
+                }
+
+                this.app.emit('config', 'live2d.models', models);
+            }
+        }
     }
 
     // will be called from "resize" runner of pixiApp's renderer

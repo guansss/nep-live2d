@@ -78,7 +78,7 @@ export default class ConfigModule implements Module {
                 this.backup(prevVersion);
             }
 
-            app.sticky('init', prevVersion);
+            app.sticky('init', prevVersion, this.config);
             localStorage.v = process.env.VERSION;
         }
     }

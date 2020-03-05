@@ -7,6 +7,8 @@ import { ModelConfig } from '@/module/live2d/ModelConfig';
 import isEqual from 'lodash/isEqual';
 import omit from 'lodash/omit';
 import omitBy from 'lodash/omitBy';
+import versionLessThan from 'semver/functions/lt';
+import versionValid from 'semver/functions/valid';
 
 export interface Config {
     theme?: {
@@ -57,7 +59,8 @@ export default class ThemeModule implements Module {
     selected = -1;
 
     constructor(readonly app: App) {
-        app.on('themeUnsaved', this.getUnsavedTheme, this)
+        app.on('init', this.migrate, this)
+            .on('themeUnsaved', this.getUnsavedTheme, this)
             .on('themeSave', this.saveTheme, this)
             .on('config:theme.selected', this.setTheme, this)
             .on('config:theme.custom', (custom: Theme[]) => (this.customThemes = custom))
@@ -78,6 +81,26 @@ export default class ThemeModule implements Module {
                     }
                 }
             });
+    }
+
+    migrate(prevVersion: string | undefined, config: Config) {
+        // apply changes of config format in commit d5184febf31119458ea33e06ce41f057257c5947
+        if (versionValid(prevVersion) && versionLessThan(prevVersion, '2.1.0')) {
+            const themes = config.get<Theme[]>('theme.custom', []);
+
+            if (themes.length) {
+                for (const theme of themes) {
+                    for (const model of theme.models) {
+                        if (typeof model.file === 'string') {
+                            // the "live2d/" prefix in Live2D model path had been deprecated
+                            model.file = model.file.replace('live2d/', '');
+                        }
+                    }
+                }
+
+                this.app.emit('config', 'theme.custom', themes);
+            }
+        }
     }
 
     getSeasonalThemeIndex() {
@@ -170,9 +193,7 @@ export default class ThemeModule implements Module {
             const leaves = this.config.get('leaves.on', false);
             const snow = this.config.get('snow.on', false);
 
-            const models = this.config.get<ModelConfig[]>('live2d.models', []) as {
-                [P in keyof ModelConfig]-?: ModelConfig[P]
-            }[];
+            const models = this.config.get<ModelConfig[]>('live2d.models', []);
 
             const theme: Theme = {
                 name,

@@ -1,3 +1,8 @@
+declare module 'semver/functions/*' {
+    const F: (...args: any[]) => {};
+    export default F;
+}
+
 /**
  * Vue shims
  */
