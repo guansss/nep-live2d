@@ -13,5 +13,5 @@ void main() {
 
     vec4 snowflake = texture2D(texture, rotated);
 
-    gl_FragColor = vec4(snowflake.rgb, snowflake.a * v_alpha);
+    gl_FragColor = snowflake * v_alpha;
 }

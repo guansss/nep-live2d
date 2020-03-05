@@ -2,7 +2,7 @@
  * Based on https://codepen.io/bsehovac/pen/GPwXxq
  */
 
-import { BLEND_MODES, DRAW_MODES } from '@pixi/constants';
+import { DRAW_MODES } from '@pixi/constants';
 import { Buffer, Geometry, Shader, State, Texture } from '@pixi/core';
 import { Mesh } from '@pixi/mesh';
 import frag from 'raw-loader!./snow.frag';
@@ -68,18 +68,14 @@ export default class Snow extends Mesh {
                 .addAttribute('a_size', Buffer.from([]), 1)
                 .addAttribute('a_alpha', Buffer.from([]), 1),
             Shader.from(vert, frag, {
-                texture: Texture.from(textureSource, {
-                    resourceOptions: {
-                        premultiplyAlpha: false,
-                    },
-                }),
+                texture: Texture.from(textureSource),
                 time: 0,
                 worldSize: [0, 0, 0],
                 gravity: 100,
                 wind: 0,
                 projection: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
             }),
-            new State(),
+            State.for2d(),
             DRAW_MODES.POINTS,
         );
 
@@ -88,10 +84,6 @@ export default class Snow extends Mesh {
         this._width = this.options.width;
         this._height = this.options.height;
         this._number = this.options.number;
-
-        this.state.blend = true;
-        this.state.blendMode = BLEND_MODES.NORMAL_NPM;
-        this.state.depthTest = false;
 
         this.setup();
     }
@@ -139,7 +131,7 @@ export default class Snow extends Mesh {
 
             size.push((maxSize - minSize) * Math.random() + minSize);
 
-            alpha.push(0.1 + Math.random() * 0.2);
+            alpha.push(0.2 + Math.random() * 0.3);
         }
 
         this.geometry.getBuffer('a_position').update(new Float32Array(position));

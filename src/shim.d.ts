@@ -20,7 +20,14 @@ declare module '@pixi/constants' {
 }
 
 declare module '@pixi/core' {
-    export { Buffer, Geometry, Renderer, Shader, State, Texture, BaseTexture } from 'pixi.js';
+    import { State } from 'pixi.js';
+
+    class ExposedState extends State {
+        static for2d(): State; // this is not defined in pixi's types
+    }
+
+    export { ExposedState as State };
+    export { Buffer, Geometry, Renderer, Shader, Texture, BaseTexture } from 'pixi.js';
 }
 
 declare module '@pixi/loaders' {
