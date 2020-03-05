@@ -23,13 +23,8 @@ function startup() {
                 startup();
             });
 
-            // completely reset!
-            app.once('reset', () => {
-                mainApp.$destroy();
-                app.destroy();
-                localStorage.clear();
-                startup();
-            });
+            // reload after resetting
+            app.once('reset', () => setTimeout(() => app.emit('reload'), 0));
 
             Modules.forEach(Module => app.use(Module));
 

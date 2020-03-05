@@ -38,7 +38,7 @@ export interface App {
 
     on(event: 'config', fn: (path: string, value: any, runtime?: boolean) => void, context?: any): this;
 
-    emit(event: 'init'): this;
+    emit(event: 'init', prevVersion: string | undefined, config: Config): this;
 
     emit(event: 'configReady', config: Config): this;
 
@@ -61,7 +61,7 @@ export default class ConfigModule implements Module {
     constructor(readonly app: App) {
         this.read();
 
-        app.on('config', this.setConfig, this);
+        app.on('config', this.setConfig, this).on('reset', this.reset, this);
 
         app.sticky('configReady', this.config);
 
@@ -74,6 +74,8 @@ export default class ConfigModule implements Module {
             if (!prevVersion) {
                 // inherit volume from old 1.x versions
                 app.once('we:volume', (value: number) => app.emit('config', 'volume', value / 10));
+            } else {
+                this.backup(prevVersion);
             }
 
             app.sticky('init', prevVersion);
@@ -101,12 +103,13 @@ export default class ConfigModule implements Module {
     }
 
     /**
+     * A handy method for batching queries.
      * @param receiver
      * @param pairs - Pairs of path and default value.
      * @example
      * getConfigs(receiver, 'obj.number', 0, 'obj.bool', false)
      */
-    getConfigs(receiver: (path: string, value: any) => void, pairs: any[]) {
+    getConfigs(receiver: (path: string, value: any) => void, pairs: string | any[]) {
         for (let i = 0; i < pairs.length; i += 2) {
             receiver(pairs[i], this.getConfig(pairs[i] as string, pairs[i + 1]));
         }
@@ -134,5 +137,16 @@ export default class ConfigModule implements Module {
             error(TAG, e);
         }
         return false;
+    }
+
+    backup(version: string) {
+        localStorage.setItem(this.storageKey + '-' + version, localStorage.getItem(this.storageKey) || '');
+    }
+
+    reset() {
+        this.backup(localStorage.v);
+
+        localStorage.removeItem('v');
+        localStorage.removeItem(this.storageKey);
     }
 }
