@@ -1,6 +1,7 @@
 import CloseSVG from '@/assets/img/close.svg';
 import RefreshSVG from '@/assets/img/refresh.svg';
 import { nop } from '@/core/utils/misc';
+import { I18N, LOCALE } from '@/defaults';
 import ConfigModule from '@/module/config/ConfigModule';
 import FloatingPanelMixin from '@/module/config/FloatingPanelMixin';
 import Scrollable from '@/module/config/reusable/Scrollable.vue';
@@ -55,11 +56,6 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
     };
 
     created() {
-        this.configModule.app.once('init', (version?: string) => {
-            // show tip at first launch
-            if (!version) this.title = process.env.NAME;
-        });
-
         this.switchTop = this.configModule.getConfig('settings.switchTop', this.switchTop);
         this.switchLeft = this.configModule.getConfig('settings.switchLeft', this.switchLeft);
 
@@ -67,18 +63,29 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
         this.panelLeft = this.configModule.getConfig('settings.panelLeft', this.panelLeft);
         this.panelWidth = this.configModule.getConfig('settings.panelWidth', this.panelWidth);
         this.panelHeight = this.configModule.getConfig('settings.panelHeight', this.panelHeight);
+    }
 
-        this.configModule.app.on('we:switch', this.toggle, this);
+    mounted() {
+        this.configModule.app
+            .once('init', (prevVersion?: string) => {
+                if (!prevVersion) {
+                    // show tip at first launch
+                    this.title = process.env.NAME;
+                } else if (I18N[LOCALE]['changelog_important']) {
+                    this.selectPage(this.pages.indexOf(AboutSettings));
+                    this.open();
+                }
+            })
+            .on('we:switch', this.toggle, this);
     }
 
     toggle(_: boolean, initial?: boolean) {
         if (!initial) {
-            console.warn(_);
             this.expanded ? this.close() : this.open();
         }
     }
 
-    async selectPage(index: number) {
+    selectPage(index: number) {
         this.selectedPage = index;
     }
 

@@ -5,15 +5,20 @@
         <div>
             <span class="badge">v{{ ver }}</span>
             <span class="badge">{{ time }}</span>
-            <span class="badge" data-title="/guansss/nep-live2d">Now on Github</span>
+            <span class="badge" data-title="/guansss/nep-live2d">Now on GitHub</span>
+        </div>
+
+        <div class="desc">{{ $t('desc') }}</div>
+
+        <div v-if="$t('changelog_important')" class="changelog">
+            <div class="title important">{{ $t('important_changes') }}</div>
+            <div class="content">{{$t('changelog_important')}}</div>
         </div>
 
         <div class="changelog">
             <div class="title">{{ $t('changelog') }}</div>
-            <p v-for="log in $t('changelog_logs')" :key="log">· {{ log }}</p>
+            <div v-for="log in $t('changelog_logs')" :key="log">· {{ log }}</div>
         </div>
-
-        <div class="desc">{{ $t('desc') }}</div>
 
         <div class="credit">
             <div class="header">Credits</div>
@@ -111,15 +116,26 @@ export default class EffectsSettings extends Vue {
     &:hover:after
         opacity 1
 
+.desc
+    margin 24px 8px
+
 .changelog
-    margin 28px auto 24px
-    padding 8px
+    margin-top 24px
+    width 100%
+    padding 8px 24px
     background #0001
     text-align left
 
     .title
         margin-bottom 4px
         font-weight bold
+
+        &.important
+            font-size 120%
+            color var(--accentColor)
+
+    .content
+        white-space pre-wrap
 
 .credit
     flex-grow 1
