@@ -2,6 +2,7 @@ import Live2DModel from '@/core/live2d/Live2DModel';
 import Ticker from '@/core/mka/Ticker';
 import { Renderer, Texture } from '@pixi/core';
 import { Container } from '@pixi/display';
+import { Sprite } from '@pixi/sprite';
 
 interface Live2DSprite {
     emit(event: 'hit', hitAreaName: string): boolean;
@@ -29,6 +30,8 @@ class Live2DSprite extends Container {
     drawingScaleX = 1;
     drawingScaleY = 1;
 
+    highlightCover?: Sprite;
+
     static async create(file: string | string[]) {
         const model = await Live2DModel.create(file);
         return new Live2DSprite(model);
@@ -54,6 +57,19 @@ class Live2DSprite extends Container {
             }
             return started;
         };
+    }
+
+    highlight(enabled: boolean) {
+        if (enabled) {
+            if (!this.highlightCover) {
+                this.highlightCover = new Sprite(Texture.WHITE);
+                this.highlightCover.alpha = 0.3;
+                this.addChild(this.highlightCover);
+            }
+            this.highlightCover.visible = true;
+        } else if (this.highlightCover) {
+            this.highlightCover.visible = false;
+        }
     }
 
     /**
@@ -128,6 +144,13 @@ class Live2DSprite extends Container {
 
         // reset the active texture because it's been changed by Live2D's drawing system
         renderer.gl.activeTexture(WebGLRenderingContext.TEXTURE0 + renderer.texture.currentLocation);
+
+        if (this.highlightCover && this.highlightCover.visible) {
+            this.highlightCover.x = this.x;
+            this.highlightCover.y = this.y;
+            this.highlightCover.width = this.width;
+            this.highlightCover.height = this.height;
+        }
     }
 }
 

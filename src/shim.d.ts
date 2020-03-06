@@ -32,7 +32,15 @@ declare module '@pixi/core' {
     }
 
     export { ExposedState as State };
-    export { Buffer, Geometry, Renderer, Shader, Texture, BaseTexture } from 'pixi.js';
+    export {
+        Buffer,
+        Geometry,
+        Renderer,
+        AbstractBatchRenderer as BatchRenderer, // use a name trick because BatchRenderer is not defined in pixi's types
+        Shader,
+        Texture,
+        BaseTexture,
+    } from 'pixi.js';
 }
 
 declare module '@pixi/loaders' {

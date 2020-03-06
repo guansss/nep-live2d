@@ -2,7 +2,10 @@ import Player, { InternalPlayer } from '@/core/mka/Player';
 import Ticker from '@/core/mka/Ticker';
 import { error, log } from '@/core/utils/log';
 import { Application as PIXIApplication } from '@pixi/app';
+import { BatchRenderer, Renderer } from '@pixi/core';
 import autobind from 'autobind-decorator';
+
+Renderer.registerPlugin('batch', BatchRenderer as any);
 
 const TAG = 'Mka';
 

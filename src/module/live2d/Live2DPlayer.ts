@@ -29,14 +29,27 @@ export default class Live2DPlayer extends Player {
 
         const self = this;
 
-        this.mouseHandler = new class extends MouseHandler {
+        this.mouseHandler = new (class extends MouseHandler {
             focus(x: number, y: number) {
-                self.sprites.forEach(sprite =>
+                let oneHighlighted = false;
+
+                // start focusing and hover testing by the z order, from top to bottom
+                for (let i = self.container.children.length - 1; i >= 0; i--) {
+                    // need to ensure the container only contains Live2DSprites
+                    const sprite = self.container.children[i] as DraggableLive2DSprite;
+
                     sprite.model.focusController.focus(
                         clamp(((x - sprite.x) / sprite.width) * 2 - 1, -1, 1),
                         -clamp(((y - sprite.y) / sprite.height) * 2 - 1, -1, 1),
-                    ),
-                );
+                    );
+
+                    if (this.draggable && !oneHighlighted && sprite.getBounds().contains(x, y)) {
+                        oneHighlighted = true;
+                        sprite.highlight(true);
+                    } else {
+                        sprite.highlight(false);
+                    }
+                }
             }
 
             clearFocus() {
@@ -72,8 +85,8 @@ export default class Live2DPlayer extends Player {
                     if (sprite.dragging) {
                         sprite.x += dx;
                         sprite.y += dy;
-                        break;
                     }
+                    sprite.highlight(!!sprite.dragging);
                 }
             }
 
@@ -82,11 +95,10 @@ export default class Live2DPlayer extends Player {
                     if (sprite.dragging) {
                         sprite.dragging = false;
                         self.dragEnded(sprite);
-                        break;
                     }
                 }
             }
-        }(MOUSE_HANDLING_ELEMENT);
+        })(MOUSE_HANDLING_ELEMENT);
 
         this.container.zIndex = Z_INDEX_LIVE2D;
         this.container.sortableChildren = true;
