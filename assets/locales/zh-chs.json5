@@ -62,6 +62,7 @@
   "max_fps": "最大FPS",
   "_ui_language": "UI语言",
 
+  "files_exceed_limit": "文件数量超出限制",
   "dragging": "拖拽",
   "focus_on_press": "按下鼠标跟随",
   "focus_timeout": "跟随持续时间",

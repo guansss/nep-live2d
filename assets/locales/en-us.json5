@@ -70,6 +70,7 @@
   "_ui_language": "UI Language",
 
   // character settings
+  "files_exceed_limit": "Amount of files exceeds the limit.",
   "dragging": "Dragging",
   "focus_on_press": "Focus on Press",
   "focus_timeout": "Focus Timeout",

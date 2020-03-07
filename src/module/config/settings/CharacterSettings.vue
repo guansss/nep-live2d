@@ -158,7 +158,11 @@ class ModelEntity {
     }
 
     constructor(config: ModelConfig) {
-        this.file = Array.isArray(config.file) ? config.file.find(f => f.endsWith('.moc'))! : config.file;
+        this.file = Array.isArray(config.file)
+            ? config.file.length > 0
+                ? config.file[0].replace(/\/.*/, '')
+                : '<EMPTY>'
+            : config.file;
 
         this.name = basename(this.file).replace(/\.(moc|json|model\.json)/, '');
 
@@ -229,7 +233,14 @@ export default class CharacterSettings extends Vue {
     @Watch('modelFiles')
     modelFileChanged(files: File[] | null) {
         if (files && files.length > 0 && 'webkitRelativePath' in files[0]) {
-            this.configModule.app.emit('live2dAdd', files.map(f => f.webkitRelativePath));
+            if (files.length <= 300) {
+                this.configModule.app.emit(
+                    'live2dAdd',
+                    files.map(f => f.webkitRelativePath),
+                );
+            } else {
+                this.$emit('dialog', this.$t('files_exceed_limit') + ` (${files.length}/300)`);
+            }
         }
     }
 
