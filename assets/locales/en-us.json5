@@ -103,6 +103,7 @@
 
   // about
   "subtitle": "The Ultimate Live2D Wallpaper",
-  "changelog": "Changelog",
+  "important_changes": "Important Changes in v{VERSION}",
+  "changelog": "Changelog v{VERSION}",
   "desc": "For tutorial and more information, please visit the Workshop page."
 }
