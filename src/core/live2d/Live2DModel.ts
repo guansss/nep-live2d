@@ -8,6 +8,9 @@ import MotionManager from '@/core/live2d/MotionManager';
 import { log } from '@/core/utils/log';
 import { randomID } from '@/core/utils/string';
 
+export const LOGICAL_WIDTH = 2;
+export const LOGICAL_HEIGHT = 2;
+
 export default class Live2DModel {
     tag = 'Live2DModel(uninitialized)';
 
@@ -25,7 +28,11 @@ export default class Live2DModel {
     readonly logicalWidth: number;
     readonly logicalHeight: number;
 
-    /** Offset to translate model to center position. */
+    /** Multiplicative inverses of the model scale */
+    readonly scaleInverseX: number; // = 1 / scaleX
+    readonly scaleInverseY: number; // = 1 / scaleY
+
+    /** Offsets to translate model to center position. */
     readonly offsetX: number;
     readonly offsetY: number;
 
@@ -93,13 +100,10 @@ export default class Live2DModel {
                 .catch(e => log(this.tag, e));
         }
 
-        this.width = internalModel.getCanvasWidth();
-        this.height = internalModel.getCanvasHeight();
-
         const layout = Object.assign(
             {
-                width: 2,
-                height: 2,
+                width: LOGICAL_WIDTH,
+                height: LOGICAL_HEIGHT,
                 centerX: 0,
                 centerY: 0,
             },
@@ -107,6 +111,10 @@ export default class Live2DModel {
         );
         this.logicalWidth = layout.width;
         this.logicalHeight = layout.height;
+        this.scaleInverseX = LOGICAL_WIDTH / layout.width;
+        this.scaleInverseY = LOGICAL_HEIGHT / layout.height;
+        this.width = internalModel.getCanvasWidth() / this.scaleInverseX;
+        this.height = internalModel.getCanvasHeight() / this.scaleInverseY;
         this.offsetX = layout.centerX - layout.width / 2;
         this.offsetY = layout.centerY - layout.height / 2;
 
@@ -204,8 +212,8 @@ export default class Live2DModel {
 
         model.update();
 
-        transform[12] += this.offsetX;
-        transform[13] -= this.offsetY;
+        transform[12] = (transform[12] + this.offsetX) * this.scaleInverseX;
+        transform[13] = (transform[13] - this.offsetY) * this.scaleInverseY;
         model.setMatrix(transform);
         model.draw();
     }

@@ -13,20 +13,24 @@ interface DraggableLive2DSprite extends Live2DSprite {
 }
 
 export default class Live2DPlayer extends Player {
-    gl: WebGLRenderingContext;
-
     readonly container = new Container();
     readonly sprites: Live2DSprite[] = [];
 
-    mouseHandler: MouseHandler;
+    mouseHandler!: MouseHandler;
 
     constructor(mka: Mka) {
         super();
 
-        this.gl = mka.gl;
+        Live2D.setGL(mka.gl);
 
-        Live2D.setGL(this.gl);
+        this.setupMouseHandler();
 
+        this.container.zIndex = Z_INDEX_LIVE2D;
+        this.container.sortableChildren = true;
+        mka.pixiApp.stage.addChild(this.container);
+    }
+
+    setupMouseHandler() {
         const self = this;
 
         this.mouseHandler = new (class extends MouseHandler {
@@ -37,13 +41,14 @@ export default class Live2DPlayer extends Player {
                 for (let i = self.container.children.length - 1; i >= 0; i--) {
                     // need to ensure the container only contains Live2DSprites
                     const sprite = self.container.children[i] as DraggableLive2DSprite;
+                    const bounds = sprite.getBounds(true);
 
                     sprite.model.focusController.focus(
-                        clamp(((x - sprite.x) / sprite.width) * 2 - 1, -1, 1),
-                        -clamp(((y - sprite.y) / sprite.height) * 2 - 1, -1, 1),
+                        clamp(((x - bounds.x) / bounds.width) * 2 - 1, -1, 1),
+                        -clamp(((y - bounds.y) / bounds.height) * 2 - 1, -1, 1),
                     );
 
-                    if (this.draggable && !oneHighlighted && sprite.getBounds().contains(x, y)) {
+                    if (this.draggable && !oneHighlighted && bounds.contains(x, y)) {
                         oneHighlighted = true;
                         sprite.highlight(true);
                     } else {
@@ -99,10 +104,6 @@ export default class Live2DPlayer extends Player {
                 }
             }
         })(MOUSE_HANDLING_ELEMENT);
-
-        this.container.zIndex = Z_INDEX_LIVE2D;
-        this.container.sortableChildren = true;
-        mka.pixiApp.stage.addChild(this.container);
     }
 
     async addSprite(file: string | string[]) {
@@ -121,7 +122,7 @@ export default class Live2DPlayer extends Player {
 
     /** @override */
     update() {
-        return true;
+        return this.container.children.length !== 0;
     }
 
     destroy() {

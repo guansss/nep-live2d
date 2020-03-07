@@ -26,10 +26,6 @@ class Live2DSprite extends Container {
         0, 0, 0, 1,
     ]);
 
-    /** The scale from WebGL's context size to model's logical size. */
-    drawingScaleX = 1;
-    drawingScaleY = 1;
-
     highlightCover?: Sprite;
 
     static async create(file: string | string[]) {
@@ -63,7 +59,10 @@ class Live2DSprite extends Container {
         if (enabled) {
             if (!this.highlightCover) {
                 this.highlightCover = new Sprite(Texture.WHITE);
+                this.highlightCover.width = this.model.width;
+                this.highlightCover.height = this.model.height;
                 this.highlightCover.alpha = 0.3;
+
                 this.addChild(this.highlightCover);
             }
             this.highlightCover.visible = true;
@@ -124,33 +123,24 @@ class Live2DSprite extends Container {
             (baseTexture as any).touched = renderer.textureGC.count;
         }
 
-        this.updateTransform();
-
-        this.drawingScaleX = this.model.logicalWidth / renderer.gl.drawingBufferWidth;
-        this.drawingScaleY = -this.model.logicalHeight / renderer.gl.drawingBufferHeight; // flip Y
+        const drawingScaleX = this.model.logicalWidth / renderer.gl.drawingBufferWidth;
+        const drawingScaleY = -this.model.logicalHeight / renderer.gl.drawingBufferHeight; // flip Y
 
         const wt = this.transform.worldTransform;
         const transform = this.modelTransform;
 
         // put sprite's 3x3 matrix into model's 4x4 matrix
-        transform[0] = wt.a * this.drawingScaleX;
-        transform[1] = wt.c * this.drawingScaleY;
-        transform[4] = wt.b * this.drawingScaleX;
-        transform[5] = wt.d * this.drawingScaleY;
-        transform[12] = wt.tx * this.drawingScaleX;
-        transform[13] = wt.ty * this.drawingScaleY;
+        transform[0] = wt.a * drawingScaleX;
+        transform[1] = wt.c * drawingScaleY;
+        transform[4] = wt.b * drawingScaleX;
+        transform[5] = wt.d * drawingScaleY;
+        transform[12] = wt.tx * drawingScaleX;
+        transform[13] = wt.ty * drawingScaleY;
 
         this.model.update(Ticker.delta, Ticker.now, transform);
 
         // reset the active texture because it's been changed by Live2D's drawing system
         renderer.gl.activeTexture(WebGLRenderingContext.TEXTURE0 + renderer.texture.currentLocation);
-
-        if (this.highlightCover && this.highlightCover.visible) {
-            this.highlightCover.x = this.x;
-            this.highlightCover.y = this.y;
-            this.highlightCover.width = this.width;
-            this.highlightCover.height = this.height;
-        }
     }
 }
 
