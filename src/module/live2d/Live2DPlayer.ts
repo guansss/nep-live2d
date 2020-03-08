@@ -21,8 +21,6 @@ export default class Live2DPlayer extends Player {
     constructor(mka: Mka) {
         super();
 
-        Live2D.setGL(mka.gl);
-
         this.setupMouseHandler();
 
         this.container.zIndex = Z_INDEX_LIVE2D;

@@ -96,7 +96,8 @@ class Live2DSprite extends Container {
         renderer.shader.reset();
         renderer.state.reset();
 
-        // set flip Y for Live2D textures
+        this.model.internalModel.drawParamWebGL.setGL(renderer.gl);
+        this.model.internalModel.drawParamWebGL.glno = (renderer as any).CONTEXT_UID;
 
         for (let i = 0, baseTexture; i < this.textures.length; i++) {
             baseTexture = this.textures[i].baseTexture;

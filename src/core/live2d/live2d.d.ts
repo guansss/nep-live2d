@@ -12,9 +12,11 @@ declare class Live2D {
 }
 
 declare class Live2DModelWebGL {
+    static loadModel(buffer: ArrayBuffer): Live2DModelWebGL;
+
     private constructor();
 
-    static loadModel(buffer: ArrayBuffer): Live2DModelWebGL;
+    drawParamWebGL: DrawParamWebGL;
 
     /**
      * @returns The width of model's Live2D drawing canvas but NOT the html canvas element.
@@ -57,6 +59,14 @@ declare class Live2DModelWebGL {
     update(): void;
 
     draw(): void;
+}
+
+// this class is not exposed from Live2D library, never use it outside
+declare class DrawParamWebGL {
+    gl: WebGLRenderingContext;
+    glno: number;
+
+    setGL(gl: WebGLRenderingContext): void;
 }
 
 declare class AMotion {
