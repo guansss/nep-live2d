@@ -48,17 +48,11 @@ export namespace ModelConfigUtils {
         const _config = toActualValues(config);
 
         if (!isNaN(_config.scale!)) {
-            const oldWidth = sprite.width;
-            const oldHeight = sprite.height;
-
             sprite.scale.x = sprite.scale.y = _config.scale!;
-
-            sprite.x -= (sprite.width - oldWidth) / 2;
-            sprite.y -= (sprite.height - oldHeight) / 2;
         }
 
-        if (!isNaN(_config.x!)) sprite.x = _config.x! - sprite.width / 2;
-        if (!isNaN(_config.y!)) sprite.y = _config.y! - sprite.height / 2;
+        if (!isNaN(_config.x!)) sprite.x = _config.x!;
+        if (!isNaN(_config.y!)) sprite.y = _config.y!;
         if (!isNaN(_config.order!)) sprite.zIndex = _config.order!;
     }
 }

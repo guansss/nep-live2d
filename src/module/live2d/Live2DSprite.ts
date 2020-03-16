@@ -1,7 +1,11 @@
 import Live2DModel from '@/core/live2d/Live2DModel';
 import Ticker from '@/core/mka/Ticker';
+import { log } from '@/core/utils/log';
+import { clamp } from '@/core/utils/math';
+import Live2DTransform from '@/module/live2d/Live2DTransform';
 import { Renderer, Texture } from '@pixi/core';
 import { Container } from '@pixi/display';
+import { Point } from '@pixi/math';
 import { Sprite } from '@pixi/sprite';
 
 interface Live2DSprite {
@@ -10,6 +14,8 @@ interface Live2DSprite {
     emit(event: 'motion', group: string, index: number): boolean;
 }
 
+const _point = new Point();
+
 class Live2DSprite extends Container {
     id!: number;
 
@@ -17,14 +23,7 @@ class Live2DSprite extends Container {
 
     texturesBound: boolean[];
 
-    // temporary 4x4 matrix
-    // prettier-ignore
-    modelTransform = new Float32Array([
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1,
-    ]);
+    transform: Live2DTransform; // override the type
 
     highlightCover?: Sprite;
 
@@ -35,6 +34,9 @@ class Live2DSprite extends Container {
 
     private constructor(public model: Live2DModel) {
         super();
+
+        this.transform = new Live2DTransform(model);
+        this.pivot.set(this.model.originalWidth / 2, this.model.originalHeight / 2);
 
         this.textures = model.modelSettings.textures.map(file =>
             Texture.from(file, { resourceOptions: { crossOrigin: true } }),
@@ -72,6 +74,23 @@ class Live2DSprite extends Container {
     }
 
     /**
+     * Makes the model focus on a point.
+     *
+     * @param x - The x position in world space.
+     * @param y - The y position in world space.
+     */
+    focus(x: number, y: number) {
+        _point.x = x;
+        _point.y = y;
+        this.toModelPosition(_point, _point);
+
+        this.model.focusController.focus(
+            clamp((_point.x / this.model.originalWidth) * 2 - 1, -1, 1),
+            -clamp((_point.y / this.model.originalHeight) * 2 - 1, -1, 1),
+        );
+    }
+
+    /**
      * Performs hit action on sprite.
      *
      * @param x - The x position in world space.
@@ -80,9 +99,31 @@ class Live2DSprite extends Container {
      * @fires Live2DSprite#hit
      */
     hit(x: number, y: number) {
-        this.model
-            .hitTest((x - this.position.x) / this.scale.x, (y - this.position.y) / this.scale.y)
-            .forEach(hitAreaName => this.emit('hit', hitAreaName));
+        _point.x = x;
+        _point.y = y;
+        this.toModelPosition(_point, _point);
+
+        this.model.hitTest(_point.x, _point.y).forEach(hitAreaName => {
+            log(this.model.tag, `Hit`, hitAreaName);
+            this.emit('hit', hitAreaName);
+        });
+    }
+
+    /**
+     * Gets the position in original (unscaled) Live2D model.
+     * @param position - The point in world space.
+     * @param point - The point to store new value.
+     */
+    toModelPosition(position: Point, point?: Point) {
+        point = point || new Point();
+
+        const transform = this.transform.worldTransform;
+        const model = this.model;
+
+        point.x = ((position.x - transform.tx) / transform.a - model.matrix.tx) / model.matrix.a;
+        point.y = ((position.y - transform.ty) / transform.d - model.matrix.ty) / model.matrix.d;
+
+        return point;
     }
 
     _calculateBounds() {
@@ -124,21 +165,8 @@ class Live2DSprite extends Container {
             (baseTexture as any).touched = renderer.textureGC.count;
         }
 
-        const drawingScaleX = this.model.logicalWidth / renderer.gl.drawingBufferWidth;
-        const drawingScaleY = -this.model.logicalHeight / renderer.gl.drawingBufferHeight; // flip Y
-
-        const wt = this.transform.worldTransform;
-        const transform = this.modelTransform;
-
-        // put sprite's 3x3 matrix into model's 4x4 matrix
-        transform[0] = wt.a * drawingScaleX;
-        transform[1] = wt.c * drawingScaleY;
-        transform[4] = wt.b * drawingScaleX;
-        transform[5] = wt.d * drawingScaleY;
-        transform[12] = wt.tx * drawingScaleX;
-        transform[13] = wt.ty * drawingScaleY;
-
-        this.model.update(Ticker.delta, Ticker.now, transform);
+        this.model.update(Ticker.delta, Ticker.now);
+        this.model.draw(this.transform.getDrawingMatrix(renderer.gl));
 
         // reset the active texture because it's been changed by Live2D's drawing system
         renderer.gl.activeTexture(WebGLRenderingContext.TEXTURE0 + renderer.texture.currentLocation);

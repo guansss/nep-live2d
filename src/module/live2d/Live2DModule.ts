@@ -267,13 +267,7 @@ export default class Live2DModule implements Module {
     }
 
     private savePosition(sprite: Live2DSprite) {
-        this.modifyModel(
-            sprite.id,
-            ModelConfigUtils.toStorageValues({
-                x: sprite.x + sprite.width / 2,
-                y: sprite.y + sprite.height / 2,
-            }),
-        );
+        this.modifyModel(sprite.id, ModelConfigUtils.toStorageValues({ x: sprite.x, y: sprite.y }));
     }
 
     private modifyModel(id: number, config: Partial<ModelConfig>) {

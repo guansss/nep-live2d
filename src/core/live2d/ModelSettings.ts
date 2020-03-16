@@ -5,6 +5,19 @@ import set from 'lodash/set';
 import { basename, dirname } from 'path';
 import { resolve as urlResolve } from 'url';
 
+export interface Layout {
+    width?: number;
+    height?: number;
+    x?: number;
+    y?: number;
+    centerX?: number;
+    centerY?: number;
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+}
+
 export interface MotionDefinition {
     readonly name?: string;
 
@@ -49,7 +62,7 @@ export default class ModelSettings {
     readonly textures: string[] = [];
 
     // metadata
-    readonly layout?: { [id: string]: number };
+    readonly layout?: Layout;
     readonly hitAreas?: { name: string; id: string }[];
     readonly initParams?: [{ id: string; value: number }];
     readonly initOpacities?: [{ id: string; value: number }];
@@ -163,7 +176,7 @@ export default class ModelSettings {
             // copy only the number properties
             for (const [key, value] of Object.entries(json.layout)) {
                 if (!isNaN(value as number)) {
-                    this.layout[key] = value as number;
+                    (this.layout as any)[key] = value;
                 }
             }
         }

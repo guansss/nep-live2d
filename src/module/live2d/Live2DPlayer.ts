@@ -1,6 +1,5 @@
 import Mka from '@/core/mka/Mka';
 import Player from '@/core/mka/Player';
-import { clamp } from '@/core/utils/math';
 import { Z_INDEX_LIVE2D } from '@/defaults';
 import Live2DSprite from '@/module/live2d/Live2DSprite';
 import MouseHandler from '@/module/live2d/MouseHandler';
@@ -38,15 +37,11 @@ export default class Live2DPlayer extends Player {
                 // start focusing and hover testing by the z order, from top to bottom
                 for (let i = self.container.children.length - 1; i >= 0; i--) {
                     // need to ensure the container only contains Live2DSprites
-                    const sprite = self.container.children[i] as DraggableLive2DSprite;
-                    const bounds = sprite.getBounds(true);
+                    const sprite = self.container.children[i] as Live2DSprite;
 
-                    sprite.model.focusController.focus(
-                        clamp(((x - bounds.x) / bounds.width) * 2 - 1, -1, 1),
-                        -clamp(((y - bounds.y) / bounds.height) * 2 - 1, -1, 1),
-                    );
+                    sprite.focus(x, y);
 
-                    if (this.draggable && !oneHighlighted && bounds.contains(x, y)) {
+                    if (this.draggable && !oneHighlighted && sprite.getBounds(true).contains(x, y)) {
                         oneHighlighted = true;
                         sprite.highlight(true);
                     } else {
@@ -65,7 +60,11 @@ export default class Live2DPlayer extends Player {
                 // TODO: Don't do this here!
                 if (self.mka) self.mka.pixiApp.stage.emit('hit', x, y);
 
-                self.sprites.forEach(sprite => sprite.hit(x, y));
+                self.sprites.forEach(sprite => {
+                    if (sprite.getBounds(true).contains(x, y)) {
+                        sprite.hit(x, y);
+                    }
+                });
             }
 
             dragStart(x: number, y: number) {
@@ -74,7 +73,7 @@ export default class Live2DPlayer extends Player {
                     // need to ensure the container only contains Live2DSprites
                     const sprite = self.container.children[i] as DraggableLive2DSprite;
 
-                    if (sprite.getBounds().contains(x, y)) {
+                    if (sprite.getBounds(true).contains(x, y)) {
                         sprite.dragging = true;
 
                         // break it so only one sprite will be dragged

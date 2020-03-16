@@ -78,7 +78,7 @@ declare module '@pixi/mesh' {
 }
 
 declare module '@pixi/math' {
-    export { Matrix, Point, Rectangle, Bounds } from 'pixi.js';
+    export { Matrix, Point, Rectangle, Bounds, Transform } from 'pixi.js';
 }
 
 /**

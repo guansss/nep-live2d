@@ -7,9 +7,18 @@ import ModelSettings from '@/core/live2d/ModelSettings';
 import MotionManager from '@/core/live2d/MotionManager';
 import { log } from '@/core/utils/log';
 import { randomID } from '@/core/utils/string';
+import { Matrix } from '@pixi/math';
 
 export const LOGICAL_WIDTH = 2;
 export const LOGICAL_HEIGHT = 2;
+
+// prettier-ignore
+const tempMatrixArray = new Float32Array([
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
+]);
 
 export default class Live2DModel {
     tag = 'Live2DModel(uninitialized)';
@@ -21,20 +30,13 @@ export default class Live2DModel {
     physics?: Live2DPhysics;
     pose?: Live2DPose;
 
+    readonly originalWidth: number;
+    readonly originalHeight: number;
+
     readonly width: number;
     readonly height: number;
 
-    /** Logical size in Live2D drawing, typically equals to 2 */
-    readonly logicalWidth: number;
-    readonly logicalHeight: number;
-
-    /** Multiplicative inverses of the model scale */
-    readonly scaleInverseX: number; // = 1 / scaleX
-    readonly scaleInverseY: number; // = 1 / scaleY
-
-    /** Offsets to translate model to center position. */
-    readonly offsetX: number;
-    readonly offsetY: number;
+    matrix = new Matrix();
 
     focusController = new FocusController();
 
@@ -104,19 +106,33 @@ export default class Live2DModel {
             {
                 width: LOGICAL_WIDTH,
                 height: LOGICAL_HEIGHT,
-                centerX: 0,
-                centerY: 0,
             },
             modelSettings.layout,
         );
-        this.logicalWidth = layout.width;
-        this.logicalHeight = layout.height;
-        this.scaleInverseX = LOGICAL_WIDTH / layout.width;
-        this.scaleInverseY = LOGICAL_HEIGHT / layout.height;
-        this.width = internalModel.getCanvasWidth() / this.scaleInverseX;
-        this.height = internalModel.getCanvasHeight() / this.scaleInverseY;
-        this.offsetX = layout.centerX - layout.width / 2;
-        this.offsetY = layout.centerY - layout.height / 2;
+
+        this.originalWidth = internalModel.getCanvasWidth();
+        this.originalHeight = internalModel.getCanvasHeight();
+
+        this.matrix.scale(layout.width / LOGICAL_WIDTH, layout.height / LOGICAL_HEIGHT);
+
+        this.width = this.originalWidth * this.matrix.a;
+        this.height = this.originalHeight * this.matrix.d;
+
+        // multiply the offset by model's width and height, this calculation differs from Live2D SDK
+        this.matrix.translate(
+            this.width *
+            ((layout.x !== undefined && layout.x - layout.width / 2) ||
+                layout.centerX ||
+                (layout.left !== undefined && layout.left - layout.width / 2) ||
+                (layout.right !== undefined && layout.right + layout.width / 2) ||
+                0),
+            -this.height *
+            ((layout.y !== undefined && layout.y - layout.height / 2) ||
+                layout.centerY ||
+                (layout.top !== undefined && layout.top - layout.height / 2) ||
+                (layout.bottom !== undefined && layout.bottom + layout.height / 2) ||
+                0),
+        );
 
         if (modelSettings.initParams) {
             modelSettings.initParams.forEach(({ id, value }) => internalModel.setParamFloat(id, value));
@@ -149,8 +165,6 @@ export default class Live2DModel {
      * @returns The names of hit areas that have passed the test.
      */
     hitTest(x: number, y: number): string[] {
-        log(this.tag, `Hit (${x}, ${y})`);
-
         if (this.internalModel && this.modelSettings.hitAreas) {
             return this.modelSettings.hitAreas
                 .filter(({ name, id }) => {
@@ -158,9 +172,9 @@ export default class Live2DModel {
 
                     if (drawIndex >= 0) {
                         const points = this.internalModel.getTransformedPoints(drawIndex);
-                        let left = this.internalModel.getCanvasWidth();
+                        let left = this.originalWidth;
                         let right = 0;
-                        let top = this.internalModel.getCanvasHeight();
+                        let top = this.originalHeight;
                         let bottom = 0;
 
                         for (let i = 0; i < points.length; i += 2) {
@@ -182,7 +196,7 @@ export default class Live2DModel {
         return [];
     }
 
-    update(dt: DOMHighResTimeStamp, now: DOMHighResTimeStamp, transform: Float32Array) {
+    update(dt: DOMHighResTimeStamp, now: DOMHighResTimeStamp) {
         const model = this.internalModel;
 
         model.loadParam();
@@ -211,10 +225,18 @@ export default class Live2DModel {
         this.pose && this.pose.update(dt);
 
         model.update();
+    }
 
-        transform[12] = (transform[12] + this.offsetX) * this.scaleInverseX;
-        transform[13] = (transform[13] - this.offsetY) * this.scaleInverseY;
-        model.setMatrix(transform);
-        model.draw();
+    draw(matrix: Matrix) {
+        // set given 3x3 matrix into a 4x4 matrix, with Y inverted
+        tempMatrixArray[0] = matrix.a;
+        tempMatrixArray[1] = -matrix.c;
+        tempMatrixArray[4] = matrix.b;
+        tempMatrixArray[5] = -matrix.d;
+        tempMatrixArray[12] = matrix.tx;
+        tempMatrixArray[13] = -matrix.ty;
+
+        this.internalModel.setMatrix(tempMatrixArray);
+        this.internalModel.draw();
     }
 }
