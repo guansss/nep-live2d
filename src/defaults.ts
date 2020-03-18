@@ -33,7 +33,7 @@ export const THEMES: Theme[] = [
                 file: 'neptune/neptune.model.json',
                 scale: 0.0004141,
                 x: 0.75,
-                y: 0.6,
+                y: 0.55,
                 order: 0,
             },
         ],
@@ -52,7 +52,7 @@ export const THEMES: Theme[] = [
                 file: 'neptune/neptune.model.json',
                 scale: 0.0004141,
                 x: 0.75,
-                y: 0.6,
+                y: 0.55,
                 order: 0,
             },
         ],
@@ -71,15 +71,15 @@ export const THEMES: Theme[] = [
                 file: 'nepsanta/nepsanta.model.json',
                 scale: 0.0004141,
                 x: 0.75,
-                y: 0.6,
+                y: 0.55,
                 order: 0,
             },
         ],
     },
 ];
 
-// A basis to divide the saved index of selected theme between built-in themes and custom themes. Avoid using a unified
-//  index for both built-in and custom themes because the amount of built-in themes may increase in future updates.
+// A basis to divide the saved indices of selected theme between built-in themes and custom themes. Avoid using unified
+//  indices for both built-in and custom themes because the amount of built-in themes may increase in future updates.
 export const THEME_CUSTOM_OFFSET = 100;
 
 export const BACKGROUNDS = THEMES.map(theme => theme.bg.src);
