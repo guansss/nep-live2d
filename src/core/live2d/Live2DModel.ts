@@ -122,13 +122,13 @@ export default class Live2DModel {
         this.matrix.translate(
             this.width *
             ((layout.x !== undefined && layout.x - layout.width / 2) ||
-                layout.centerX ||
+                (layout.centerX !== undefined && layout.centerX) ||
                 (layout.left !== undefined && layout.left - layout.width / 2) ||
                 (layout.right !== undefined && layout.right + layout.width / 2) ||
                 0),
             -this.height *
             ((layout.y !== undefined && layout.y - layout.height / 2) ||
-                layout.centerY ||
+                (layout.centerY !== undefined && layout.centerY) ||
                 (layout.top !== undefined && layout.top - layout.height / 2) ||
                 (layout.bottom !== undefined && layout.bottom + layout.height / 2) ||
                 0),
