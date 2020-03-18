@@ -131,10 +131,11 @@ export default class EffectsSettings extends Vue {
         font-weight bold
 
         &.important
-            font-size 120%
+            font-size 200%
             color var(--accentColor)
 
     .content
+        font-size 110%
         white-space pre-wrap
 
 .credit
