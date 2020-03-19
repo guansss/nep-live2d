@@ -135,6 +135,9 @@ export default class ModelSettings {
             throw new TypeError('Invalid JSON.');
         }
 
+        // set default name to folder's name
+        this.name = basename(basePath);
+
         this.copy(cloneWithCamelCase(json));
         this.adaptLegacy();
 

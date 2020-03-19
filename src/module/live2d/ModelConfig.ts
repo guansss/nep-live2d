@@ -55,4 +55,17 @@ export namespace ModelConfigUtils {
         if (!isNaN(_config.y!)) sprite.y = _config.y!;
         if (!isNaN(_config.order!)) sprite.zIndex = _config.order!;
     }
+
+    /**
+     * Makes a Live2D model path using the name of its model settings file.
+     *
+     * @example
+     * makeModelPath('neptune.model.json')
+     * // => 'neptune/neptune.model.json'
+     */
+    export function makeModelPath(fileName: string) {
+        const separatorIndex = fileName.indexOf('.');
+        const dir = fileName.slice(0, separatorIndex > 0 ? separatorIndex : undefined);
+        return `${dir}/${fileName}`;
+    }
 }

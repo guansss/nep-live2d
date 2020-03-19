@@ -1,20 +1,22 @@
 <template>
     <div class="file-input">
         <input :multiple="multiple" type="file" :accept="accept" :webkitdirectory="directory" @change="change" />
-        <PlusSVG class="svg" />
+        <FolderPlusSVG v-if="directory" class="svg" />
+        <FilePlusSVG v-else class="svg" />
     </div>
 </template>
 
 <script lang="ts">
-import PlusSVG from '@/assets/img/plus.svg';
+import FilePlusSVG from '@/assets/img/file-plus.svg';
+import FolderPlusSVG from '@/assets/img/folder-plus.svg';
 import Vue from 'vue';
 import { Component, Model, Prop } from 'vue-property-decorator';
 
 @Component({
-    components: { PlusSVG },
+    components: { FilePlusSVG, FolderPlusSVG },
 })
 export default class FileInput extends Vue {
-    @Model('change', { default: undefined }) readonly files!: File[] | File | null;
+    @Model('change', { default: undefined }) readonly files!: File[];
 
     @Prop({ default: false, type: Boolean }) readonly multiple!: boolean;
     @Prop({ default: false, type: Boolean }) readonly directory!: boolean;
@@ -22,9 +24,9 @@ export default class FileInput extends Vue {
 
     change(e: Event) {
         const input = e.target as HTMLInputElement;
-        const files = input.files || [];
 
-        this.$emit('change', this.multiple ? [...files] : files[0] || null);
+        // always return an array regardless of `multiple` option
+        this.$emit('change', input.files ? [...input.files] : []);
 
         // reset the input, otherwise its "change" event will never be triggered when user selects same file(s) again
         input.value = '';

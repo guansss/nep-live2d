@@ -2,10 +2,11 @@
     <div class="model">
         <transition-group class="list" name="move">
             <div class="actions" key="(unused but required by transition-group)">
-                <div :class="['action general', { selected: selectedIndex === -1 }]" @click="selectedIndex = -1">
+                <div :class="['action top', { selected: selectedIndex === -1 }]" @click="selectedIndex = -1">
                     <TuneSVG class="icon" />
                 </div>
-                <FileInput directory multiple class="action" v-model="modelFiles" />
+                <FileInput class="action left" accept=".json" v-model="modelInputFiles" />
+                <FileInput directory multiple class="action right" v-model="modelInputFiles" />
             </div>
 
             <LongClickAction
@@ -194,7 +195,7 @@ export default class CharacterSettings extends Vue {
 
     models: ModelEntity[] = [];
 
-    modelFiles: File[] | null = null;
+    modelInputFiles: File[] = [];
 
     selectedIndex = -1;
 
@@ -230,14 +231,22 @@ export default class CharacterSettings extends Vue {
         return language ? language.name : '';
     }
 
-    @Watch('modelFiles')
-    modelFileChanged(files: File[] | null) {
-        if (files && files.length > 0 && 'webkitRelativePath' in files[0]) {
+    @Watch('modelInputFiles')
+    modelInputFilesChanged(files: File[]) {
+        if (files.length > 0) {
             if (files.length <= 300) {
-                this.configModule.app.emit(
-                    'live2dAdd',
-                    files.map(f => f.webkitRelativePath),
-                );
+                if (files.length === 1) {
+                    this.configModule.app.emit('live2dAdd', ModelConfigUtils.makeModelPath(files[0].name));
+                } else if ('webkitRelativePath' in files[0]) {
+                    this.configModule.app.emit(
+                        'live2dAdd',
+                        files.map(f => f.webkitRelativePath),
+                    );
+                } else {
+                    console.error(
+                        'Failed to select files because directory selection is not supported by current browser.',
+                    );
+                }
             } else {
                 this.$emit('dialog', this.$t('files_exceed_limit') + ` (${files.length}/300)`);
             }
@@ -440,24 +449,33 @@ $selectableCard
         cursor default
 
 .actions
-    display flex
     margin 8px 0 0 8px
     width $itemSize
     height $itemSize
-    flex-flow column
+    font-size 0 // to remove the gap between inline-blocks
 
     .action
+        display inline-block
         @extend $selectableCard
-        flex 1 0 0
+        border 2px solid transparent
+
+    .top
+        margin-bottom 8px
+        width $itemSize
+        height (($itemSize - 8) / 2)
         padding 8px
 
-        &.general
-            margin-bottom 8px
-            border 2px solid transparent
+    .left, .right
+        width (($itemSize - 8) / 2)
+        height @width
+        padding 16px
 
-        .icon
-            width 100%
-            height 100%
+    .left
+        margin-right 8px
+
+    .icon
+        width 100%
+        height 100%
 
 .list
     display flex
