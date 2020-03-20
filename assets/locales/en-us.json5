@@ -1,18 +1,21 @@
 {
   // ===================================================================================================================
   // these logs should only be updated by the project maintainer, please do NOT put them in languages other than English and Chinese
+  "changelog_important": "\
+Due to some changes in coordinate calculation, some Live2D models will offset to incorrect positions, you may need to reposition them. Sorry for the inconvenience.\
+Any regular model of Live2D 2.1 is now supported to import by folder.\n\n\
+For more information about using custom models, please visit the Workshop page.",
   "changelog_logs": [
-    "Optimized layout of background list",
-    "Optimized display of Live2D loading errors",
-    "Changed scrollbar to be static",
-    "Added Toggle Menu option",
-    "Added Reset Settings option",
-    "Added safe area mode",
-    "Added in-app changelog",
-    "Fixed only morning greetings would be made",
-    "Fixed greeting subtitles sometimes stuck to default language on startup",
-    "Fixed dragging offset in high resolutions",
-    "Fixed loading Live2D model would be endless when the file is not found"
+    "Supports importing Live2D model by folder",
+    "Supports newer Live2D models of Neptunia series",
+    "Highlights Live2D models when dragging",
+    "Copies to clipboard when dumping logs and storage",
+    "Removed layout offset of built-in Live2D models",
+    "Added French subtitles contributed by Lord Lionnel",
+    "Added auto backup for configs",
+    "Fixed discontinuous animation after resuming",
+    "Fixed texture errors occur when using Live2D models that have single texture",
+    "Fixed incorrect layout of Live2D models"
   ],
   // ===================================================================================================================
 
