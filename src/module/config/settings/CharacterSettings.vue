@@ -159,13 +159,21 @@ class ModelEntity {
     }
 
     constructor(config: ModelConfig) {
-        this.file = Array.isArray(config.file)
-            ? config.file.length > 0
-                ? config.file[0].replace(/\/.*/, '')
-                : '<EMPTY>'
-            : config.file;
-
-        this.name = basename(this.file).replace(/\.(moc|json|model\.json)/, '');
+        if (Array.isArray(config.file)) {
+            if (config.file.length > 0) {
+                this.file =
+                    config.file.find(f => f.endsWith('.model.json')) ||
+                    config.file.find(f => f.endsWith('.moc')) ||
+                    'None';
+                this.name = config.file[0].replace(/\/.*/, ''); // take folder's name
+            } else {
+                this.file = 'None';
+                this.name = 'Unknown';
+            }
+        } else {
+            this.file = config.file;
+            this.name = basename(this.file).replace(/\.(json|model\.json)/, '');
+        }
 
         this.updateConfig(config);
     }
