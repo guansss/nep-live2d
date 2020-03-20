@@ -10,8 +10,8 @@ const TRANSFORM_EASING = 'cubic-bezier(0.4, 0.0, 0.2, 1)';
 const SNAP_DISTANCE_X = 150;
 const SNAP_DISTANCE_Y = 150;
 
-const PANEL_WIDTH = Math.min(600, SafeArea.area.width);
-const PANEL_HEIGHT = Math.min(450, SafeArea.area.height);
+const PANEL_WIDTH = Math.min(640, SafeArea.area.width);
+const PANEL_HEIGHT = Math.min(470, SafeArea.area.height);
 
 @Component
 export default class FloatingPanelMixin extends Vue {
