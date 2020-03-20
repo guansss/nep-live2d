@@ -468,7 +468,7 @@ $selectableCard
     .left, .right
         width (($itemSize - 8) / 2)
         height @width
-        padding 16px
+        padding 18px
 
     .left
         margin-right 8px
