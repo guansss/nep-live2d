@@ -33,6 +33,8 @@ export async function postJSON(url: string, json: any) {
 export async function getArrayBuffer(url: string) {
     const arrayBuffer = await request<ArrayBuffer>(url, { responseType: 'arraybuffer' });
 
+    if (!arrayBuffer) throw new TypeError('Empty response');
+
     log(TAG, `[${url}] (ArrayBuffer[${arrayBuffer.byteLength}])`);
 
     return arrayBuffer;
