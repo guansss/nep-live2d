@@ -1,11 +1,10 @@
 import { SEASONS } from '@/defaults';
-import { Config } from '../config/ConfigModule';
 import Live2DSprite from '../live2d/Live2DSprite';
 
 const activeSeason = SEASONS.find(season => season.active);
 const activeSeasonValue = activeSeason && activeSeason.value;
 
-export default function greet(sprite: Live2DSprite, config: Config) {
+export default function greet(sprite: Live2DSprite) {
     const definitions = sprite.model.motionManager.definitions['greet'];
 
     if (definitions && definitions.length !== 0) {

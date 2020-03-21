@@ -22,12 +22,17 @@ export default class Live2DEventModule implements Module {
             }
         });
 
-        app.on('configReady', (config: Config) => (this.config = config));
+        app.on('configReady', (config: Config) => {
+            this.config = config;
+            app.emit('config', 'live2d.greet', true, true);
+        });
     }
 
     processSprite(sprite: Live2DSprite) {
         registerHitEvent(sprite);
 
-        this.config && greet(sprite, this.config);
+        if (this.config && this.config.get('live2d.greet', false)) {
+            greet(sprite);
+        }
     }
 }
