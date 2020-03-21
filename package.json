@@ -1,6 +1,6 @@
 {
   "name": "nep-live2d",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Live2D wallpaper for Neptune",
   "main": "index.js",
   "repository": "https://github.com/guansss/nep-live2d.git",
