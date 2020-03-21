@@ -11,6 +11,7 @@ import CharacterSettings from '@/module/config/settings/CharacterSettings.vue';
 import ConsoleSettings from '@/module/config/settings/ConsoleSettings.vue';
 import EffectsSettings from '@/module/config/settings/EffectsSettings.vue';
 import GeneralSettings from '@/module/config/settings/GeneralSettings.vue';
+import versionLessThan from 'semver/functions/lt';
 import { Component, Mixins, Prop, Ref } from 'vue-property-decorator';
 import { Vue } from 'vue/types/vue';
 
@@ -71,9 +72,15 @@ export default class SettingsPanel extends Mixins(FloatingPanelMixin) {
                 if (!prevVersion) {
                     // show tip at first launch
                     this.title = process.env.NAME;
-                } else if (I18N[LOCALE]['changelog_important']) {
-                    this.selectPage(this.pages.indexOf(AboutSettings));
-                    this.open();
+                } else {
+                    // test the specific version of important changes
+                    const changes = I18N[LOCALE]['changelog_important'] as string | undefined;
+                    const version = changes && changes.substring(0, changes.indexOf('\n'));
+
+                    if (version && versionLessThan(prevVersion, version)) {
+                        this.selectPage(this.pages.indexOf(AboutSettings));
+                        this.open();
+                    }
                 }
             })
             .on('we:switch', this.toggle, this);

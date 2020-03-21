@@ -1,7 +1,7 @@
 {
   // ===================================================================================================================
   // these logs should only be updated by the project maintainer, please do NOT put them in languages other than English and Chinese
-  "changelog_important": "\
+  "changelog_important": "2.1.0\n\
 Due to some changes in coordinate calculation, some Live2D models will offset to incorrect positions, you may need to reposition them. Sorry for the inconvenience.\
 Any regular model of Live2D 2.1 is now supported to import by folder.\n\n\
 For more information about using custom models, please visit the Workshop page.",
@@ -107,7 +107,7 @@ For more information about using custom models, please visit the Workshop page."
 
   // about
   "subtitle": "The Ultimate Live2D Wallpaper",
-  "important_changes": "Important Changes in v{VERSION}",
+  "important_changes": "Important Changes",
   "changelog": "Changelog v{VERSION}",
   "desc": "For tutorial and more information, please visit the Workshop page."
 }

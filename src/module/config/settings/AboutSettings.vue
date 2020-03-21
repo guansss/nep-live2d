@@ -10,9 +10,9 @@
 
         <div class="desc">{{ $t('desc') }}</div>
 
-        <div v-if="$t('changelog_important')" class="changelog">
-            <div class="title important">{{ $t('important_changes') }}</div>
-            <div class="content">{{$t('changelog_important')}}</div>
+        <div v-if="importantChanges" class="changelog">
+            <div class="title important">{{ $t('important_changes') + ' v' + importantChangesVersion }}</div>
+            <div class="content">{{ importantChanges }}</div>
         </div>
 
         <div class="changelog">
@@ -56,6 +56,22 @@ export default class EffectsSettings extends Vue {
     time = new Date(process.env.BUILT_TIME!).toLocaleDateString();
 
     counter = 0; // :P
+
+    importantChanges = '';
+    importantChangesVersion = '';
+
+    created() {
+        const importantChanges = this.$t('changelog_important') as string | undefined;
+
+        if (importantChanges) {
+            let index = importantChanges.indexOf('\n');
+
+            if (index === -1) index = 0;
+
+            this.importantChangesVersion = importantChanges.slice(0, index);
+            this.importantChanges = importantChanges.slice(index + 1);
+        }
+    }
 }
 </script>
 
