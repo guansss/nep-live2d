@@ -16,6 +16,8 @@ interface Live2DSprite {
 
 const _point = new Point();
 
+let glContextID = -1;
+
 class Live2DSprite extends Container {
     id!: number;
 
@@ -34,6 +36,8 @@ class Live2DSprite extends Container {
 
     private constructor(public model: Live2DModel) {
         super();
+
+        this.model.internalModel.getModelContext().clipManager.curFrameNo = glContextID;
 
         this.transform = new Live2DTransform(model);
         this.pivot.set(this.model.originalWidth / 2, this.model.originalHeight / 2);
@@ -139,6 +143,14 @@ class Live2DSprite extends Container {
 
         this.model.internalModel.drawParamWebGL.setGL(renderer.gl);
         this.model.internalModel.drawParamWebGL.glno = (renderer as any).CONTEXT_UID;
+
+        // a temporary workaround for the frame buffers
+        if ((renderer as any).CONTEXT_UID !== glContextID) {
+            glContextID = (renderer as any).CONTEXT_UID;
+            const clipManager = this.model.internalModel.getModelContext().clipManager;
+            clipManager.curFrameNo = glContextID;
+            clipManager.getMaskRenderTexture();
+        }
 
         for (let i = 0, baseTexture; i < this.textures.length; i++) {
             baseTexture = this.textures[i].baseTexture;
